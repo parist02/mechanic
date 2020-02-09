@@ -48,6 +48,7 @@ public class PrintPreview {
         labelTitle.setId("title");
 
         Label labelCompany7=new Label("Invoice No.:");
+    
         Label labelCompany8=new Label("123456");
         Label labelCompany9=new Label("Date:");
         Label labelCompany10=new Label("D/MMM/YYYY");

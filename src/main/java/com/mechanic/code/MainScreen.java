@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -38,6 +39,7 @@ public class MainScreen extends Application{
         Button buttonForm=new Button("Show form");
         buttonForm.setPadding(padding);
         buttonForm.setFont(font);
+        
         Label labelInvoice=new Label("Press the button to show the print form");
         labelInvoice.setPadding(padding);
         labelInvoice.setFont(font);
@@ -54,6 +56,7 @@ public class MainScreen extends Application{
         tabPane.getTabs().add(tab1);
         tabPane.getTabs().add(tab2);
         tabPane.getTabs().add(tab3);
+        tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 
         Scene scene=new Scene(tabPane);
         stage.setScene(scene);

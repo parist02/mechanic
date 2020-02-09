@@ -81,7 +81,7 @@ public class Form{
           grid.add(box,0,4,2,1);
           grid.setGridLinesVisible(false);
           final Scene scene=new Scene(grid);
-          scene.getStylesheets().add("stylemain.css");
+          scene.getStylesheets().add("stylesheets.css");
           stageForm.setScene(scene);
           stageForm.setTitle("Form");
     }
