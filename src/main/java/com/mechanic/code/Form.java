@@ -35,7 +35,7 @@ public class Form{
           final Label labelTitle=new Label("Form");
           labelTitle.setPadding(padding);
           labelTitle.setFont(Font.font("Arial",FontWeight.BOLD,FontPosture.REGULAR,20));
-  
+
   
           //TextFields
           final TextField textFieldName=new TextField();
