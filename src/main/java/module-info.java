@@ -1,4 +1,5 @@
 module com.mechanic.code {
-    requires javafx.controls;
+    requires transitive javafx.graphics;
+    requires transitive javafx.controls;
     exports com.mechanic.code;
 }

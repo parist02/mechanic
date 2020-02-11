@@ -1,5 +1,6 @@
 .root {
     -fx-padding: 5, 5, 5, 5;
+    padding: 5,5,5,5;
     
     
 }
@@ -7,9 +8,13 @@
 
 #grid{
     -fx-font-family: Arial;
+    font-family: Arial;
     -fx-font-size: 12;
+    font-size: 12;
     -fx-padding: 5,5,5,5;
+    padding: 5,5,5,5;
     -fx-font-weight: bold;
+    font-weight: bold;
     -fx-vgap: 5;
     -fx-hgap: 5;
     -fx-grid-lines-visible: false;
@@ -17,22 +22,35 @@
 
 #label1 {
     -fx-font-family: Arial;
-
+    font-family: Arial;
     -fx-font-size: 12;
+    font-size: 12;
+    font-family: Arial;
     -fx-padding: 5,5,5,5;
+    padding: 5,5,5,5;
 }
 #label2{
     -fx-font-family: Arial;
+    font-family: Arial;
     -fx-font-size: 12;
-    -fx-font-weight: bold;
+    font-size: 12;
+    font-family: Arial;
     -fx-padding: 5,5,5,5;
+    padding: 5,5,5,5;
+    -fx-fontweight: bold;
+    font-weight: bold;
 }
 
 #title{
     -fx-font-family: Arial;
+    font-family: Arial;
     -fx-font-size: 22;
-    -fx-font-weight: bold;
+    font-size: 22;
+    font-family: Arial;
     -fx-padding: 5,5,5,5;
+    padding: 5,5,5,5;
+    -fx-fontweight: bold;
+    font-weight: bold;
 }
 
 

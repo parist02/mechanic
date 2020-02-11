@@ -51,6 +51,7 @@ public class Form{
           //Button
           final Button buttonPrint =new Button("Print");
           buttonPrint.setPadding(padding);
+           
           final Button buttonCancel=new Button("Cancel");
           buttonCancel.setPadding(padding);
           buttonCancel.setOnAction(e->{
@@ -58,7 +59,7 @@ public class Form{
               exit(0);
           });
           buttonPrint.setOnAction(e->{
-              final PrintPreview printPreview=new PrintPreview(textFieldName.getText(),textFieldSurname.getText(),textFieldCarNumbers.getText());
+              final InvoicePrintPreview printPreview=new InvoicePrintPreview(textFieldName.getText(),textFieldSurname.getText(),textFieldCarNumbers.getText());
               printPreview.stagePrint.show();
           });
   
@@ -81,7 +82,7 @@ public class Form{
           grid.add(box,0,4,2,1);
           grid.setGridLinesVisible(false);
           final Scene scene=new Scene(grid);
-          scene.getStylesheets().add("stylesheets.css");
+          scene.getStylesheets().add("com.mechanic/style.css");
           stageForm.setScene(scene);
           stageForm.setTitle("Form");
     }

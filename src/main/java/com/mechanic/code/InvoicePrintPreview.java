@@ -1,28 +1,18 @@
 package com.mechanic.code;
-
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.print.PageLayout;
 import javafx.print.Paper;
-import javafx.print.Printer;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 
-public class PrintPreview {
+public class InvoicePrintPreview {
     public Stage stagePrint=new Stage();
     public static javafx.geometry.Insets padding = new Insets(20, 20, 20, 20);
     public static javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
@@ -30,7 +20,7 @@ public class PrintPreview {
     private static double width=Paper.A4.getWidth();
 
 
-    public PrintPreview(String name, String surname, String carNumbers) {
+    public InvoicePrintPreview(String name, String surname, String carNumbers) {
 
         //1st Part
         Label labelCompany1=new Label("M.B.A LTD");
@@ -129,6 +119,7 @@ public class PrintPreview {
         gridCustomer3.add(labelCustomer11,0,3);
         gridCustomer3.add(labelCustomer11_1, 1, 3);
         gridCustomer3.setId("grid");
+    
 
 
         // VBox boxCustomer3=new VBox(labelCustomer8,labelCustomer9,labelCustomer10,labelCustomer11);
@@ -186,7 +177,7 @@ public class PrintPreview {
 
         VBox boxMain=new VBox(grid,buttonPrint);
         Scene scene=new Scene(boxMain);
-        scene.getStylesheets().add("stylesheets.css");
+        scene.getStylesheets().add("syle.css");
         stagePrint.setScene(scene);
 
     }
