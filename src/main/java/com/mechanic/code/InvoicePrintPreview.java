@@ -171,6 +171,7 @@ public class InvoicePrintPreview {
         grid.setAlignment(Pos.TOP_CENTER);
         Print print=new Print(grid);
         Button buttonPrint=new Button("Print");
+        
         buttonPrint.setOnAction(e->{
             print.print();
         });
