@@ -81,10 +81,10 @@ public class Form{
           buttonCancel.setAlignment(Pos.BASELINE_RIGHT);
           grid.add(box,0,4,2,1);
           grid.setGridLinesVisible(false);
-          final Scene scene=new Scene(grid);
-          scene.getStylesheets().add("com.mechanic/style.css");
-          stageForm.setScene(scene);
-          stageForm.setTitle("Form");
+        final Scene scene=new Scene(grid);
+        scene.getStylesheets().add("com.mechanic/style.css");
+        stageForm.setScene(scene);
+        stageForm.setTitle("Form");
     }
 
     public void showForm(){

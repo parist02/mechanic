@@ -29,6 +29,7 @@ public class InvoicePrintPreview {
         Label labelCompany4=new Label("Fax: 22317441");
         Label labelCompany5=new Label("VAT Reg.: 10091591L");
         Label labelCompany6=new Label("TAX REG.: 12091591N");
+                    
 
         VBox boxCompany=new VBox(labelCompany1,labelCompany2,labelCompany3,labelCompany4,labelCompany5,labelCompany6);
         boxCompany.setId("label1");
