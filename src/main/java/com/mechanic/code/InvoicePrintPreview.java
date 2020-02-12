@@ -10,6 +10,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 public class InvoicePrintPreview {
@@ -142,16 +143,40 @@ public class InvoicePrintPreview {
         boxComments.setId("label2");
         boxComments.setSpacing(5);
 
-        Label labelTotal1=new Label("Amount:   €1234.123");
-        Label labelTotal2=new Label("Discount: €1234.123");
-        Label labelTotal3=new Label("Net:      €1234.123");
-        Label labelTotal4=new Label("Vat:      €1234.123");
-        Label labelTotal5=new Label("GTotal:   €1234.123");
-        Label labelTotal6=new Label("\tReceived By");
-        Label labelDots2=new Label("..........................................");
-        VBox boxTotal=new VBox(labelTotal1,labelTotal2,labelTotal3,labelTotal4,labelTotal5,labelTotal6,labelDots2);
-        boxTotal.setSpacing(5);
-        boxTotal.setId("label2");
+        Label labelTotal1=new Label("Amount:");
+        Label labelTotal1_1=new Label("€1234.123");
+        Label labelTotal2=new Label("Discount:");
+        Label labelTotal2_2=new Label("€1234.123");
+        Label labelTotal3=new Label("Net:");
+        Label labelTotal3_3 = new Label("€1234.123");
+        Label labelTotal4=new Label("Vat:");
+        Label labelTotal4_4=new Label("€1234.123");
+        Label labelTotal5=new Label("GTotal:");
+        Label labelTotal5_5=new Label("€1234.123");
+        Label labelTotal6=new Label("Received By");
+        Label labelDots2=new Label("..........................................\nnas\nnasd\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd");
+
+        GridPane gridTotal=new GridPane();
+        gridTotal.add(labelTotal1, 0, 0);
+        gridTotal.add(labelTotal1_1, 1, 0);
+        gridTotal.add(labelTotal2, 0, 1);
+        gridTotal.add(labelTotal2_2, 1, 1);
+        gridTotal.add(labelTotal3, 0, 2);
+        gridTotal.add(labelTotal3_3, 1, 2);
+        gridTotal.add(labelTotal4, 0, 3);
+        gridTotal.add(labelTotal4_4, 1, 3);
+        gridTotal.add(labelTotal5, 0, 4);
+        gridTotal.add(labelTotal5_5, 1, 4);
+        gridTotal.add(labelTotal6, 0, 5, 2, 1);
+        gridTotal.add(labelDots2, 0, 6, 2, 1);
+        gridTotal.setId("grid");
+
+
+
+
+        // VBox boxTotal=new VBox(labelTotal1,labelTotal2,labelTotal3,labelTotal4,labelTotal5,labelTotal6,labelDots2);
+        // boxTotal.setSpacing(5);
+        // boxTotal.setId("label2");
 
 
         //Scene Control
@@ -163,7 +188,7 @@ public class InvoicePrintPreview {
         grid.add(gridCustomer2,1,1);
         grid.add(gridCustomer3,2,1);
         grid.add(boxComments,0,2,2,1);
-        grid.add(boxTotal,2,2);
+        grid.add(gridTotal,2,2);
         grid.setGridLinesVisible(false);
         grid.setHgap(20);
         grid.setVgap(20);
@@ -178,8 +203,11 @@ public class InvoicePrintPreview {
         });
 
         VBox boxMain=new VBox(grid,buttonPrint);
-        Scene scene=new Scene(boxMain);
-        scene.getStylesheets().add("syle.css");
+        ScrollPane scrollPane=new ScrollPane(boxMain);
+        Scene scene=new Scene(scrollPane);
+        scene.getStylesheets().add(getClass().getResource("stylesheets.css").toExternalForm());
+        stagePrint.initStyle(StageStyle.UTILITY);
+        stagePrint.setResizable(false);
         stagePrint.setScene(scene);
 
     }
