@@ -53,7 +53,7 @@ public class Form{
           buttonPrint.setPadding(padding);
            
           final Button buttonCancel=new Button("Cancel");
-          buttonCancel.setPadding(padding);
+          //buttonCancel.setPadding(padding);
           buttonCancel.setOnAction(e->{
               stageForm.close();
               exit(0);

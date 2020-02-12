@@ -7,4 +7,4 @@ public class App {
         Application.launch(MainScreen.class, args);
         System.out.println("Hello World!");   
     }
-]
+}
