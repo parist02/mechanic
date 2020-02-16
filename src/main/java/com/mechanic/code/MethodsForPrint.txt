@@ -1,0 +1,87 @@
+public class Print {
+
+    private GridPane nodePrint;
+    private Rectangle rect;
+    private WritableImage writableImage;
+
+//    public Print(GridPane node) {
+//        nodePrint =  node;
+//        rect=new Rectangle(0,0,nodePrint.getWidth(),nodePrint.getHeight());
+//        nodePrint.setClip(rect);
+//        System.out.println((int) nodePrint.getPrefWidth()+ (int) nodePrint.getPrefHeight());
+//        int wPrefWidth=(int)nodePrint.getPrefWidth();
+//        System.out.println("Pref Width: " + wPrefWidth);
+//        int wPrefHeight=(int)nodePrint.getMinHeight();
+//        System.out.println("Pref Height "+wPrefHeight);
+//        writableImage = new WritableImage(wPrefWidth,wPrefHeight);
+//        nodePrint.snapshot(null,writableImage);
+//
+//    }
+//
+//
+//    public void print() {
+//        ImageView imageView =new ImageView(writableImage);
+//        Printer printer = Printer.getDefaultPrinter();
+//        PageLayout pageLayout = printer.createPageLayout(Paper.A4, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+//        double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
+//        double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
+//        imageView.getTransforms().add(new Scale(scaleX, scaleY));
+//
+//        PrinterJob job = PrinterJob.createPrinterJob();
+//        if (job != null) {
+//            boolean successPrintDialog = job.showPrintDialog(null);
+//            if(successPrintDialog){
+//                boolean success = job.printPage(pageLayout,imageView);
+//                if (success) {
+//                    job.endJob();
+//                }
+//            }
+//        }
+//    }
+
+//    public void print() {
+//        PrinterJob printerJob = PrinterJob.createPrinterJob();
+//        if (printerJob != null) {
+//            boolean correctSettings = printerJob.showPrintDialog(null);
+//            PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.A4, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+//            JobSettings job = printerJob.getJobSettings();
+//            job.setCollation(Collation.COLLATED);
+//            double pageWidth = pageLayout.getPrintableWidth();
+//            double pageHeight = pageLayout.getPrintableHeight();
+//            final int pagesAcross = (int) Math.ceil(nodePrint.getWidth() / pageWidth);
+//            final int pagesDown = (int) Math.ceil(nodePrint.getHeight() / pageHeight);
+//            if (correctSettings) {
+//                //for (int pageColumn = 0; pageColumn < pagesAcross; pageColumn++) {
+////                    for (int pageRow = 0; pageRow < pagesDown; pageRow++) {
+////                  //      nodePrint.setTranslateX(-(pageWidth * pageColumn));
+////                        nodePrint.setTranslateY(-(pageHeight * pageRow));
+////                        printerJob.printPage(pageLayout, nodePrint);
+////                    //}
+////                }
+//
+//                for (PageRange pr : job.getPageRanges()){
+//                    for (int i = pr.getStartPage();i<=pr.getEndPage();i++){
+//                        printerJob.printPage(pageLayout,nodePrint);
+//                    }
+//                }
+//
+//
+
+//
+//                printerJob.endJob();
+//
+//            }else {
+//                System.out.println("Error with printer settings");
+//            }
+//        } else {
+//            System.out.println("Error with creating printer job");
+//        }
+//    }
+//	public void print(){
+//		Window window = nodePrint.getScene() != null ? nodePrint.getScene().getWindow(): null;
+//		PrinterJob printerJob = PrinterJob.createPrinterJob();
+//		printerJob.showPrintDialog(window);
+//		PageLayout pageLayout= printerJob.getPrinter().createPageLayout(Paper.A4, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+
+//
+//	}

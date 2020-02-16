@@ -30,7 +30,7 @@ public class InvoicePrintPreview {
         Label labelCompany4=new Label("Fax: 22317441");
         Label labelCompany5=new Label("VAT Reg.: 10091591L");
         Label labelCompany6=new Label("TAX REG.: 12091591N");
-                    
+
 
         VBox boxCompany=new VBox(labelCompany1,labelCompany2,labelCompany3,labelCompany4,labelCompany5,labelCompany6);
         boxCompany.setId("label1");
@@ -138,7 +138,7 @@ public class InvoicePrintPreview {
         textAreaComments.setPrefHeight(70);
         textAreaComments.setPrefWidth(220);
         Label labelSignature=new Label("\tIssued By");
-        Label labelDots1=new Label("..........................................");
+        Label labelDots1=new Label("..........................................d\n\nasd\n\nasd\n\nasd\n\nasd\n\nasd\n\nasd\nn\nasd\n\nasd\n\nasd\n\nasd\n\nasd\n\nasd\n");
         VBox boxComments=new VBox(labelComments,textAreaComments,labelSignature,labelDots1);
         boxComments.setId("label2");
         boxComments.setSpacing(5);
@@ -154,7 +154,7 @@ public class InvoicePrintPreview {
         Label labelTotal5=new Label("GTotal:");
         Label labelTotal5_5=new Label("€1234.123");
         Label labelTotal6=new Label("Received By");
-        Label labelDots2=new Label("..........................................\nnas\nnasd\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnasdasdasdsad\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd\nnas\nnasd");
+        Label labelDots2=new Label("..........................................");
 
         GridPane gridTotal=new GridPane();
         gridTotal.add(labelTotal1, 0, 0);
@@ -193,22 +193,35 @@ public class InvoicePrintPreview {
         grid.setHgap(20);
         grid.setVgap(20);
         grid.setPrefWidth(width);
-        grid.setPrefHeight(height);
+        grid.setMinHeight(height);
+        int wPrefWidth=(int)grid.getPrefWidth();
+        System.out.println("Pref Width: " + wPrefWidth);
+        int wPrefHeight=(int)grid.getMinHeight();
+        System.out.println("Pref Height "+wPrefHeight);
         grid.setAlignment(Pos.TOP_CENTER);
-        Print print=new Print(grid);
+
         Button buttonPrint=new Button("Print");
         
-        buttonPrint.setOnAction(e->{
-            print.print();
-        });
+
+//        ScrollPane scrollPane=new ScrollPane(grid);
+
+//        scrollPane.setPrefHeight(height);
+//        scrollPane.setPrefWidth(width);
+//        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
 
         VBox boxMain=new VBox(grid,buttonPrint);
-        ScrollPane scrollPane=new ScrollPane(boxMain);
-        Scene scene=new Scene(scrollPane);
-        scene.getStylesheets().add(getClass().getResource("stylesheets.css").toExternalForm());
+        Scene scene=new Scene(boxMain);
+        //
+        //scene.getStylesheets().add(getClass().getResource("stylesheets.css").toExternalForm());
         stagePrint.initStyle(StageStyle.UTILITY);
         stagePrint.setResizable(false);
         stagePrint.setScene(scene);
+//        Print print=new Print(grid);
+        buttonPrint.setOnAction(e->{
+           Print print=new Print(grid,stagePrint);
+        });
+
 
     }
 }
