@@ -1,8 +1,8 @@
 package com.mechanic.code.databaseClasses;
 
 public class Customers {
-	String name,surname,address;
-	int phone1,phone2,counter;
+	public String name,surname,address;
+	public int phone1,phone2,counter;
 
 	public Customers(){
 		name="";
@@ -12,7 +12,7 @@ public class Customers {
 		phone2=0;
 		counter=0;
 	}
-	public Customers(String onoma,String epitheto,String diefthinsi,int til1,int til2, int i){
+	public Customers( int i,String onoma,String epitheto,int til1,int til2,String diefthinsi){
 		name=onoma;
 		surname=epitheto;
 		address=diefthinsi;
@@ -63,4 +63,5 @@ public class Customers {
 	public int getCounter() {
 		return counter;
 	}
+
 }

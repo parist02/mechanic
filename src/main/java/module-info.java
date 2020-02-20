@@ -1,4 +1,5 @@
 module com.mechanic.code {
+	exports com.mechanic.code.databaseClasses;
     requires transitive javafx.graphics;
     requires transitive javafx.controls;
 	requires mysql.connector.java;

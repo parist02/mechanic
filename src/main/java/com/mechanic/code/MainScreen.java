@@ -2,26 +2,27 @@ package com.mechanic.code;
 
 import com.mechanic.code.databaseClasses.Customers;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+
+import java.sql.*;
 
 public class MainScreen extends Application {
-    public TableView tableView;
+    public TableView<Customers> tableView;
     public static Insets padding = new Insets(20, 20, 20, 20);
     public static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
-
+    public Connection connection;
 
     @Override
     public void init() throws Exception {
@@ -29,15 +30,10 @@ public class MainScreen extends Application {
         System.out.println("The application is starting");
         System.out.println("Trying to create connection to database...");
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mechanic", "root", "");
-            System.out.println("Established connection...");
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from customers");
-            System.out.println("Printing table...\n");
 
-            while (rs.next())
-                System.out.println(rs.getInt(1) + "  " + rs.getString(2) + "  " + rs.getString(3) + " " + rs.getInt(4) + " " + rs.getInt(5) + " " + rs.getString(6) + " ");
-            connection.close();
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mechanic", "root", "");
+            System.out.println("Established connection...");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,9 +55,7 @@ public class MainScreen extends Application {
         labelInvoice.setFont(font);
         VBox boxInvoice = new VBox(buttonForm, labelInvoice);
         boxInvoice.setPadding(padding);
-        buttonForm.setOnAction(e -> {
-            form.showForm();
-        });
+        buttonForm.setOnAction(e -> form.showForm());
         //Tab 1
         Label labelCustomer = new Label("Customers");
         TableColumn<Customers, Integer> counterColumn = new TableColumn<>("No.");
@@ -88,10 +82,21 @@ public class MainScreen extends Application {
         addressColumn.setMinWidth(150);
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
 
-        tableView = new TableView<>();
+        TableView<Customers> tableView = new TableView<>();
 
-
-        Tab tab1 = new Tab("Customers", new Label("Showing all customers"));
+        tableView.getColumns().add(counterColumn);
+        tableView.getColumns().add(nameColumn);
+        tableView.getColumns().add(surnameColumn);
+        tableView.getColumns().add(phone1Column);
+        tableView.getColumns().add(phone2Column);
+        tableView.getColumns().add(addressColumn);
+        tableView.setItems(importFromCustomers());
+        tableView.setPadding(padding);
+        Label labelCustomerTitle= new Label("Showing all customers");
+        VBox boxCustomers = new VBox(tableView,labelCustomerTitle);
+        boxCustomers.setPadding(padding);
+        boxCustomers.setSpacing(20);
+        Tab tab1 = new Tab("Customers",boxCustomers);
         Tab tab2 = new Tab("Parts", new Label("Showing all parts"));
         Tab tab3 = new Tab("Invoices", boxInvoice);
 
@@ -106,6 +111,24 @@ public class MainScreen extends Application {
         stage.setTitle("MainScreen");
         stage.show();
 
+    }
+
+    public ObservableList<Customers>importFromCustomers() {
+        ObservableList<Customers>customerData= FXCollections.observableArrayList();
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from customers");
+            System.out.println("Printing table...\n");
+            Customers customer;
+            while (rs.next()) {
+                customer = new Customers(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),rs.getInt(5),rs.getString(6));
+                customerData.add(customer);
+            }
+            connection.close();
+        }catch (SQLException e){
+            System.out.println("Error with getting data");
+        }
+        return customerData;
     }
 
 
