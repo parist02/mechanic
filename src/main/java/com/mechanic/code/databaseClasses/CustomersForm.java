@@ -1,0 +1,145 @@
+package com.mechanic.code.databaseClasses;
+
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+public class CustomersForm {
+	public Stage stageForm;
+	public String name, surname, address;
+	public Integer phone1, phone2;
+	public TextField textFieldName;
+	public TextField textFieldSurname;
+	public TextField textFieldPhone1;
+	public TextField textFieldPhone2;
+	public TextField textFieldAddress;
+	public Button buttonOk, buttonCancel;
+	public Label labelEmpty;
+	public boolean changed=false;
+
+
+	public CustomersForm(Stage primaryStage, String onoma,String epitheto,Integer til1,Integer til2,String diefthinsi ) {
+		customersFormInitializer();
+		stageForm.initModality(Modality.WINDOW_MODAL);
+		stageForm.initOwner(primaryStage);
+		System.out.println(onoma);
+		textFieldName.setText(onoma);
+		textFieldSurname.setText(epitheto);
+		textFieldPhone1.setText(til1.toString());
+		textFieldPhone2.setText(til2.toString());
+		textFieldAddress.setText(diefthinsi);
+		//Event Handler
+		buttonCancel.setOnAction(e->{
+			stageForm.close();
+		});
+		buttonOk.setOnAction(e->{
+			name=textFieldName.getText();
+			surname=textFieldSurname.getText();
+			phone1=Integer.parseInt(textFieldPhone1.getText());
+			phone2=Integer.parseInt(textFieldPhone2.getText());
+			address=textFieldAddress.getText();
+			if (name.equals("")||surname.equals("")|| phone1 == null){
+				labelEmpty.setText("Please fill all the details");
+			}else {
+				changed=true;
+				stageForm.close();
+			}
+		});
+
+	}
+
+	public void customersFormInitializer() {
+		stageForm = new Stage();
+
+		stageForm.setTitle("Form");
+		Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
+		//Labels
+		Label labelName = new Label("Name:");
+		labelName.setFont(font);
+		labelName.setTextFill(Color.BLACK);
+		Label labelSurname = new Label("Surname:");
+		labelSurname.setFont(font);
+		labelSurname.setTextFill(Color.BLACK);
+		Label labelPhone1 = new Label("Phone1:");
+		labelPhone1.setFont(font);
+		labelPhone1.setTextFill(Color.BLACK);
+		Label labelPhone2 = new Label("Phone2:");
+		labelPhone2.setFont(font);
+		labelPhone2.setTextFill(Color.BLACK);
+		Label labelAddress = new Label("Address:");
+		labelAddress.setFont(font);
+		labelAddress.setTextFill(Color.BLACK);
+		labelEmpty = new Label("");
+		labelEmpty.setFont(font);
+		labelEmpty.setTextFill(Color.FIREBRICK);
+		labelEmpty.setPadding(new Insets(10, 10, 10, 10));
+		Label labelTitle = new Label("Please fill the form");
+		labelTitle.setTextFill(Color.BLACK);
+		labelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+		labelTitle.setPadding(new Insets(10, 10, 10, 10));
+		//Text fields
+		textFieldName = new TextField();
+		textFieldSurname = new TextField();
+		textFieldPhone1 = new TextField();
+		textFieldPhone2 = new TextField();
+		textFieldAddress = new TextField();
+		//
+		buttonOk = new Button("Ok");
+		buttonCancel = new Button("Cancel");
+		//Grid control
+		GridPane grid = new GridPane();
+		grid.add(labelTitle, 0, 0, 2, 1);
+		grid.add(labelName, 0, 1);
+		grid.add(textFieldName, 1, 1);
+		grid.add(labelSurname, 0, 2);
+		grid.add(textFieldSurname, 1, 2);
+		grid.add(labelPhone1, 0, 3);
+		grid.add(textFieldPhone1, 1, 3);
+		grid.add(labelPhone2, 0, 4);
+		grid.add(textFieldPhone2, 1, 4);
+		grid.add(labelAddress, 0, 5);
+		grid.add(textFieldAddress, 1, 5);
+		grid.add(labelEmpty, 0, 6, 2, 1);
+		grid.add(buttonOk, 0, 7);
+		grid.add(buttonCancel, 1, 7);
+		grid.setPadding(new Insets(25, 25, 25, 25));
+		grid.setHgap(20);
+		grid.setVgap(15);
+		//Scene control
+		Scene sceneForm = new Scene(grid);
+		//sceneForm.getStylesheets().add("style.css");
+		stageForm.setScene(sceneForm);
+		buttonOk.getStyleClass().add("button2");
+	}
+	 public void showForm(){
+		stageForm.showAndWait();
+	 }
+	public String getName(){
+		return name;
+	}
+	public String getSurname(){
+		return surname;
+	}
+	public String getAddress(){
+		return address;
+	}
+	public Integer getPhone1(){
+		return phone1;
+	}
+	public Integer getPhone2() {
+		return phone2;
+	}
+
+	public boolean isChanged() {
+		return changed;
+	}
+}

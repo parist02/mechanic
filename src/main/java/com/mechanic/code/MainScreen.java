@@ -1,6 +1,7 @@
 package com.mechanic.code;
 
 import com.mechanic.code.databaseClasses.Customers;
+import com.mechanic.code.databaseClasses.CustomersForm;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +17,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.sql.*;
 
 public class MainScreen extends Application {
@@ -23,6 +25,7 @@ public class MainScreen extends Application {
     public static Insets padding = new Insets(20, 20, 20, 20);
     public static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     public Connection connection;
+    public Stage primaryStage;
 
     @Override
     public void init() throws Exception {
@@ -40,7 +43,7 @@ public class MainScreen extends Application {
     }
 
     @Override
-    public void start(final Stage stage) {
+    public void start(Stage stage) {
 
         TabPane tabPane = new TabPane();
         Form form = new Form();
@@ -82,7 +85,7 @@ public class MainScreen extends Application {
         addressColumn.setMinWidth(150);
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
 
-        TableView<Customers> tableView = new TableView<>();
+        tableView = new TableView<>();
 
         tableView.getColumns().add(counterColumn);
         tableView.getColumns().add(nameColumn);
@@ -92,11 +95,26 @@ public class MainScreen extends Application {
         tableView.getColumns().add(addressColumn);
         tableView.setItems(importFromCustomers());
         tableView.setPadding(padding);
-        Label labelCustomerTitle= new Label("Showing all customers");
-        VBox boxCustomers = new VBox(tableView,labelCustomerTitle);
+        Label labelCustomerTitle = new Label("Showing all customers");
+        Button buttonDeleteCustomers = new Button("Delete");
+        buttonDeleteCustomers.setPadding(padding);
+        buttonDeleteCustomers.setOnAction(del -> {
+            deleteFromCustomers();
+        });
+        Button buttonUpdateCustomers = new Button("Edit");
+        buttonUpdateCustomers.setPadding(padding);
+        buttonUpdateCustomers.setOnAction(upd -> {
+            updateFromCustomers();
+        });
+        HBox boxButtonsCustomers = new HBox(buttonUpdateCustomers, buttonDeleteCustomers);
+        boxButtonsCustomers.setPadding(padding);
+        boxButtonsCustomers.setSpacing(20);
+        VBox boxCustomers = new VBox(boxButtonsCustomers, tableView, labelCustomerTitle);
         boxCustomers.setPadding(padding);
         boxCustomers.setSpacing(20);
-        Tab tab1 = new Tab("Customers",boxCustomers);
+
+        //
+        Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Parts", new Label("Showing all parts"));
         Tab tab3 = new Tab("Invoices", boxInvoice);
 
@@ -106,30 +124,75 @@ public class MainScreen extends Application {
         tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 
         Scene scene = new Scene(tabPane);
-        stage.setMaximized(false);
-        stage.setScene(scene);
-        stage.setTitle("MainScreen");
-        stage.show();
+        primaryStage = new Stage();
+        primaryStage.setMaximized(false);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("MainScreen");
+        stage = primaryStage;
+        primaryStage.show();
 
     }
 
-    public ObservableList<Customers>importFromCustomers() {
-        ObservableList<Customers>customerData= FXCollections.observableArrayList();
+    @Override
+    public void stop() throws Exception {
+        System.out.println("Closing connection...");
+        connection.close();
+        System.out.println("Connection closed...");
+
+    }
+
+    public ObservableList<Customers> importFromCustomers() {
+        ObservableList<Customers> customerData = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from customers");
-            System.out.println("Printing table...\n");
             Customers customer;
             while (rs.next()) {
-                customer = new Customers(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),rs.getInt(5),rs.getString(6));
+                customer = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6));
                 customerData.add(customer);
             }
-            connection.close();
-        }catch (SQLException e){
+
+        } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
         return customerData;
     }
 
+    public void deleteFromCustomers() {
+        try {
+            ObservableList<Customers> selectedCustomer, allCustomers;
+            allCustomers = tableView.getItems();
+            selectedCustomer = tableView.getSelectionModel().getSelectedItems();
+            final int index = selectedCustomer.get(0).getCounter();
+            selectedCustomer.forEach(allCustomers::remove);
+            final String query = "DELETE FROM customers WHERE CustomerID = " + index;
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.execute();
+        } catch (Exception ex) {
+            System.out.println("Error with removing from database");
+            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
+        }
+    }
 
+    public void updateFromCustomers() {
+        try {
+            ObservableList<Customers> selectedCustomer, allCustomers;
+            allCustomers = tableView.getItems();
+            selectedCustomer = tableView.getSelectionModel().getSelectedItems();
+            final int index = selectedCustomer.get(0).getCounter();
+            System.out.println("Selected Counter: " + index);
+            System.out.println(selectedCustomer.get(0).getName() + selectedCustomer.get(0).getSurname() + selectedCustomer.get(0).getPhone1() + selectedCustomer.get(0).getPhone2() + selectedCustomer.get(0).getAddress());
+            CustomersForm customersForm = new CustomersForm(primaryStage, selectedCustomer.get(0).getName(), selectedCustomer.get(0).getSurname(), selectedCustomer.get(0).getPhone1(), selectedCustomer.get(0).getPhone2(), selectedCustomer.get(0).getAddress());
+            customersForm.showForm();
+            if (customersForm.isChanged()) {
+                System.out.println("Saving Changes");
+            } else {
+                System.out.println("Not saving changes");
+            }
+        } catch (Exception ex) {
+            System.out.println("Error with updating from database");
+            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
+        }
+
+    }
 }
