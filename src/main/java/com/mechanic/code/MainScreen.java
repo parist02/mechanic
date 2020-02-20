@@ -179,13 +179,17 @@ public class MainScreen extends Application {
             ObservableList<Customers> selectedCustomer, allCustomers;
             allCustomers = tableView.getItems();
             selectedCustomer = tableView.getSelectionModel().getSelectedItems();
+            final int index2=tableView.getSelectionModel().getFocusedIndex();
             final int index = selectedCustomer.get(0).getCounter();
-            System.out.println("Selected Counter: " + index);
-            System.out.println(selectedCustomer.get(0).getName() + selectedCustomer.get(0).getSurname() + selectedCustomer.get(0).getPhone1() + selectedCustomer.get(0).getPhone2() + selectedCustomer.get(0).getAddress());
             CustomersForm customersForm = new CustomersForm(primaryStage, selectedCustomer.get(0).getName(), selectedCustomer.get(0).getSurname(), selectedCustomer.get(0).getPhone1(), selectedCustomer.get(0).getPhone2(), selectedCustomer.get(0).getAddress());
             customersForm.showForm();
             if (customersForm.isChanged()) {
-                System.out.println("Saving Changes");
+                final String query=customersForm.getQuery()+" WHERE CustomerID = "+index+";";
+                System.out.println(query);
+                PreparedStatement preparedStatement=connection.prepareStatement(query);
+                preparedStatement.execute();
+                Customers customersEdited=new Customers(index,customersForm.getName(), customersForm.getSurname(),customersForm.getPhone1(),customersForm.getPhone2(),customersForm.getAddress());
+                allCustomers.set(index2,customersEdited);
             } else {
                 System.out.println("Not saving changes");
             }

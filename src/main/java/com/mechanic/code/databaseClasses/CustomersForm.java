@@ -25,13 +25,20 @@ public class CustomersForm {
 	public Button buttonOk, buttonCancel;
 	public Label labelEmpty;
 	public boolean changed=false;
+	private String nameBefore,surnameBefore,addressBefore;
+	private Integer phone1Before,phone2Before;
+	public String query="UPDATE customers SET ";
 
 
 	public CustomersForm(Stage primaryStage, String onoma,String epitheto,Integer til1,Integer til2,String diefthinsi ) {
+		nameBefore=onoma;
+		surnameBefore=epitheto;
+		phone1Before=til1;
+		phone2Before=til2;
+		addressBefore=diefthinsi;
 		customersFormInitializer();
 		stageForm.initModality(Modality.WINDOW_MODAL);
 		stageForm.initOwner(primaryStage);
-		System.out.println(onoma);
 		textFieldName.setText(onoma);
 		textFieldSurname.setText(epitheto);
 		textFieldPhone1.setText(til1.toString());
@@ -50,7 +57,46 @@ public class CustomersForm {
 			if (name.equals("")||surname.equals("")|| phone1 == null){
 				labelEmpty.setText("Please fill all the details");
 			}else {
-				changed=true;
+				if (!name.equals(nameBefore)){
+					if(changed){
+						query=query+", Name = '"+name+"'";
+					}else{
+						changed=true;
+						query=query+" Name = '"+name+"'";
+					}
+				}
+				if(!surname.equals(surnameBefore)){
+					if(changed){
+						query=query+", Surname = '"+surname+"'";
+					}else{
+						changed=true;
+						query=query+" Surname = '"+surname+"'";
+					}
+				}
+				if(!phone1.equals(phone1Before)){
+					if(changed){
+						query=query+", Phone_1 = "+phone1.toString();
+					}else{
+						changed=true;
+						query=query+" Phone_1 = "+phone1.toString();
+					}
+				}
+				if(!phone2.equals(phone2Before)){
+					if(changed){
+						query=query+", Phone_2 = "+phone2.toString();
+					}else{
+						changed=true;
+						query=query+" Phone_2 = "+phone2.toString();
+					}
+				}
+				if(!address.equals(addressBefore)){
+					if(changed){
+						query=query+", Address = '"+address+"'";
+					}else{
+						changed=true;
+						query=query+" Address = '"+address+"'";
+					}
+				}
 				stageForm.close();
 			}
 		});
@@ -59,7 +105,6 @@ public class CustomersForm {
 
 	public void customersFormInitializer() {
 		stageForm = new Stage();
-
 		stageForm.setTitle("Form");
 		Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
 		//Labels
@@ -82,7 +127,7 @@ public class CustomersForm {
 		labelEmpty.setFont(font);
 		labelEmpty.setTextFill(Color.FIREBRICK);
 		labelEmpty.setPadding(new Insets(10, 10, 10, 10));
-		Label labelTitle = new Label("Please fill the form");
+		Label labelTitle = new Label("Στοιχεία Πελάτη");
 		labelTitle.setTextFill(Color.BLACK);
 		labelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 		labelTitle.setPadding(new Insets(10, 10, 10, 10));
@@ -120,7 +165,12 @@ public class CustomersForm {
 		stageForm.setScene(sceneForm);
 		buttonOk.getStyleClass().add("button2");
 	}
-	 public void showForm(){
+
+	public String getQuery() {
+		return query;
+	}
+
+	public void showForm(){
 		stageForm.showAndWait();
 	 }
 	public String getName(){
