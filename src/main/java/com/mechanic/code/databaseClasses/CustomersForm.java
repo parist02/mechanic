@@ -15,8 +15,8 @@ import javafx.stage.Stage;
 
 public class CustomersForm {
 	public Stage stageForm;
-	public String name, surname, address;
-	public Integer phone1, phone2;
+	public String name, surname, address=null;
+	public Integer phone1=null, phone2=null;
 	public TextField textFieldName;
 	public TextField textFieldSurname;
 	public TextField textFieldPhone1;
@@ -28,6 +28,35 @@ public class CustomersForm {
 	private String nameBefore,surnameBefore,addressBefore;
 	private Integer phone1Before,phone2Before;
 	public String query="UPDATE customers SET ";
+	public String queryAdd="INSERT INTO customers (CustomerId, Name, Surname, Phone_1, Phone_2, Address) VALUES (NULL";
+
+	public CustomersForm(Stage primaryStage) {
+		customersFormInitializer();
+		stageForm.initModality(Modality.WINDOW_MODAL);
+		stageForm.initOwner(primaryStage);
+		buttonCancel.setOnAction(e -> {
+			stageForm.close();
+		});
+		buttonOk.setOnAction(e -> {
+			name=textFieldName.getText();
+			surname=textFieldSurname.getText();
+			if (!textFieldPhone1.getText().equals("")){
+				phone1=Integer.parseInt(textFieldPhone1.getText());
+			}
+			if (!textFieldPhone2.getText().equals("")){
+				phone2=Integer.parseInt(textFieldPhone2.getText());
+			}
+			address=textFieldAddress.getText();
+			if (name.equals("") || surname.equals("") || phone1 == null) {
+				labelEmpty.setText("Please fill all the details");
+			} else {
+				changed=true;
+				queryAdd = queryAdd + ", '" + name + "' , '" + surname + "', " + phone1 + ", " + phone2 + ", '" + address + "');";
+				stageForm.close();
+			}
+		});
+	}
+
 
 
 	public CustomersForm(Stage primaryStage, String onoma,String epitheto,Integer til1,Integer til2,String diefthinsi ) {
@@ -168,6 +197,10 @@ public class CustomersForm {
 
 	public String getQuery() {
 		return query;
+	}
+
+	public String getQueryAdd() {
+		return queryAdd;
 	}
 
 	public void showForm(){

@@ -26,6 +26,7 @@ public class MainScreen extends Application {
     public static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     public Connection connection;
     public Stage primaryStage;
+    public int customerID;
 
     @Override
     public void init() throws Exception {
@@ -106,7 +107,12 @@ public class MainScreen extends Application {
         buttonUpdateCustomers.setOnAction(upd -> {
             updateFromCustomers();
         });
-        HBox boxButtonsCustomers = new HBox(buttonUpdateCustomers, buttonDeleteCustomers);
+        Button buttonAddCustomer=new Button("Add");
+        buttonAddCustomer.setPadding(padding);
+        buttonAddCustomer.setOnAction(add->{
+            addToCustomers();
+        });
+        HBox boxButtonsCustomers = new HBox(buttonAddCustomer,buttonUpdateCustomers, buttonDeleteCustomers);
         boxButtonsCustomers.setPadding(padding);
         boxButtonsCustomers.setSpacing(20);
         VBox boxCustomers = new VBox(boxButtonsCustomers, tableView, labelCustomerTitle);
@@ -149,6 +155,7 @@ public class MainScreen extends Application {
             Customers customer;
             while (rs.next()) {
                 customer = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6));
+                customerID=rs.getInt(1);
                 customerData.add(customer);
             }
 
@@ -166,6 +173,7 @@ public class MainScreen extends Application {
             final int index = selectedCustomer.get(0).getCounter();
             selectedCustomer.forEach(allCustomers::remove);
             final String query = "DELETE FROM customers WHERE CustomerID = " + index;
+            System.out.println(query);
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.execute();
         } catch (Exception ex) {
@@ -197,6 +205,28 @@ public class MainScreen extends Application {
             System.out.println("Error with updating from database");
             ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
         }
+    }
 
+    public void addToCustomers(){
+        try{
+            CustomersForm customersForm=new CustomersForm(primaryStage);
+            customersForm.showForm();
+            if (customersForm.isChanged()) {
+                final String query = customersForm.getQueryAdd();
+                System.out.println(query);
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.execute();
+                customerID++;
+                Customers customersNew=new Customers(customerID,customersForm.getName(),customersForm.getSurname(),customersForm.getPhone1(),((customersForm.getPhone2()==null)?0:customersForm.getPhone2()),customersForm.getAddress());
+                ObservableList<Customers>newCustomer=tableView.getItems();
+                newCustomer.add(customersNew);
+                tableView.setItems(newCustomer);
+            }else{
+                System.out.println("Data not added");
+            }
+        }catch (SQLException e) {
+            System.out.println("Error with adding data to database");
+            ErrorPopUp errorPopUp=new ErrorPopUp("Error with adding data to database",primaryStage);
+        }
     }
 }
