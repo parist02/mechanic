@@ -1,6 +1,7 @@
 package com.mechanic.code;
 
 import com.mechanic.code.databaseClasses.Cars;
+import com.mechanic.code.databaseClasses.CarsForm;
 import com.mechanic.code.databaseClasses.Customers;
 import com.mechanic.code.databaseClasses.CustomersForm;
 import javafx.application.Application;
@@ -22,13 +23,12 @@ import java.io.FileNotFoundException;
 import java.sql.*;
 
 public class MainScreen extends Application {
-    public TableView<Customers> tableViewCustomers;
-    public TableView<Cars>tableViewCars;
+    public TableView<Customers> tableViewCustomers=new TableView<>();
+    public TableView<Cars>tableViewCars= new TableView<>();
     public static Insets padding = new Insets(10, 10, 10, 10);
     public static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     public Connection connection;
     public Stage primaryStage;
-    public int customerID;
     public ObservableList<Customers>allCustomers;
     public ObservableList<Cars>allCars;
 
@@ -43,7 +43,9 @@ public class MainScreen extends Application {
             System.out.println("Established connection...");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Connection with database has failed...");
+            System.exit(0);
+
         }
     }
 
@@ -104,7 +106,7 @@ public class MainScreen extends Application {
         addressColumn.setMinWidth(175);
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
 
-        tableViewCustomers = new TableView<>();
+
 
         tableViewCustomers.getColumns().add(counterColumn);
         tableViewCustomers.getColumns().add(nameColumn);
@@ -154,13 +156,13 @@ public class MainScreen extends Application {
         TableColumn<Cars, String> brandColumn = new TableColumn<>("Brand");
         brandColumn.setReorderable(false);
         brandColumn.setResizable(false);
-        brandColumn.setMinWidth(100);
+        brandColumn.setMinWidth(125);
         brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
         TableColumn<Cars, String> modelColumn = new TableColumn<>("Model");
         modelColumn.setReorderable(false);
         modelColumn.setResizable(false);
-        modelColumn.setMinWidth(100);
+        modelColumn.setMinWidth(125);
         modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
 
         TableColumn<Cars, String> vinColumn = new TableColumn<>("VIN");
@@ -172,7 +174,7 @@ public class MainScreen extends Application {
         TableColumn<Cars, Date> dateColumn = new TableColumn<>("Date");
         dateColumn.setReorderable(false);
         dateColumn.setResizable(false);
-        dateColumn.setMinWidth(100);
+        dateColumn.setMinWidth(50);
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         TableColumn<Cars, Integer> customerIdColumn = new TableColumn<>("CustomerID");
@@ -181,7 +183,7 @@ public class MainScreen extends Application {
         customerIdColumn.setMinWidth(50);
         customerIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
 
-        tableViewCars = new TableView<>();
+
 
         tableViewCars.getColumns().add(licencePlatesColumn);
         tableViewCars.getColumns().add(brandColumn);
@@ -190,15 +192,22 @@ public class MainScreen extends Application {
         tableViewCars.getColumns().add(dateColumn);
         tableViewCars.getColumns().add(customerIdColumn);
         tableViewCars.setEditable(false);
-
         tableViewCars.setItems(importFromCars());
         tableViewCars.setPadding(padding);
 
+        Button buttonAddCars=new Button("Add");
+        buttonAddCars.setPadding(padding);
+        buttonAddCars.setOnAction(add->{
+            addToCars();
+        });
 
         HBox boxButtonsCustomers = new HBox(buttonAddCustomer,buttonUpdateCustomers, buttonDeleteCustomers,textFieldSearchCustomers,buttonSearchCustomers,buttonSearchClearCustomers);
         boxButtonsCustomers.setPadding(padding);
         boxButtonsCustomers.setSpacing(20);
-        VBox boxCustomers = new VBox(labelCustomerTitle,boxButtonsCustomers, tableViewCustomers,tableViewCars );
+        HBox boxButtonsCars=new HBox(buttonAddCars);
+        boxButtonsCars.setPadding(padding);
+        boxButtonsCars.setSpacing(20);
+        VBox boxCustomers = new VBox(labelCustomerTitle,boxButtonsCustomers, tableViewCustomers,boxButtonsCars,tableViewCars );
         boxCustomers.setPadding(padding);
         boxCustomers.setSpacing(20);
 
@@ -259,7 +268,7 @@ public class MainScreen extends Application {
             ResultSet rs = stmt.executeQuery("select * from cars");
             Cars cars;
             while (rs.next()) {
-                cars = new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDate(5), rs.getInt(6));
+                cars = new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
                 allCars.add(cars);
             }
 
@@ -354,4 +363,27 @@ public class MainScreen extends Application {
             ErrorPopUp errorPopUp=new ErrorPopUp("Error with adding data to database",primaryStage);
         }
     }
+
+    public void addToCars(){
+        try{
+            CarsForm carsForm=new CarsForm(primaryStage);
+            carsForm.showForm();
+            if (carsForm.isChanged()) {
+                final String query = carsForm.getQueryAdd();
+                System.out.println(query);
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.execute();
+                Cars carsNew=new Cars(carsForm.licensePlates,carsForm.getBrand(),carsForm.getModel(),carsForm.getVin(),carsForm.getDate(),carsForm.getCustomerID());
+                ObservableList<Cars>newCars=tableViewCars.getItems();
+                newCars.add(carsNew);
+                tableViewCars.setItems(newCars);
+            }else{
+                System.out.println("Data not added");
+            }
+        }catch (SQLException e) {
+            System.out.println("Error with adding data to database");
+            ErrorPopUp errorPopUp=new ErrorPopUp("Error with adding data to database",primaryStage);
+        }
+    }
+
 }

@@ -24,6 +24,7 @@ public class ErrorPopUp {
 		stage.setTitle("Error");
 		stage.initModality(Modality.WINDOW_MODAL);
 		stage.initOwner(primaryStage);
+
 //			FileInputStream inputStream = new FileInputStream("@/images/error.png");
 //			Image image = new Image(inputStream);
 //			ImageView imageView = new ImageView(image);
@@ -47,7 +48,7 @@ public class ErrorPopUp {
 		Scene scene = new Scene(box);
 		stage.setScene(scene);
 
-		stage.show();
+		stage.showAndWait();
 
 	}
 }

@@ -1,10 +1,9 @@
 package com.mechanic.code.databaseClasses;
 
-import java.sql.Date;
+
 
 public class Cars {
-	public String licencePlates,brand,model,vin;
-	public Date date;
+	public String licencePlates,brand,model,date,vin;
 	public int customerId;
 
 	public Cars(){
@@ -12,11 +11,11 @@ public class Cars {
 		brand="";
 		model="";
 		vin="";
-		date=new Date(1010-3-30);
+		date="";
 		customerId=0;
 	}
 
-	public Cars(String noumeraAftokinitou,String marka,String montelo,String chassis,Date imerominia,int metritis){
+	public Cars(String noumeraAftokinitou,String marka,String montelo,String chassis,String imerominia,int metritis){
 		licencePlates=noumeraAftokinitou;
 		brand=marka;
 		model=montelo;
@@ -25,7 +24,7 @@ public class Cars {
 		customerId=metritis;
 	}
 
-	public Date getDate() {
+	public String getDate() {
 		return date;
 	}
 
@@ -53,7 +52,7 @@ public class Cars {
 		this.customerId = customerId;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 
