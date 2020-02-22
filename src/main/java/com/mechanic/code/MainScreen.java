@@ -1,5 +1,6 @@
 package com.mechanic.code;
 
+import com.mechanic.code.databaseClasses.Cars;
 import com.mechanic.code.databaseClasses.Customers;
 import com.mechanic.code.databaseClasses.CustomersForm;
 import javafx.application.Application;
@@ -22,11 +23,14 @@ import java.sql.*;
 
 public class MainScreen extends Application {
     public TableView<Customers> tableViewCustomers;
+    public TableView<Cars>tableViewCars;
     public static Insets padding = new Insets(10, 10, 10, 10);
     public static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     public Connection connection;
     public Stage primaryStage;
     public int customerID;
+    public ObservableList<Customers>allCustomers;
+    public ObservableList<Cars>allCars;
 
     @Override
     public void init() throws Exception {
@@ -97,7 +101,7 @@ public class MainScreen extends Application {
         TableColumn<Customers, Integer> addressColumn = new TableColumn<>("Address");
         addressColumn.setReorderable(false);
         addressColumn.setResizable(false);
-        addressColumn.setMinWidth(150);
+        addressColumn.setMinWidth(175);
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
 
         tableViewCustomers = new TableView<>();
@@ -135,16 +139,69 @@ public class MainScreen extends Application {
         buttonSearchCustomers.setOnAction(ser->tableViewCustomers.setItems(searchFromCustomers(textFieldSearchCustomers.getText())));
         Button buttonSearchClearCustomers=new Button("Clear");
         buttonSearchClearCustomers.setPadding(padding);
-        buttonSearchClearCustomers.setOnAction(cle->tableViewCustomers.setItems(importFromCustomers()));
+        buttonSearchClearCustomers.setOnAction(cle->{
+            tableViewCustomers.setItems(allCustomers);
+            textFieldSearchCustomers.setText("");
 
+        });
+
+        TableColumn<Cars, String> licencePlatesColumn = new TableColumn<>("Licence Plates");
+        licencePlatesColumn.setReorderable(false);
+        licencePlatesColumn.setResizable(false);
+        licencePlatesColumn.setMinWidth(100);
+        licencePlatesColumn.setCellValueFactory(new PropertyValueFactory<>("licencePlates"));
+
+        TableColumn<Cars, String> brandColumn = new TableColumn<>("Brand");
+        brandColumn.setReorderable(false);
+        brandColumn.setResizable(false);
+        brandColumn.setMinWidth(100);
+        brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
+
+        TableColumn<Cars, String> modelColumn = new TableColumn<>("Model");
+        modelColumn.setReorderable(false);
+        modelColumn.setResizable(false);
+        modelColumn.setMinWidth(100);
+        modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
+
+        TableColumn<Cars, String> vinColumn = new TableColumn<>("VIN");
+        vinColumn.setReorderable(false);
+        vinColumn.setResizable(false);
+        vinColumn.setMinWidth(125);
+        vinColumn.setCellValueFactory(new PropertyValueFactory<>("vin"));
+
+        TableColumn<Cars, Date> dateColumn = new TableColumn<>("Date");
+        dateColumn.setReorderable(false);
+        dateColumn.setResizable(false);
+        dateColumn.setMinWidth(100);
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+
+        TableColumn<Cars, Integer> customerIdColumn = new TableColumn<>("CustomerID");
+        customerIdColumn.setReorderable(false);
+        customerIdColumn.setResizable(false);
+        customerIdColumn.setMinWidth(50);
+        customerIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+
+        tableViewCars = new TableView<>();
+
+        tableViewCars.getColumns().add(licencePlatesColumn);
+        tableViewCars.getColumns().add(brandColumn);
+        tableViewCars.getColumns().add(modelColumn);
+        tableViewCars.getColumns().add(vinColumn);
+        tableViewCars.getColumns().add(dateColumn);
+        tableViewCars.getColumns().add(customerIdColumn);
+        tableViewCars.setEditable(false);
+
+        tableViewCars.setItems(importFromCars());
+        tableViewCars.setPadding(padding);
 
 
         HBox boxButtonsCustomers = new HBox(buttonAddCustomer,buttonUpdateCustomers, buttonDeleteCustomers,textFieldSearchCustomers,buttonSearchCustomers,buttonSearchClearCustomers);
         boxButtonsCustomers.setPadding(padding);
         boxButtonsCustomers.setSpacing(20);
-        VBox boxCustomers = new VBox(boxButtonsCustomers, tableViewCustomers, labelCustomerTitle);
+        VBox boxCustomers = new VBox(labelCustomerTitle,boxButtonsCustomers, tableViewCustomers,tableViewCars );
         boxCustomers.setPadding(padding);
         boxCustomers.setSpacing(20);
+
 
 
 
@@ -177,22 +234,39 @@ public class MainScreen extends Application {
 
     }
 
+
     public ObservableList<Customers> importFromCustomers() {
-        ObservableList<Customers> customerData = FXCollections.observableArrayList();
+        allCustomers = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from customers");
             Customers customer;
             while (rs.next()) {
                 customer = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6));
-                customerID=rs.getInt(1);
-                customerData.add(customer);
+                allCustomers.add(customer);
             }
 
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
-        return customerData;
+        return allCustomers;
+    }
+
+    public ObservableList<Cars> importFromCars() {
+        allCars = FXCollections.observableArrayList();
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from cars");
+            Cars cars;
+            while (rs.next()) {
+                cars = new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDate(5), rs.getInt(6));
+                allCars.add(cars);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error with getting data");
+        }
+        return allCars;
     }
 
     public ObservableList<Customers>searchFromCustomers(String searchString) {
