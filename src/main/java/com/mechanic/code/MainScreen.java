@@ -147,7 +147,7 @@ public class MainScreen extends Application {
 
         });
 
-        TableColumn<Cars, String> licencePlatesColumn = new TableColumn<>("Licence Plates");
+        TableColumn<Cars, String> licencePlatesColumn = new TableColumn<>("License Plates");
         licencePlatesColumn.setReorderable(false);
         licencePlatesColumn.setResizable(false);
         licencePlatesColumn.setMinWidth(100);
