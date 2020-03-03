@@ -47,7 +47,7 @@ public class CustomersForm {
 				phone2=Integer.parseInt(textFieldPhone2.getText());
 			}
 			address=textFieldAddress.getText();
-			if (name.equals("") || surname.equals("") || phone1 == null) {
+			if (name.equals("") || surname.equals("") || phone1 == null) { //elegxos an iparxoun xaraktires sta tilefono
 				labelEmpty.setText("Please fill all the details");
 			} else {
 				changed=true;
