@@ -15,9 +15,9 @@ import static java.lang.System.exit;
 
 
 public class Form{
-    public static Insets padding=new Insets(20,20,20,20);
-    public static Font font=Font.font("Arial",FontWeight.NORMAL, FontPosture.REGULAR,18);
-    public static Stage stageForm;
+    private static Insets padding=new Insets(20,20,20,20);
+    private static Font font=Font.font("Arial",FontWeight.NORMAL, FontPosture.REGULAR,18);
+    private static Stage stageForm;
 
 
     public Form(){

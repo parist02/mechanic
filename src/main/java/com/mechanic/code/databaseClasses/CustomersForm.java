@@ -14,24 +14,24 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class CustomersForm {
-	public Stage stageForm;
-	public String name, surname, address=null;
-	public Integer phone1=null, phone2=null;
+	private Stage stageForm;
+	private String name, surname, address=null;
+	private Integer phone1=null, phone2=null;
 	private Float balance=null;
-	public TextField textFieldName;
-	public TextField textFieldSurname;
-	public TextField textFieldPhone1;
-	public TextField textFieldPhone2;
-	public TextField textFieldAddress;
+	private TextField textFieldName;
+	private TextField textFieldSurname;
+	private TextField textFieldPhone1;
+	private TextField textFieldPhone2;
+	private TextField textFieldAddress;
 	private TextField textFieldBalance;
-	public Button buttonOk, buttonCancel;
-	public Label labelEmpty;
-	public boolean changed=false;
+	private Button buttonOk, buttonCancel;
+	private Label labelEmpty;
+	private boolean changed=false;
 	private String nameBefore,surnameBefore,addressBefore;
 	private Integer phone1Before,phone2Before;
 	private Float balanceBefore;
-	public String query="UPDATE customers SET ";
-	public String queryAdd="INSERT INTO customers (CustomerId, Name, Surname, Phone_1, Phone_2, Address, Balance) VALUES (NULL";
+	private String query="UPDATE customers SET ";
+	private String queryAdd="INSERT INTO customers (CustomerId, Name, Surname, Phone_1, Phone_2, Address, Balance) VALUES (NULL";
 
 	public CustomersForm(Stage primaryStage) {
 		customersFormInitializer();

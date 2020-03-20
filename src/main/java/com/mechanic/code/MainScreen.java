@@ -404,7 +404,7 @@ public class MainScreen extends Application {
             ObservableList<Cars> selectedCars, allCars;
             allCars = tableViewCars.getItems();
             selectedCars = tableViewCars.getSelectionModel().getSelectedItems();
-            final String index = selectedCars.get(0).licencePlates;
+            final String index = selectedCars.get(0).getLicencePlates();
             selectedCars.forEach(allCars::remove);
             final String query = "DELETE FROM cars WHERE LicensePlates = '" + index + "'";
             System.out.println(query);
@@ -479,7 +479,7 @@ public class MainScreen extends Application {
                 System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
-                Cars carsNew=new Cars(carsForm.licensePlates,carsForm.getBrand(),carsForm.getModel(),carsForm.getVin(),carsForm.getDate(),carsForm.getCustomerID());
+                Cars carsNew=new Cars(carsForm.getLicensePlates(),carsForm.getBrand(),carsForm.getModel(),carsForm.getVin(),carsForm.getDate(),carsForm.getCustomerID());
                 ObservableList<Cars>newCars=tableViewCars.getItems();
                 newCars.add(carsNew);
                 tableViewCars.setItems(newCars);

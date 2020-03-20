@@ -3,8 +3,8 @@ package com.mechanic.code.databaseClasses;
 
 
 public class Cars {
-	public String licencePlates,brand,model,date,vin;
-	public int customerId;
+	private String licencePlates,brand,model,date,vin;
+	private int customerId;
 
 	public Cars(){
 		licencePlates="";

@@ -15,7 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class ErrorPopUp {
-	public static Insets padding = new Insets(10, 10, 10, 10);
+	private static Insets padding = new Insets(10, 10, 10, 10);
 
 	ErrorPopUp(String errorMessage, Stage primaryStage) {
 

@@ -15,8 +15,8 @@ import javafx.stage.StageStyle;
 
 public class InvoicePrintPreview {
     public Stage stagePrint=new Stage();
-    public static javafx.geometry.Insets padding = new Insets(20, 20, 20, 20);
-    public static javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
+    private static javafx.geometry.Insets padding = new Insets(20, 20, 20, 20);
+    private static javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     private static double height= Paper.A4.getHeight();
     private static double width=Paper.A4.getWidth();
 

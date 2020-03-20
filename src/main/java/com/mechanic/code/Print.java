@@ -8,11 +8,11 @@ import javafx.stage.Window;
 
 public class Print {
 
-    private GridPane nodePrint;
-    private Rectangle rect;
-    private WritableImage writableImage;
-    private double width;
-    private double height;
+    public GridPane nodePrint;
+    public Rectangle rect;
+    public WritableImage writableImage;
+    public double width;
+    public double height;
 
 
     public Print(GridPane node,Window window){

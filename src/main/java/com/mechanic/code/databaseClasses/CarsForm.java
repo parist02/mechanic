@@ -14,22 +14,22 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class CarsForm {
-	public Stage stageForm;
-	public String licensePlates, brand, model,date,vin;
-	public Integer customerID;
-	public TextField textFieldLicensePlates;
-	public TextField textFieldBrand;
-	public TextField textFieldModel;
-	public TextField textFieldVin;
-	public TextField textFieldDate;
-	public TextField textFieldCustomerID;
-	public Button buttonOk, buttonCancel;
-	public Label labelEmpty;
-	public boolean changed=false;
+	private Stage stageForm;
+	private String licensePlates, brand, model,date,vin;
+	private Integer customerID;
+	private TextField textFieldLicensePlates;
+	private TextField textFieldBrand;
+	private TextField textFieldModel;
+	private TextField textFieldVin;
+	private TextField textFieldDate;
+	private TextField textFieldCustomerID;
+	private Button buttonOk, buttonCancel;
+	private Label labelEmpty;
+	private boolean changed=false;
 	private String licensePlatesBefore,brandBefore,modelBefore,dateBefore,vinBefore;
 	private Integer customerIDBefore;
-	public String query="UPDATE cars SET ";
-	public String queryAdd="INSERT INTO cars (LicensePlates, Brand, Model, VIN, ManufacturingDate, CustomerID) VALUES (";
+	private String query="UPDATE cars SET ";
+	private String queryAdd="INSERT INTO cars (LicensePlates, Brand, Model, VIN, ManufacturingDate, CustomerID) VALUES (";
 
 	public CarsForm(Stage primaryStage) {
 		customersFormInitializer();
