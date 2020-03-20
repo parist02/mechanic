@@ -17,18 +17,21 @@ public class CustomersForm {
 	public Stage stageForm;
 	public String name, surname, address=null;
 	public Integer phone1=null, phone2=null;
+	private Float balance=null;
 	public TextField textFieldName;
 	public TextField textFieldSurname;
 	public TextField textFieldPhone1;
 	public TextField textFieldPhone2;
 	public TextField textFieldAddress;
+	private TextField textFieldBalance;
 	public Button buttonOk, buttonCancel;
 	public Label labelEmpty;
 	public boolean changed=false;
 	private String nameBefore,surnameBefore,addressBefore;
 	private Integer phone1Before,phone2Before;
+	private Float balanceBefore;
 	public String query="UPDATE customers SET ";
-	public String queryAdd="INSERT INTO customers (CustomerId, Name, Surname, Phone_1, Phone_2, Address) VALUES (NULL";
+	public String queryAdd="INSERT INTO customers (CustomerId, Name, Surname, Phone_1, Phone_2, Address, Balance) VALUES (NULL";
 
 	public CustomersForm(Stage primaryStage) {
 		customersFormInitializer();
@@ -47,11 +50,12 @@ public class CustomersForm {
 				phone2=Integer.parseInt(textFieldPhone2.getText());
 			}
 			address=textFieldAddress.getText();
+			balance=Float.parseFloat(textFieldBalance.getText());
 			if (name.equals("") || surname.equals("") || phone1 == null) { //elegxos an iparxoun xaraktires sta tilefono
 				labelEmpty.setText("Please fill all the details");
 			} else {
 				changed=true;
-				queryAdd = queryAdd + ", '" + name + "' , '" + surname + "', " + phone1 + ", " + phone2 + ", '" + address + "');";
+				queryAdd = queryAdd + ", '" + name + "' , '" + surname + "', " + phone1 + ", " + phone2 + ", '" + address + "'," + balance +");";
 				stageForm.close();
 			}
 		});
@@ -59,12 +63,13 @@ public class CustomersForm {
 
 
 
-	public CustomersForm(Stage primaryStage, String onoma,String epitheto,Integer til1,Integer til2,String diefthinsi ) {
+	public CustomersForm(Stage primaryStage, String onoma,String epitheto,Integer til1,Integer til2,String diefthinsi,Float ipolipo ) {
 		nameBefore=onoma;
 		surnameBefore=epitheto;
 		phone1Before=til1;
 		phone2Before=til2;
 		addressBefore=diefthinsi;
+		balanceBefore=ipolipo;
 		customersFormInitializer();
 		stageForm.initModality(Modality.WINDOW_MODAL);
 		stageForm.initOwner(primaryStage);
@@ -73,6 +78,7 @@ public class CustomersForm {
 		textFieldPhone1.setText(til1.toString());
 		textFieldPhone2.setText(til2.toString());
 		textFieldAddress.setText(diefthinsi);
+		textFieldBalance.setText(ipolipo.toString());
 		//Event Handler
 		buttonCancel.setOnAction(e->{
 			stageForm.close();
@@ -83,6 +89,7 @@ public class CustomersForm {
 			phone1=Integer.parseInt(textFieldPhone1.getText());
 			phone2=Integer.parseInt(textFieldPhone2.getText());
 			address=textFieldAddress.getText();
+			balance=Float.parseFloat(textFieldBalance.getText());
 			if (name.equals("")||surname.equals("")|| phone1 == null){
 				labelEmpty.setText("Please fill all the details");
 			}else {
@@ -126,6 +133,14 @@ public class CustomersForm {
 						query=query+" Address = '"+address+"'";
 					}
 				}
+				if(!balance.equals(balanceBefore)){
+					if(changed){
+						query=query+", Balance = "+balance.toString();
+					}else{
+						changed=true;
+						query=query+" Balance = "+balance.toString();
+					}
+				}
 				stageForm.close();
 			}
 		});
@@ -152,6 +167,9 @@ public class CustomersForm {
 		Label labelAddress = new Label("Address:");
 		labelAddress.setFont(font);
 		labelAddress.setTextFill(Color.BLACK);
+		Label labelBalance=new Label("Balance");
+		labelBalance.setFont(font);
+		labelBalance.setTextFill(Color.BLACK);
 		labelEmpty = new Label("");
 		labelEmpty.setFont(font);
 		labelEmpty.setTextFill(Color.FIREBRICK);
@@ -166,6 +184,7 @@ public class CustomersForm {
 		textFieldPhone1 = new TextField();
 		textFieldPhone2 = new TextField();
 		textFieldAddress = new TextField();
+		textFieldBalance=new TextField();
 		//
 		buttonOk = new Button("Ok");
 		buttonCancel = new Button("Cancel");
@@ -182,9 +201,11 @@ public class CustomersForm {
 		grid.add(textFieldPhone2, 1, 4);
 		grid.add(labelAddress, 0, 5);
 		grid.add(textFieldAddress, 1, 5);
-		grid.add(labelEmpty, 0, 6, 2, 1);
-		grid.add(buttonOk, 0, 7);
-		grid.add(buttonCancel, 1, 7);
+		grid.add(labelBalance, 0, 6);
+		grid.add(textFieldBalance, 1, 6);
+		grid.add(labelEmpty, 0, 7, 2, 1);
+		grid.add(buttonOk, 0, 8);
+		grid.add(buttonCancel, 1, 8);
 		grid.setPadding(new Insets(25, 25, 25, 25));
 		grid.setHgap(20);
 		grid.setVgap(15);
@@ -220,6 +241,9 @@ public class CustomersForm {
 	}
 	public Integer getPhone2() {
 		return phone2;
+	}
+	public Float getBalance() {
+		return balance;
 	}
 
 	public boolean isChanged() {

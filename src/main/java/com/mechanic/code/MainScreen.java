@@ -18,19 +18,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
-import java.io.FileNotFoundException;
 import java.sql.*;
 
 public class MainScreen extends Application {
-    public TableView<Customers> tableViewCustomers=new TableView<>();
-    public TableView<Cars>tableViewCars= new TableView<>();
-    public static Insets padding = new Insets(10, 10, 10, 10);
-    public static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
-    public Connection connection;
-    public Stage primaryStage;
-    public ObservableList<Customers>allCustomers;
-    public ObservableList<Cars>allCars;
+    private TableView<Customers> tableViewCustomers=new TableView<>();
+    private TableView<Cars>tableViewCars= new TableView<>();
+    private static Insets padding = new Insets(10, 10, 10, 10);
+    private static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
+    private Connection connection;
+    private Stage primaryStage;
+    private ObservableList<Customers>allCustomers;
+    private ObservableList<Cars>allCars;
 
     @Override
     public void init() throws Exception {
@@ -91,33 +89,35 @@ public class MainScreen extends Application {
         TableColumn<Customers, Integer> phone1Column = new TableColumn<>("Phone1");
         phone1Column.setReorderable(false);
         phone1Column.setResizable(false);
-        phone1Column.setMinWidth(75);
+        phone1Column.setMinWidth(100);
         phone1Column.setCellValueFactory(new PropertyValueFactory<>("phone1"));
 
         TableColumn<Customers, Integer> phone2Column = new TableColumn<>("Phone2");
         phone2Column.setReorderable(false);
         phone2Column.setResizable(false);
-        phone2Column.setMinWidth(75);
+        phone2Column.setMinWidth(100);
         phone2Column.setCellValueFactory(new PropertyValueFactory<>("phone2"));
 
         TableColumn<Customers, Integer> addressColumn = new TableColumn<>("Address");
         addressColumn.setReorderable(false);
         addressColumn.setResizable(false);
-        addressColumn.setMinWidth(175);
+        addressColumn.setMinWidth(200);
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
 
+        TableColumn<Customers,Float> balanceColumn=new TableColumn<>("Balance");
+        balanceColumn.setReorderable(false);
+        balanceColumn.setResizable(false);
+        balanceColumn.setMinWidth(100);
+        balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
 
-        tableViewCustomers.getColumns().add(counterColumn);
-        tableViewCustomers.getColumns().add(nameColumn);
-        tableViewCustomers.getColumns().add(surnameColumn);
-        tableViewCustomers.getColumns().add(phone1Column);
-        tableViewCustomers.getColumns().add(phone2Column);
-        tableViewCustomers.getColumns().add(addressColumn);
+
+        tableViewCustomers.getColumns().addAll(counterColumn,nameColumn,surnameColumn,phone1Column,phone2Column,addressColumn,balanceColumn);
         tableViewCustomers.setEditable(false);
-
         tableViewCustomers.setItems(importFromCustomers());
         tableViewCustomers.setPadding(padding);
+        tableViewCustomers.setMaxHeight(500);
+        tableViewCustomers.setMaxWidth(800);
         Label labelCustomerTitle = new Label("Showing all customers");
         Button buttonDeleteCustomers = new Button("Delete");
         buttonDeleteCustomers.setPadding(padding);
@@ -137,15 +137,9 @@ public class MainScreen extends Application {
         TextField textFieldSearchCustomers = new TextField();
         textFieldSearchCustomers.setPadding(padding);
         Button buttonSearchCustomers=new Button("Search");
-        buttonSearchCustomers.setPadding(padding);
-        buttonSearchCustomers.setOnAction(ser->tableViewCustomers.setItems(searchFromCustomers(textFieldSearchCustomers.getText())));
         Button buttonSearchClearCustomers=new Button("Clear");
-        buttonSearchClearCustomers.setPadding(padding);
-        buttonSearchClearCustomers.setOnAction(cle->{
-            tableViewCustomers.setItems(allCustomers);
-            textFieldSearchCustomers.setText("");
 
-        });
+
 
         TableColumn<Cars, String> licencePlatesColumn = new TableColumn<>("License Plates");
         licencePlatesColumn.setReorderable(false);
@@ -156,25 +150,25 @@ public class MainScreen extends Application {
         TableColumn<Cars, String> brandColumn = new TableColumn<>("Brand");
         brandColumn.setReorderable(false);
         brandColumn.setResizable(false);
-        brandColumn.setMinWidth(125);
+        brandColumn.setMinWidth(150);
         brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
         TableColumn<Cars, String> modelColumn = new TableColumn<>("Model");
         modelColumn.setReorderable(false);
         modelColumn.setResizable(false);
-        modelColumn.setMinWidth(125);
+        modelColumn.setMinWidth(150);
         modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
 
         TableColumn<Cars, String> vinColumn = new TableColumn<>("VIN");
         vinColumn.setReorderable(false);
         vinColumn.setResizable(false);
-        vinColumn.setMinWidth(125);
+        vinColumn.setMinWidth(200);
         vinColumn.setCellValueFactory(new PropertyValueFactory<>("vin"));
 
         TableColumn<Cars, Date> dateColumn = new TableColumn<>("Date");
         dateColumn.setReorderable(false);
         dateColumn.setResizable(false);
-        dateColumn.setMinWidth(50);
+        dateColumn.setMinWidth(100);
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         TableColumn<Cars, Integer> customerIdColumn = new TableColumn<>("CustomerID");
@@ -192,6 +186,8 @@ public class MainScreen extends Application {
         tableViewCars.getColumns().add(dateColumn);
         tableViewCars.getColumns().add(customerIdColumn);
         tableViewCars.setEditable(false);
+        tableViewCars.setMaxHeight(150);
+        tableViewCars.setMaxWidth(800);
         tableViewCars.setItems(importFromCars());
         tableViewCars.setPadding(padding);
 
@@ -200,11 +196,47 @@ public class MainScreen extends Application {
         buttonAddCars.setOnAction(add->{
             addToCars();
         });
+        Button buttonDeleteCars = new Button("Delete");
+        buttonDeleteCars.setPadding(padding);
+        buttonDeleteCars.setOnAction(del -> {
+            deleteFromCars();
+        });
 
-        HBox boxButtonsCustomers = new HBox(buttonAddCustomer,buttonUpdateCustomers, buttonDeleteCustomers,textFieldSearchCustomers,buttonSearchCustomers,buttonSearchClearCustomers);
+
+        ComboBox comboBoxSearchTab1=new ComboBox();
+        comboBoxSearchTab1.getItems().add("Αριθμός Τηλεφώνου");
+        comboBoxSearchTab1.getItems().add("Νούμερα Αυτοκινήτου");
+        comboBoxSearchTab1.getSelectionModel().selectFirst();
+        comboBoxSearchTab1.setPadding(padding);
+        buttonSearchCustomers.setPadding(padding);
+        buttonSearchCustomers.setOnAction(ser->{
+            if (!textFieldSearchCustomers.getText().equals("")) {
+                if (comboBoxSearchTab1.getValue().equals("Αριθμός Τηλεφώνου")) {
+                    tableViewCustomers.setItems(searchFromCustomers(0, textFieldSearchCustomers.getText()));
+                    int customerIDSearched = tableViewCustomers.getItems().get(0).getCounter();
+                    tableViewCars.setItems(searchFromCars(customerIDSearched, ""));
+                } else if (comboBoxSearchTab1.getValue().equals("Νούμερα Αυτοκινήτου")) {
+                    tableViewCars.setItems(searchFromCars(0, textFieldSearchCustomers.getText()));
+                    int customerIDSearched = tableViewCars.getItems().get(0).getCustomerId();
+                    tableViewCustomers.setItems(searchFromCustomers(customerIDSearched, ""));
+                }
+            }else{
+                ErrorPopUp errorPopUp = new ErrorPopUp("Η μπάρα αναζήτησης είναι κενή", primaryStage);
+            }
+        });
+        buttonSearchClearCustomers.setPadding(padding);
+        buttonSearchClearCustomers.setOnAction(cle->{
+            tableViewCustomers.setItems(allCustomers);
+            textFieldSearchCustomers.setText("");
+            tableViewCars.setItems(allCars);
+
+        });
+
+
+        HBox boxButtonsCustomers = new HBox(buttonAddCustomer,buttonUpdateCustomers, buttonDeleteCustomers,comboBoxSearchTab1,textFieldSearchCustomers,buttonSearchCustomers,buttonSearchClearCustomers);
         boxButtonsCustomers.setPadding(padding);
         boxButtonsCustomers.setSpacing(20);
-        HBox boxButtonsCars=new HBox(buttonAddCars);
+        HBox boxButtonsCars=new HBox(buttonAddCars,buttonDeleteCars);
         boxButtonsCars.setPadding(padding);
         boxButtonsCars.setSpacing(20);
         VBox boxCustomers = new VBox(labelCustomerTitle,boxButtonsCustomers, tableViewCustomers,boxButtonsCars,tableViewCars );
@@ -251,7 +283,7 @@ public class MainScreen extends Application {
             ResultSet rs = stmt.executeQuery("select * from customers");
             Customers customer;
             while (rs.next()) {
-                customer = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6));
+                customer = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6),rs.getFloat(7));
                 allCustomers.add(customer);
             }
 
@@ -278,23 +310,77 @@ public class MainScreen extends Application {
         return allCars;
     }
 
-    public ObservableList<Customers>searchFromCustomers(String searchString) {
-        ObservableList<Customers>customersSearched=FXCollections.observableArrayList();
-        try {
-            final String querySearch = "SELECT * FROM customers WHERE Phone_1=" + searchString + ";";
-            System.out.println(querySearch);
-            Statement statement=connection.createStatement();
-            ResultSet rs = statement.executeQuery(querySearch);
-            Customers customerSearched;
-            while (rs.next()) {
-                customerSearched = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6));
-                customersSearched.add(customerSearched);
+    public ObservableList<Cars>searchFromCars(int searchType,String searchString) {
+        ObservableList<Cars> carsSearched = FXCollections.observableArrayList();
+        if (searchType == 0) {
+            try {
+                final String querySearch = "SELECT * FROM cars WHERE LicensePlates= '" + searchString + "';";
+                System.out.println(querySearch);
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery(querySearch);
+                Cars carSearched;
+                while (rs.next()) {
+                    carSearched = new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
+                    carsSearched.add(carSearched);
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error with searching");
             }
-        }catch (SQLException ex){
-            System.out.println("Error with searching");
+        }else{
+            try {
+                final String querySearch = "SELECT * FROM cars WHERE CustomerID=" + searchType + ";";
+                System.out.println(querySearch);
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery(querySearch);
+                Cars carSearched;
+                while (rs.next()) {
+                    carSearched =  new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
+                    carsSearched.add(carSearched);
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error with searching");
+            }
+        }
+        return carsSearched;
+    }
+
+    public ObservableList<Customers>searchFromCustomers(int searchType,String searchString) {
+        ObservableList<Customers> customersSearched = FXCollections.observableArrayList();
+        if (searchType == 0) {
+            try {
+                final String querySearch = "SELECT * FROM customers WHERE Phone_1=" + searchString + ";";
+                System.out.println(querySearch);
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery(querySearch);
+                Customers customerSearched;
+                while (rs.next()) {
+                    customerSearched = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
+                    customersSearched.add(customerSearched);
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error with searching");
+            }
+        }else{
+            try {
+                final String querySearch = "SELECT * FROM customers WHERE CustomerID=" + searchType + ";";
+                System.out.println(querySearch);
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery(querySearch);
+                Customers customerSearched;
+                while (rs.next()) {
+                    customerSearched = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
+                    customersSearched.add(customerSearched);
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error with searching");
+            }
         }
         return customersSearched;
     }
+
+
+
+
 
     public void deleteFromCustomers() {
         try {
@@ -313,6 +399,26 @@ public class MainScreen extends Application {
         }
     }
 
+    public void deleteFromCars() {
+        try {
+            ObservableList<Cars> selectedCars, allCars;
+            allCars = tableViewCars.getItems();
+            selectedCars = tableViewCars.getSelectionModel().getSelectedItems();
+            final String index = selectedCars.get(0).licencePlates;
+            selectedCars.forEach(allCars::remove);
+            final String query = "DELETE FROM cars WHERE LicensePlates = '" + index + "'";
+            System.out.println(query);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.execute();
+        } catch (Exception ex) {
+            System.out.println("Error with removing from database");
+            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
+        }
+    }
+
+
+
+
     public void updateFromCustomers() {
         try {
             ObservableList<Customers> selectedCustomer, allCustomers;
@@ -320,14 +426,14 @@ public class MainScreen extends Application {
             selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItems();
             final int index2=tableViewCustomers.getSelectionModel().getFocusedIndex();
             final int index = selectedCustomer.get(0).getCounter();
-            CustomersForm customersForm = new CustomersForm(primaryStage, selectedCustomer.get(0).getName(), selectedCustomer.get(0).getSurname(), selectedCustomer.get(0).getPhone1(), selectedCustomer.get(0).getPhone2(), selectedCustomer.get(0).getAddress());
+            CustomersForm customersForm = new CustomersForm(primaryStage, selectedCustomer.get(0).getName(), selectedCustomer.get(0).getSurname(), selectedCustomer.get(0).getPhone1(), selectedCustomer.get(0).getPhone2(), selectedCustomer.get(0).getAddress(),selectedCustomer.get(0).getBalance());
             customersForm.showForm();
             if (customersForm.isChanged()) {
                 final String query=customersForm.getQuery()+" WHERE CustomerID = "+index+";";
                 System.out.println(query);
                 PreparedStatement preparedStatement=connection.prepareStatement(query);
                 preparedStatement.execute();
-                Customers customersEdited=new Customers(index,customersForm.getName(), customersForm.getSurname(),customersForm.getPhone1(),customersForm.getPhone2(),customersForm.getAddress());
+                Customers customersEdited=new Customers(index,customersForm.getName(), customersForm.getSurname(),customersForm.getPhone1(),customersForm.getPhone2(),customersForm.getAddress(),customersForm.getBalance());
                 allCustomers.set(index2,customersEdited);
             } else {
                 System.out.println("Not saving changes");
@@ -351,7 +457,7 @@ public class MainScreen extends Application {
                 Statement statement=connection.createStatement();
                 ResultSet rs = statement.executeQuery(querySearch);
                 rs.next();
-                Customers customersNew=new Customers(rs.getInt(1),customersForm.getName(),customersForm.getSurname(),customersForm.getPhone1(),((customersForm.getPhone2()==null)?0:customersForm.getPhone2()),customersForm.getAddress());
+                Customers customersNew=new Customers(rs.getInt(1),customersForm.getName(),customersForm.getSurname(),customersForm.getPhone1(),((customersForm.getPhone2()==null)?0:customersForm.getPhone2()),customersForm.getAddress(),customersForm.getBalance());
                 ObservableList<Customers>newCustomer=tableViewCustomers.getItems();
                 newCustomer.add(customersNew);
                 tableViewCustomers.setItems(newCustomer);
