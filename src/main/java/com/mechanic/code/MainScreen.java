@@ -118,6 +118,28 @@ public class MainScreen extends Application {
         tableViewCustomers.setPadding(padding);
         tableViewCustomers.setMaxHeight(500);
         tableViewCustomers.setMaxWidth(800);
+        tableViewCustomers.setOnMouseClicked(mouseEvent -> {
+            if(tableViewCustomers.getSelectionModel().isEmpty()){
+                System.out.println("Nothing is selected");
+            }else{
+                ObservableList<Customers>selectedCustomer=tableViewCustomers.getSelectionModel().getSelectedItems();
+                ObservableList<Cars> carsSearched = FXCollections.observableArrayList();
+                try {
+                    final String querySearch = "SELECT * FROM cars WHERE CustomerID=" + selectedCustomer.get(0).getCounter() + ";";
+                    System.out.println(querySearch);
+                    Statement statement = connection.createStatement();
+                    ResultSet rs = statement.executeQuery(querySearch);
+                    Cars carSearched;
+                    while (rs.next()) {
+                        carSearched =  new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
+                        carsSearched.add(carSearched);
+                    }
+                } catch (SQLException ex) {
+                    System.out.println("Error with searching");
+                }
+                tableViewCars.setItems(carsSearched);
+            }
+        });
         Label labelCustomerTitle = new Label("Showing all customers");
         Button buttonDeleteCustomers = new Button("Delete");
         buttonDeleteCustomers.setPadding(padding);
@@ -229,6 +251,8 @@ public class MainScreen extends Application {
             tableViewCustomers.setItems(allCustomers);
             textFieldSearchCustomers.setText("");
             tableViewCars.setItems(allCars);
+            tableViewCustomers.getSelectionModel().clearSelection();
+            tableViewCars.getSelectionModel().clearSelection();
 
         });
 
