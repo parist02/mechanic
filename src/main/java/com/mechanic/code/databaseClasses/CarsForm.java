@@ -39,13 +39,13 @@ public class CarsForm {
 			stageForm.close();
 		});
 		buttonOk.setOnAction(e -> {
-			licensePlates=textFieldLicensePlates.getText();
-			brand=textFieldBrand.getText();
-			model=textFieldModel.getText();
-			vin=textFieldVin.getText();
-			date=textFieldDate.getText();
+			licensePlates=textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
+			brand=textFieldBrand.getText().replaceAll("[^a-zA-Z0-9]", "");
+			model=textFieldModel.getText().replaceAll("[^a-zA-Z0-9]", "");
+			vin=textFieldVin.getText().replaceAll("[^a-zA-Z0-9]", "");
+			date=textFieldDate.getText().replaceAll("[^a-zA-Z0-9/-]\\s", "");
 			if (!textFieldCustomerID.getText().equals("")){
-				customerID=Integer.parseInt(textFieldCustomerID.getText());
+				customerID=Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
 			}
 			if (licensePlates.equals("") || brand.equals("") || model.equals("") || vin.equals("") || date.equals("")) {
 				labelEmpty.setText("Please fill all the details");
@@ -80,13 +80,13 @@ public class CarsForm {
 			stageForm.close();
 		});
 		buttonOk.setOnAction(e->{
-			licensePlates=textFieldLicensePlates.getText();
-			brand=textFieldBrand.getText();
-			model=textFieldModel.getText();
-			vin=textFieldVin.getText();
-			date=textFieldDate.getText();
+			licensePlates=textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
+			brand=textFieldBrand.getText().replaceAll("[^a-zA-Z0-9]", "");
+			model=textFieldModel.getText().replaceAll("[^a-zA-Z0-9]", "");
+			vin=textFieldVin.getText().replaceAll("[^a-zA-Z0-9]", "");
+			date=textFieldDate.getText().replaceAll("[^a-zA-Z0-9/-]\\s", "");
 			if (!textFieldCustomerID.getText().equals("")){
-				customerID=Integer.parseInt(textFieldCustomerID.getText());
+				customerID=Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
 			}
 			if (licensePlates.equals("") || brand.equals("") || model.equals("") || vin.equals("") || date.toString().equals("")) {
 				labelEmpty.setText("Please fill all the details");

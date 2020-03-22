@@ -212,6 +212,33 @@ public class MainScreen extends Application {
         tableViewCars.setMaxWidth(800);
         tableViewCars.setItems(importFromCars());
         tableViewCars.setPadding(padding);
+        tableViewCars.setOnMouseClicked(mouseEvent -> {
+            if(tableViewCars.getSelectionModel().isEmpty()){
+                System.out.println("Nothing is selected");
+            }else{
+                ObservableList<Cars>selectedCar=tableViewCars.getSelectionModel().getSelectedItems();
+                ObservableList<Customers> customersSearched = FXCollections.observableArrayList();
+                try {
+                    final String querySearch = "SELECT * FROM customers WHERE CustomerID=" + selectedCar.get(0).getCustomerId() + ";";
+                    System.out.println(querySearch);
+                    Statement statement = connection.createStatement();
+                    ResultSet rs = statement.executeQuery(querySearch);
+                    Customers customerSearched;
+                    while (rs.next()) {
+                        customerSearched =  new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6),rs.getFloat(7));
+                        customersSearched.add(customerSearched);
+                    }
+                } catch (SQLException ex) {
+                    System.out.println("Error with searching");
+                }
+                tableViewCustomers.setItems(customersSearched);
+            }
+        });
+
+
+
+
+
 
         Button buttonAddCars=new Button("Add");
         buttonAddCars.setPadding(padding);
@@ -234,13 +261,21 @@ public class MainScreen extends Application {
         buttonSearchCustomers.setOnAction(ser->{
             if (!textFieldSearchCustomers.getText().equals("")) {
                 if (comboBoxSearchTab1.getValue().equals("Αριθμός Τηλεφώνου")) {
-                    tableViewCustomers.setItems(searchFromCustomers(0, textFieldSearchCustomers.getText()));
-                    int customerIDSearched = tableViewCustomers.getItems().get(0).getCounter();
-                    tableViewCars.setItems(searchFromCars(customerIDSearched, ""));
+                    tableViewCustomers.setItems(searchFromCustomers(0, textFieldSearchCustomers.getText().replaceAll("[^0-9]", "")));
+                    if (!tableViewCustomers.getItems().isEmpty()) {
+                        int customerIDSearched = tableViewCustomers.getItems().get(0).getCounter();
+                        tableViewCars.setItems(searchFromCars(customerIDSearched, ""));
+                    }else{
+                        tableViewCars.setItems(searchFromCars(0, ""));
+                    }
                 } else if (comboBoxSearchTab1.getValue().equals("Νούμερα Αυτοκινήτου")) {
-                    tableViewCars.setItems(searchFromCars(0, textFieldSearchCustomers.getText()));
-                    int customerIDSearched = tableViewCars.getItems().get(0).getCustomerId();
-                    tableViewCustomers.setItems(searchFromCustomers(customerIDSearched, ""));
+                    tableViewCars.setItems(searchFromCars(0, textFieldSearchCustomers.getText().replaceAll("[^a-zA-Z0-9]", "")));
+                    if (!tableViewCars.getItems().isEmpty()) {
+                        int customerIDSearched = tableViewCars.getItems().get(0).getCustomerId();
+                        tableViewCustomers.setItems(searchFromCustomers(customerIDSearched, ""));
+                    }else{
+                        tableViewCustomers.setItems(searchFromCustomers(-1, ""));
+                    }
                 }
             }else{
                 ErrorPopUp errorPopUp = new ErrorPopUp("Η μπάρα αναζήτησης είναι κενή", primaryStage);
@@ -377,6 +412,13 @@ public class MainScreen extends Application {
                 Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(querySearch);
                 Customers customerSearched;
+                while (rs.next()) {
+                    customerSearched = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
+                    customersSearched.add(customerSearched);
+                }
+                final String querySearch2 = "SELECT * FROM customers WHERE Phone_2=" + searchString + ";";
+                System.out.println(querySearch2);
+                rs = statement.executeQuery(querySearch2);
                 while (rs.next()) {
                     customerSearched = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
                     customersSearched.add(customerSearched);

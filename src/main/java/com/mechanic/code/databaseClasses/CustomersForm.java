@@ -42,15 +42,18 @@ public class CustomersForm {
 		});
 		buttonOk.setOnAction(e -> {
 			name=textFieldName.getText();
+			name=name.replaceAll("[^a-zA-Z0-9]", "");
 			surname=textFieldSurname.getText();
+			surname=surname.replaceAll("[^a-zA-Z0-9]", "");
 			if (!textFieldPhone1.getText().equals("")){
-				phone1=Integer.parseInt(textFieldPhone1.getText());
+				phone1=Integer.parseInt(textFieldPhone1.getText().replaceAll("[^0-9]", ""));
 			}
 			if (!textFieldPhone2.getText().equals("")){
-				phone2=Integer.parseInt(textFieldPhone2.getText());
+				phone2=Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
 			}
 			address=textFieldAddress.getText();
-			balance=Float.parseFloat(textFieldBalance.getText());
+			address=address.replaceAll("[^a-zA-Z0-9]\\s", "");
+			balance=Float.parseFloat(textFieldBalance.getText().replaceAll("[^0-9.]", ""));
 			if (name.equals("") || surname.equals("") || phone1 == null) { //elegxos an iparxoun xaraktires sta tilefono
 				labelEmpty.setText("Please fill all the details");
 			} else {
@@ -84,12 +87,12 @@ public class CustomersForm {
 			stageForm.close();
 		});
 		buttonOk.setOnAction(e->{
-			name=textFieldName.getText();
-			surname=textFieldSurname.getText();
-			phone1=Integer.parseInt(textFieldPhone1.getText());
-			phone2=Integer.parseInt(textFieldPhone2.getText());
-			address=textFieldAddress.getText();
-			balance=Float.parseFloat(textFieldBalance.getText());
+			name=textFieldName.getText().replaceAll("[^a-zA-Z0-9]", "");
+			surname=textFieldSurname.getText().replaceAll("[^a-zA-Z0-9]", "");
+			phone1=Integer.parseInt(textFieldPhone1.getText().replaceAll("[^0-9]", ""));
+			phone2=Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
+			address=textFieldAddress.getText().replaceAll("[^a-zA-Z0-9]\\s", "");;
+			balance=Float.parseFloat(textFieldBalance.getText().replaceAll("[^0-9.]", ""));
 			if (name.equals("")||surname.equals("")|| phone1 == null){
 				labelEmpty.setText("Please fill all the details");
 			}else {
