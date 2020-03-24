@@ -248,8 +248,10 @@ public class CustomersForm {
 	public Float getBalance() {
 		return balance;
 	}
-
 	public boolean isChanged() {
 		return changed;
+	}
+	public void setTextFieldPhone1(String til) {
+		this.textFieldPhone1.setText(til);
 	}
 }

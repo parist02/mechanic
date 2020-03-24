@@ -253,4 +253,8 @@ public class CarsForm {
 	public boolean isChanged() {
 		return changed;
 	}
+
+	public void setTextFieldLicensePlates(String noumera) {
+		textFieldLicensePlates.setText(noumera);
+	}
 }

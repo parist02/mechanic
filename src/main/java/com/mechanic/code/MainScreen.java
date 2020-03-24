@@ -29,6 +29,9 @@ public class MainScreen extends Application {
     private Stage primaryStage;
     private ObservableList<Customers>allCustomers;
     private ObservableList<Cars>allCars;
+    private ErrorPopUp errorPopUp0;
+    private ErrorPopUp errorPopUp1;
+    private ErrorPopUp errorPopUp2;
 
     @Override
     public void init() throws Exception {
@@ -144,7 +147,16 @@ public class MainScreen extends Application {
         Button buttonDeleteCustomers = new Button("Delete");
         buttonDeleteCustomers.setPadding(padding);
         buttonDeleteCustomers.setOnAction(del -> {
-            deleteFromCustomers();
+            if (tableViewCustomers.getSelectionModel().isEmpty()){
+                errorPopUp0.setErrorMessage("Επιλέξτε τον πελάτη που θέλετε");
+                errorPopUp0.showError();
+            }else {
+                errorPopUp2.setErrorMessage("Είστε σίγουρος ότι θέλετε να διαγράψετε τον πελάτη;");
+                errorPopUp2.showError();
+                if (errorPopUp2.isAdded()) {
+                    deleteFromCustomers();
+                }
+            }
         });
         Button buttonUpdateCustomers = new Button("Edit");
         buttonUpdateCustomers.setPadding(padding);
@@ -154,7 +166,7 @@ public class MainScreen extends Application {
         Button buttonAddCustomer=new Button("Add");
         buttonAddCustomer.setPadding(padding);
         buttonAddCustomer.setOnAction(add->{
-            addToCustomers();
+            addToCustomers(null);
         });
         TextField textFieldSearchCustomers = new TextField();
         textFieldSearchCustomers.setPadding(padding);
@@ -243,7 +255,7 @@ public class MainScreen extends Application {
         Button buttonAddCars=new Button("Add");
         buttonAddCars.setPadding(padding);
         buttonAddCars.setOnAction(add->{
-            addToCars();
+            addToCars(null);
         });
         Button buttonDeleteCars = new Button("Delete");
         buttonDeleteCars.setPadding(padding);
@@ -261,24 +273,45 @@ public class MainScreen extends Application {
         buttonSearchCustomers.setOnAction(ser->{
             if (!textFieldSearchCustomers.getText().equals("")) {
                 if (comboBoxSearchTab1.getValue().equals("Αριθμός Τηλεφώνου")) {
-                    tableViewCustomers.setItems(searchFromCustomers(0, textFieldSearchCustomers.getText().replaceAll("[^0-9]", "")));
-                    if (!tableViewCustomers.getItems().isEmpty()) {
-                        int customerIDSearched = tableViewCustomers.getItems().get(0).getCounter();
-                        tableViewCars.setItems(searchFromCars(customerIDSearched, ""));
-                    }else{
-                        tableViewCars.setItems(searchFromCars(0, ""));
+                    if (textFieldSearchCustomers.getText().replaceAll("[^0-9]", "").equals("")) {
+                        errorPopUp0.setErrorMessage("Μη έγκυρη είσοδος , παρακαλώ καταχώρησε αριθμό τηλεφώνου");
+                        errorPopUp0.showError();
+                    } else {
+                        ObservableList<Customers> searchedData = searchFromCustomers(0, textFieldSearchCustomers.getText().replaceAll("[^0-9]", ""));
+                        if (searchedData.isEmpty()) {
+                            errorPopUp1.setErrorMessage("Ο πελάτης με αριθμό τηλεφώνου "+textFieldSearchCustomers.getText().replaceAll("[^0-9]", "")+" που αναζητήσατε δεν βρέθηκε. Θέλετε να τον προσθεσετε;");
+                            errorPopUp1.showError();
+                            if (errorPopUp1.isAdded()) {
+                                addToCustomers(textFieldSearchCustomers.getText().replaceAll("[^0-9]", ""));
+                            }
+                        } else {
+                            tableViewCustomers.setItems(searchedData);
+                            int customerIDSearched = tableViewCustomers.getItems().get(0).getCounter();
+                            tableViewCars.setItems(searchFromCars(customerIDSearched, ""));
+                        }
                     }
                 } else if (comboBoxSearchTab1.getValue().equals("Νούμερα Αυτοκινήτου")) {
-                    tableViewCars.setItems(searchFromCars(0, textFieldSearchCustomers.getText().replaceAll("[^a-zA-Z0-9]", "")));
-                    if (!tableViewCars.getItems().isEmpty()) {
-                        int customerIDSearched = tableViewCars.getItems().get(0).getCustomerId();
-                        tableViewCustomers.setItems(searchFromCustomers(customerIDSearched, ""));
-                    }else{
-                        tableViewCustomers.setItems(searchFromCustomers(-1, ""));
+                    if (textFieldSearchCustomers.getText().replaceAll("[^a-zA-Z0-9]", "").equals("")) {
+                        errorPopUp0.setErrorMessage("Μη έγκυρη είσοδος , παρακαλώ καταχώρησε νούμερα αυτοκινήτου");
+                        errorPopUp0.showError();
+                    } else {
+                        ObservableList<Cars> searchedData = searchFromCars(0, textFieldSearchCustomers.getText().replaceAll("[^a-zA-Z0-9]", ""));
+                        if (searchedData.isEmpty()) {
+                            errorPopUp1.setErrorMessage("To αυτοκίνητο με νούμερα "+textFieldSearchCustomers.getText().replaceAll("[^a-zA-Z0-9]", "")+" που αναζητήσατε δεν βρέθηκε. Θέλετε να το προσθεσετε;");
+                            errorPopUp1.showError();
+                            if (errorPopUp1.isAdded()) {
+                                addToCars(textFieldSearchCustomers.getText().replaceAll("[^a-zA-Z0-9]", ""));
+                            }
+                        } else {
+                            tableViewCars.setItems(searchedData);
+                            int customerIDSearched = tableViewCars.getItems().get(0).getCustomerId();
+                            tableViewCustomers.setItems(searchFromCustomers(customerIDSearched, ""));
+                        }
                     }
                 }
-            }else{
-                ErrorPopUp errorPopUp = new ErrorPopUp("Η μπάρα αναζήτησης είναι κενή", primaryStage);
+            }else {
+                errorPopUp0.setErrorMessage("Η μπάρα αναζήτησης είναι κενή");
+                errorPopUp0.showError();
             }
         });
         buttonSearchClearCustomers.setPadding(padding);
@@ -322,6 +355,9 @@ public class MainScreen extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("MainScreen");
         stage = primaryStage;
+        errorPopUp0=new ErrorPopUp(0,primaryStage);
+        errorPopUp1=new ErrorPopUp(1,primaryStage);
+        errorPopUp2=new ErrorPopUp(2,primaryStage);
         primaryStage.show();
 
     }
@@ -345,7 +381,6 @@ public class MainScreen extends Application {
                 customer = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6),rs.getFloat(7));
                 allCustomers.add(customer);
             }
-
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
@@ -461,7 +496,7 @@ public class MainScreen extends Application {
             preparedStatement.execute();
         } catch (Exception ex) {
             System.out.println("Error with removing from database");
-            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
+//            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
         }
     }
 
@@ -478,7 +513,9 @@ public class MainScreen extends Application {
             preparedStatement.execute();
         } catch (Exception ex) {
             System.out.println("Error with removing from database");
-            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
+            errorPopUp0.setErrorMessage("Επιλέξτε τον πελάτη που θέλετε");
+            errorPopUp0.showError();
+//            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
         }
     }
 
@@ -506,13 +543,16 @@ public class MainScreen extends Application {
             }
         } catch (Exception ex) {
             System.out.println("Error with updating from database");
-            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
+            errorPopUp0.setErrorMessage("Επιλέξτε τον πελάτη που θέλετε");
+            errorPopUp0.showError();
+//            ErrorPopUp errorPopUp = new ErrorPopUp("Select an item", primaryStage);
         }
     }
 
-    public void addToCustomers(){
+    public void addToCustomers(String til){
         try{
             CustomersForm customersForm=new CustomersForm(primaryStage);
+            customersForm.setTextFieldPhone1(til);
             customersForm.showForm();
             if (customersForm.isChanged()) {
                 final String query = customersForm.getQueryAdd();
@@ -532,13 +572,16 @@ public class MainScreen extends Application {
             }
         }catch (SQLException e) {
             System.out.println("Error with adding data to database");
-            ErrorPopUp errorPopUp=new ErrorPopUp("Error with adding data to database",primaryStage);
+            errorPopUp0.setErrorMessage("Πρόβλημα στην εισαγωγή δεδομένων. Ελέξτε αν βάλατε τα σωστά στοιχεία.");
+            errorPopUp0.showError();
+            //ErrorPopUp errorPopUp=new ErrorPopUp("Error with adding data to database",primaryStage);
         }
     }
 
-    public void addToCars(){
+    public void addToCars(String noumera){
         try{
             CarsForm carsForm=new CarsForm(primaryStage);
+            carsForm.setTextFieldLicensePlates(noumera);
             carsForm.showForm();
             if (carsForm.isChanged()) {
                 final String query = carsForm.getQueryAdd();
@@ -554,7 +597,9 @@ public class MainScreen extends Application {
             }
         }catch (SQLException e) {
             System.out.println("Error with adding data to database");
-            ErrorPopUp errorPopUp=new ErrorPopUp("Error with adding data to database",primaryStage);
+            errorPopUp0.setErrorMessage("Πρόβλημα στην εισαγωγή δεδομένων. Ελέξτε αν βάλατε τα σωστά στοιχεία.");
+            errorPopUp0.showError();
+            //ErrorPopUp errorPopUp=new ErrorPopUp("Error with adding data to database",primaryStage);
         }
     }
 
