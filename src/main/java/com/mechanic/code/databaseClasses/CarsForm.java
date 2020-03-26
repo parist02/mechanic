@@ -32,12 +32,10 @@ public class CarsForm {
 	private String queryAdd="INSERT INTO cars (LicensePlates, Brand, Model, VIN, ManufacturingDate, CustomerID) VALUES (";
 
 	public CarsForm(Stage primaryStage) {
-		customersFormInitializer();
+		carsFormInitializer();
 		stageForm.initModality(Modality.WINDOW_MODAL);
 		stageForm.initOwner(primaryStage);
-		buttonCancel.setOnAction(e -> {
-			stageForm.close();
-		});
+		buttonCancel.setOnAction(e ->stageForm.close());
 		buttonOk.setOnAction(e -> {
 			licensePlates=textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
 			brand=textFieldBrand.getText().replaceAll("[^a-zA-Z0-9]", "");
@@ -66,7 +64,7 @@ public class CarsForm {
 		vinBefore=chassis;
 		dateBefore=imerominia;
 		customerIDBefore=arithmosPelati;
-		customersFormInitializer();
+		carsFormInitializer();
 		stageForm.initModality(Modality.WINDOW_MODAL);
 		stageForm.initOwner(primaryStage);
 		textFieldLicensePlates.setText(noumeraAftokinitou);
@@ -76,9 +74,7 @@ public class CarsForm {
 		textFieldDate.setText(imerominia);
 		textFieldCustomerID.setText(arithmosPelati.toString());
 		//Event Handler
-		buttonCancel.setOnAction(e->{
-			stageForm.close();
-		});
+		buttonCancel.setOnAction(e->stageForm.close());
 		buttonOk.setOnAction(e->{
 			licensePlates=textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
 			brand=textFieldBrand.getText().replaceAll("[^a-zA-Z0-9]", "");
@@ -88,7 +84,7 @@ public class CarsForm {
 			if (!textFieldCustomerID.getText().equals("")){
 				customerID=Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
 			}
-			if (licensePlates.equals("") || brand.equals("") || model.equals("") || vin.equals("") || date.toString().equals("")) {
+			if (licensePlates.equals("") || brand.equals("") || model.equals("") || vin.equals("") || date.equals("")) {
 				labelEmpty.setText("Please fill all the details");
 			}else {
 				if (!licensePlates.equals(licensePlatesBefore)){
@@ -145,7 +141,7 @@ public class CarsForm {
 
 	}
 
-	public void customersFormInitializer() {
+	public void carsFormInitializer() {
 		stageForm = new Stage();
 		stageForm.setTitle("Form");
 		Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
