@@ -1,9 +1,6 @@
 package com.mechanic.code;
 
-import com.mechanic.code.databaseClasses.Cars;
-import com.mechanic.code.databaseClasses.CarsForm;
-import com.mechanic.code.databaseClasses.Customers;
-import com.mechanic.code.databaseClasses.CustomersForm;
+import com.mechanic.code.databaseClasses.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +20,7 @@ import java.sql.*;
 public class MainScreen extends Application {
     private TableView<Customers> tableViewCustomers=new TableView<>();
     private TableView<Cars>tableViewCars= new TableView<>();
+    private TableView<Invoice>tableViewInvoice=new TableView<>();
     private static Insets padding = new Insets(10, 10, 10, 10);
     private static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     private Connection connection;
@@ -70,7 +68,6 @@ public class MainScreen extends Application {
 
 
         //Tab 1
-        Label labelCustomer = new Label("Customers");
         TableColumn<Customers, Integer> counterColumn = new TableColumn<>("No.");
         counterColumn.setReorderable(false);
         counterColumn.setResizable(false);
@@ -200,11 +197,11 @@ public class MainScreen extends Application {
         vinColumn.setMinWidth(200);
         vinColumn.setCellValueFactory(new PropertyValueFactory<>("vin"));
 
-        TableColumn<Cars, Date> dateColumn = new TableColumn<>("Date");
-        dateColumn.setReorderable(false);
-        dateColumn.setResizable(false);
-        dateColumn.setMinWidth(100);
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        TableColumn<Cars, Date> dateCarColumn = new TableColumn<>("Date");
+        dateCarColumn.setReorderable(false);
+        dateCarColumn.setResizable(false);
+        dateCarColumn.setMinWidth(100);
+        dateCarColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         TableColumn<Cars, Integer> customerIdColumn = new TableColumn<>("CustomerID");
         customerIdColumn.setReorderable(false);
@@ -218,7 +215,7 @@ public class MainScreen extends Application {
         tableViewCars.getColumns().add(brandColumn);
         tableViewCars.getColumns().add(modelColumn);
         tableViewCars.getColumns().add(vinColumn);
-        tableViewCars.getColumns().add(dateColumn);
+        tableViewCars.getColumns().add(dateCarColumn);
         tableViewCars.getColumns().add(customerIdColumn);
         tableViewCars.setEditable(false);
         tableViewCars.setMaxHeight(150);
@@ -329,7 +326,6 @@ public class MainScreen extends Application {
 
         });
 
-
         HBox boxButtonsCustomers = new HBox(buttonAddCustomer,buttonUpdateCustomers, buttonDeleteCustomers,choiceBoxSearchTab1,textFieldSearchCustomers,buttonSearchCustomers,buttonSearchClearCustomers);
         boxButtonsCustomers.setPadding(padding);
         boxButtonsCustomers.setSpacing(20);
@@ -339,14 +335,104 @@ public class MainScreen extends Application {
         VBox boxCustomers = new VBox(labelCustomerTitle,boxButtonsCustomers, tableViewCustomers,boxButtonsCars,tableViewCars );
         boxCustomers.setPadding(padding);
         boxCustomers.setSpacing(20);
+		//Tab2
+
+	    TableColumn<Invoice, Integer> invoiceIDColumn=new TableColumn<>("Invoice No.");
+	    invoiceIDColumn.setReorderable(false);
+	    invoiceIDColumn.setResizable(false);
+	    invoiceIDColumn.setMinWidth(50);
+	    invoiceIDColumn.setCellValueFactory(new PropertyValueFactory<>("invoiceID"));
+
+        TableColumn<Invoice, Date> dateInvoiceColumn=new TableColumn<>("Date");
+        dateInvoiceColumn.setReorderable(false);
+        dateInvoiceColumn.setResizable(false);
+        dateInvoiceColumn.setMinWidth(100);
+        dateInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+
+        TableColumn<Invoice, Integer> customerIDInvoiceColumn=new TableColumn<>("CustomerID");
+        customerIDInvoiceColumn.setReorderable(false);
+        customerIDInvoiceColumn.setResizable(false);
+        customerIDInvoiceColumn.setMinWidth(50);
+        customerIDInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
+
+
+        TableColumn<Invoice, String> fullNameColumn=new TableColumn<>("Full Name");
+        fullNameColumn.setReorderable(false);
+        fullNameColumn.setResizable(false);
+        fullNameColumn.setMinWidth(200);
+        fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+
+        TableColumn<Invoice, Integer> phoneInvoiceColumn=new TableColumn<>("Phone");
+        phoneInvoiceColumn.setReorderable(false);
+        phoneInvoiceColumn.setResizable(false);
+        phoneInvoiceColumn.setMinWidth(50);
+        phoneInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
+
+
+        TableColumn<Invoice, String> licencePlatesInvoiceColumn=new TableColumn<>("License Plates");
+        licencePlatesInvoiceColumn.setReorderable(false);
+        licencePlatesInvoiceColumn.setResizable(false);
+        licencePlatesInvoiceColumn.setMinWidth(100);
+        licencePlatesInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("licencePlates"));
+
+        TableColumn<Invoice, String> mechanicNameColumn=new TableColumn<>("Mechanic");
+        mechanicNameColumn.setReorderable(false);
+        mechanicNameColumn.setResizable(false);
+        mechanicNameColumn.setMinWidth(100);
+        mechanicNameColumn.setCellValueFactory(new PropertyValueFactory<>("mechanicName"));
+
+        TableColumn<Invoice, String> repairTypeColumn=new TableColumn<>("Repair");
+        repairTypeColumn.setReorderable(false);
+        repairTypeColumn.setResizable(false);
+        repairTypeColumn.setMinWidth(100);
+        repairTypeColumn.setCellValueFactory(new PropertyValueFactory<>("repairType"));
+
+        TableColumn<Invoice,Float> balanceInvoiceColumn=new TableColumn<>("Balance");
+        balanceInvoiceColumn.setReorderable(false);
+        balanceInvoiceColumn.setResizable(false);
+        balanceInvoiceColumn.setMinWidth(50);
+        balanceInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
+
+        tableViewInvoice.getColumns().add(invoiceIDColumn);
+        tableViewInvoice.getColumns().add(dateInvoiceColumn);
+        tableViewInvoice.getColumns().add(customerIDInvoiceColumn);
+        tableViewInvoice.getColumns().add(fullNameColumn);
+        tableViewInvoice.getColumns().add(phoneInvoiceColumn);
+        tableViewInvoice.getColumns().add(licencePlatesInvoiceColumn);
+        tableViewInvoice.getColumns().add(mechanicNameColumn);
+        tableViewInvoice.getColumns().add(repairTypeColumn);
+        tableViewInvoice.getColumns().add(balanceInvoiceColumn);
+        tableViewInvoice.setEditable(false);
+        tableViewInvoice.setPadding(padding);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
         //
         Tab tab1 = new Tab("Customers", boxCustomers);
-        Tab tab2 = new Tab("Parts", new Label("Showing all parts"));
-        Tab tab3 = new Tab("Invoices", boxInvoice);
+        Tab tab2 = new Tab("Invoice",tableViewInvoice);
+        Tab tab3 = new Tab("Unfinished...", boxInvoice);
 
         tabPane.getTabs().add(tab1);
         tabPane.getTabs().add(tab2);
