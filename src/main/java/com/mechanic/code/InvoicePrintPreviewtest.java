@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 
-public class InvoicePrintPreview {
+public class InvoicePrintPreviewtest {
     public Stage stagePrint=new Stage();
     private static javafx.geometry.Insets padding = new Insets(20, 20, 20, 20);
     private static javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
@@ -21,7 +21,7 @@ public class InvoicePrintPreview {
     private static double width=Paper.A4.getWidth();
 
 
-    public InvoicePrintPreview(String name, String surname, String carNumbers) {
+    public InvoicePrintPreviewtest(String name, String surname, String carNumbers) {
 
         //1st Part
         Label labelCompany1=new Label("M.B.A LTD");
@@ -138,7 +138,7 @@ public class InvoicePrintPreview {
         textAreaComments.setPrefHeight(70);
         textAreaComments.setPrefWidth(220);
         Label labelSignature=new Label("\tIssued By");
-        Label labelDots1=new Label("..........................................d\n\nasd\n\nasd\n\nasd\n\nasd\n\nasd\n\nasd\nn\nasd\n\nasd\n\nasd\n\nasd\n\nasd\n\nasd\n");
+        Label labelDots1=new Label("..........................................");
         VBox boxComments=new VBox(labelComments,textAreaComments,labelSignature,labelDots1);
         boxComments.setId("label2");
         boxComments.setSpacing(5);

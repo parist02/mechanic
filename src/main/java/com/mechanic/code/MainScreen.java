@@ -407,28 +407,6 @@ public class MainScreen extends Application {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         //
         Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Invoice",tableViewInvoice);
@@ -624,8 +602,13 @@ public class MainScreen extends Application {
                 System.out.println(query);
                 PreparedStatement preparedStatement=connection.prepareStatement(query);
                 preparedStatement.execute();
-                Customers customersEdited=new Customers(index,customersForm.getName(), customersForm.getSurname(),customersForm.getPhone1(),customersForm.getPhone2(),customersForm.getAddress(),customersForm.getBalance());
-                allCustomers.set(index2,customersEdited);
+                allCustomers.get(index2).setName(customersForm.getName());
+                allCustomers.get(index2).setSurname(customersForm.getSurname());
+                allCustomers.get(index2).setPhone1(customersForm.getPhone1());
+                allCustomers.get(index2).setPhone2(customersForm.getPhone2());
+                allCustomers.get(index2).setAddress(customersForm.getAddress());
+                allCustomers.get(index2).setBalance(customersForm.getBalance());
+                tableViewCustomers.refresh();
             } else {
                 System.out.println("Not saving changes");
             }
@@ -651,8 +634,13 @@ public class MainScreen extends Application {
                 System.out.println(query);
                 PreparedStatement preparedStatement=connection.prepareStatement(query);
                 preparedStatement.execute();
-                Cars carsEdited=new Cars(index,carsForm.getBrand(),carsForm.getModel(),carsForm.getVin(),carsForm.getDate(),carsForm.getCustomerID());
-                allCars.set(index2,carsEdited);
+                allCars.get(index2).setBrand(carsForm.getBrand());
+                allCars.get(index2).setLicencePlates(carsForm.getLicensePlates());
+                allCars.get(index2).setModel(carsForm.getModel());
+                allCars.get(index2).setVin(carsForm.getVin());
+                allCars.get(index2).setDate(carsForm.getDate());
+                allCars.get(index2).setCustomerId(carsForm.getCustomerID());
+                tableViewCars.refresh();
             } else {
                 System.out.println("Not saving changes");
             }
@@ -678,6 +666,7 @@ public class MainScreen extends Application {
                 System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
+                //to deftero query ginete gia na piasoume to customerID tou customer to opio exei topothetithei sto database gia ton logo oti den mporoume na gnorizoume sigoura to epomeno
                 final String querySearch = "SELECT * FROM customers WHERE Phone_1=" + customersForm.getPhone1() + ";";
                 Statement statement=connection.createStatement();
                 ResultSet rs = statement.executeQuery(querySearch);
