@@ -195,6 +195,7 @@ public class InvoicePrintPreview {
 		//
 		//scene.getStylesheets().add(getClass().getResource("stylesheets.css").toExternalForm());
 		stagePrint.initStyle(StageStyle.UTILITY);
+		stagePrint.initOwner(primaryStage);
 		stagePrint.setResizable(false);
 		stagePrint.setScene(scene);
 //        Print print=new Print(grid);
@@ -202,6 +203,11 @@ public class InvoicePrintPreview {
 		//	Print print=new Print(grid,stagePrint);
 		});
 
-
 	}
+
+	public void show(){
+		stagePrint.showAndWait();
+	}
+
+
 }

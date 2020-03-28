@@ -405,11 +405,19 @@ public class MainScreen extends Application {
         tableViewInvoice.setEditable(false);
         tableViewInvoice.setPadding(padding);
 
-
+        Button buttonNewInvoice= new Button("Δημιουργία Τιμολογίου");
+        buttonNewInvoice.setPadding(padding);
+        buttonNewInvoice.setOnAction(actionEvent -> {
+            InvoiceForm invoiceForm=new InvoiceForm(primaryStage,connection);
+            invoiceForm.showForm();
+        });
+        VBox boxTab2 =new VBox(tableViewInvoice,buttonNewInvoice);
+        boxTab2.setPadding(padding);
+        boxTab2.setSpacing(10);
 
         //
         Tab tab1 = new Tab("Customers", boxCustomers);
-        Tab tab2 = new Tab("Invoice",tableViewInvoice);
+        Tab tab2 = new Tab("Invoice",boxTab2);
         Tab tab3 = new Tab("Unfinished...", boxInvoice);
 
         tabPane.getTabs().add(tab1);
@@ -675,6 +683,7 @@ public class MainScreen extends Application {
                 ObservableList<Customers>newCustomer=tableViewCustomers.getItems();
                 newCustomer.add(customersNew);
                 tableViewCustomers.setItems(newCustomer);
+                tableViewCustomers.refresh();
             }else{
                 System.out.println("Data not added");
             }
@@ -699,6 +708,7 @@ public class MainScreen extends Application {
                 ObservableList<Cars>newCars=tableViewCars.getItems();
                 newCars.add(carsNew);
                 tableViewCars.setItems(newCars);
+                tableViewCars.refresh();
             }else{
                 System.out.println("Data not added");
             }

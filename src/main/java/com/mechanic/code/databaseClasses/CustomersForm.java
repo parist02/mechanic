@@ -150,7 +150,7 @@ public class CustomersForm {
 
 	}
 
-	public void customersFormInitializer() {
+	private void customersFormInitializer() {
 		stageForm = new Stage();
 		stageForm.setTitle("Form");
 		Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);

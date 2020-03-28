@@ -58,8 +58,8 @@ public class Form{
             exit(0);
         });
         buttonPrint.setOnAction(e->{
-            final InvoicePrintPreview printPreview=new InvoicePrintPreview(textFieldName.getText(),textFieldSurname.getText(),textFieldCarNumbers.getText());
-            printPreview.stagePrint.show();
+            //final InvoicePrintPreview printPreview=new InvoicePrintPreview(textFieldName.getText(),textFieldSurname.getText(),textFieldCarNumbers.getText());
+            //printPreview.stagePrint.show();
         });
   
         //Scene control

@@ -141,7 +141,7 @@ public class CarsForm {
 
 	}
 
-	public void carsFormInitializer() {
+	private void carsFormInitializer() {
 		stageForm = new Stage();
 		stageForm.setTitle("Form");
 		Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
