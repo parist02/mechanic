@@ -12,6 +12,8 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.time.LocalDate;
+
 
 public class InvoicePrintPreview {
 	public Stage stagePrint=new Stage();
@@ -20,7 +22,7 @@ public class InvoicePrintPreview {
 	private static double height= Paper.A4.getHeight();
 	private static double width=Paper.A4.getWidth();
 
-	public InvoicePrintPreview(Stage primaryStage) {
+	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates,String brandModel, String vin) {
 		//1st Part, import from database except date
 		Label labelCompany1=new Label("M.B.A LTD");
 		Label labelCompany2=new Label("37 PRODROMOU\nSTR.2062 STROVOLOS");
@@ -50,15 +52,15 @@ public class InvoicePrintPreview {
 
 		//2nd Part, need to implement search when adding customers
 		Label labelCustomer1=new Label("Customer Account:");
-		Label labelCustomerCustomerID=new Label("");
+		Label labelCustomerCustomerID=new Label(String.valueOf(customerID));
 		Label labelCustomer2=new Label("Full Name:");
-		Label labelCustomerFullName=new Label("");
+		Label labelCustomerFullName=new Label(fullName);
 		Label labelCustomer3=new Label("Auto No.:");
-		Label labelCustomerLicencePlates=new Label("");
+		Label labelCustomerLicencePlates=new Label(licensePlates);
 		Label labelCustomer4=new Label("Auto Make.:");
-		Label labelCustomerBrandModel=new Label("");
+		Label labelCustomerBrandModel=new Label(brandModel);
 		Label labelCustomer5=new Label("Chassis No.");
-		Label labelCustomerVin=new Label("");
+		Label labelCustomerVin=new Label(vin);
 
 		GridPane gridCustomer1=new GridPane();
 		gridCustomer1.add(labelCustomer1,0,0);
@@ -72,10 +74,6 @@ public class InvoicePrintPreview {
 		gridCustomer1.add(labelCustomer5,0,4);
 		gridCustomer1.add(labelCustomerVin,1,4);
 		gridCustomer1.setId("grid");
-
-//        VBox boxCustomer1=new VBox(labelCustomer1,labelCustomer2,labelCustomer3,labelCustomer4,labelCustomer5);
-//        boxCustomer1.setSpacing(5);
-//        boxCustomer1.setId("label1");
 
 		Label labelCustomer6=new Label("Date In:");
 		DatePicker datePickerIN = new DatePicker();
@@ -116,7 +114,7 @@ public class InvoicePrintPreview {
 		labelComments.setId("label2");
 		TextArea textAreaComments=new  TextArea();
 		textAreaComments.setPrefHeight(70);
-		textAreaComments.setPrefWidth(220);
+		//textAreaComments.setPrefWidth(220);
 		Label labelSignature=new Label("\tIssued By");
 		Label labelDots1=new Label("..........................................");
 		VBox boxComments=new VBox(labelComments,textAreaComments,labelSignature,labelDots1);
@@ -149,14 +147,6 @@ public class InvoicePrintPreview {
 		gridTotal.add(labelTotal5_5, 1, 4);
 		gridTotal.add(labelTotal6, 0, 5, 2, 1);
 		gridTotal.add(labelDots2, 0, 6, 2, 1);
-		gridTotal.setId("grid");
-
-
-
-
-		// VBox boxTotal=new VBox(labelTotal1,labelTotal2,labelTotal3,labelTotal4,labelTotal5,labelTotal6,labelDots2);
-		// boxTotal.setSpacing(5);
-		// boxTotal.setId("label2");
 
 
 		//Scene Control
@@ -172,22 +162,10 @@ public class InvoicePrintPreview {
 		grid.setGridLinesVisible(false);
 		grid.setHgap(20);
 		grid.setVgap(20);
-		grid.setPrefWidth(width);
-		grid.setMinHeight(height);
-		int wPrefWidth=(int)grid.getPrefWidth();
-		System.out.println("Pref Width: " + wPrefWidth);
-		int wPrefHeight=(int)grid.getMinHeight();
-		System.out.println("Pref Height "+wPrefHeight);
 		grid.setAlignment(Pos.TOP_CENTER);
 
 		Button buttonPrint=new Button("Print");
 
-
-//        ScrollPane scrollPane=new ScrollPane(grid);
-
-//        scrollPane.setPrefHeight(height);
-//        scrollPane.setPrefWidth(width);
-//        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
 
 		VBox boxMain=new VBox(grid,buttonPrint);
@@ -198,9 +176,8 @@ public class InvoicePrintPreview {
 		stagePrint.initOwner(primaryStage);
 		stagePrint.setResizable(false);
 		stagePrint.setScene(scene);
-//        Print print=new Print(grid);
 		buttonPrint.setOnAction(e->{
-		//	Print print=new Print(grid,stagePrint);
+			System.out.println("Button Print Pressed");
 		});
 
 	}

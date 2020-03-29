@@ -4,6 +4,7 @@ import com.mechanic.code.databaseClasses.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -410,6 +411,11 @@ public class MainScreen extends Application {
         buttonNewInvoice.setOnAction(actionEvent -> {
             InvoiceForm invoiceForm=new InvoiceForm(primaryStage,connection);
             invoiceForm.showForm();
+            if (invoiceForm.isClickedOK()){
+                System.out.println("Clicked Okay creating invoice");
+                InvoicePrintPreview invoicePrintPreview =new InvoicePrintPreview(primaryStage,invoiceForm.getCustomerID(),invoiceForm.getFullName(),invoiceForm.getLicensePlates(),invoiceForm.getBrandModel(),invoiceForm.getVin());
+                invoicePrintPreview.show();
+            }
         });
         VBox boxTab2 =new VBox(tableViewInvoice,buttonNewInvoice);
         boxTab2.setPadding(padding);
@@ -424,6 +430,7 @@ public class MainScreen extends Application {
         tabPane.getTabs().add(tab2);
         tabPane.getTabs().add(tab3);
         tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+        tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
 
 
         Scene scene = new Scene(tabPane);
