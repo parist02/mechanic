@@ -4,6 +4,7 @@ import com.mechanic.code.databaseClasses.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -129,22 +130,22 @@ public class MainScreen extends Application {
             if(tableViewCustomers.getSelectionModel().isEmpty()){
                 System.out.println("Nothing is selected");
             }else{
-                ObservableList<Customers>selectedCustomer=tableViewCustomers.getSelectionModel().getSelectedItems();
-                ObservableList<Cars> carsSearched = FXCollections.observableArrayList();
-                try {
-                    final String querySearch = "SELECT * FROM cars WHERE CustomerID=" + selectedCustomer.get(0).getCounter() + ";";
-                    System.out.println(querySearch);
-                    Statement statement = connection.createStatement();
-                    ResultSet rs = statement.executeQuery(querySearch);
-                    Cars carSearched;
-                    while (rs.next()) {
-                        carSearched =  new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
-                        carsSearched.add(carSearched);
-                    }
-                } catch (SQLException ex) {
-                    System.out.println("Error with searching");
-                }
-                tableViewCars.setItems(carsSearched);
+//                ObservableList<Customers>selectedCustomer=tableViewCustomers.getSelectionModel().getSelectedItems();
+//                ObservableList<Cars> carsSearched = FXCollections.observableArrayList();
+//                try {
+//                    final String querySearch = "SELECT * FROM cars WHERE CustomerID=" + selectedCustomer.get(0).getCounter() + ";";
+//                    System.out.println(querySearch);
+//                    Statement statement = connection.createStatement();
+//                    ResultSet rs = statement.executeQuery(querySearch);
+//                    Cars carSearched;
+//                    while (rs.next()) {
+//                        carSearched =  new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
+//                        carsSearched.add(carSearched);
+//                    }
+//                } catch (SQLException ex) {
+//                    System.out.println("Error with searching");
+//                }
+                tableViewCars.setItems(tableViewCustomers.getSelectionModel().getSelectedItem().getCustomerCars());
             }
         });
         Label labelCustomerTitle = new Label("Showing all customers");
@@ -481,7 +482,12 @@ public class MainScreen extends Application {
             Cars cars;
             while (rs.next()) {
                 cars = new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
+                Cars finalCars = cars;
+                FilteredList<Customers> filteredList =new FilteredList<>(allCustomers.filtered(customers -> customers.getCounter()==finalCars.getCustomerId()));
+                filteredList.get(0).addCar(cars);
+                allCustomers.set(filteredList.getSourceIndex(0),filteredList.get(0));
                 allCars.add(cars);
+
             }
 
         } catch (SQLException e) {

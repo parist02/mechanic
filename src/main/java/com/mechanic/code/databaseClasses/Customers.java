@@ -1,9 +1,14 @@
 package com.mechanic.code.databaseClasses;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+
 public class Customers {
 	private String name,surname,address;
 	private int phone1,phone2,counter;
 	private float balance;
+	private ObservableList<Cars> customerCars=FXCollections.observableArrayList();
 
 	public Customers(){
 		name="";
@@ -13,6 +18,8 @@ public class Customers {
 		phone2=0;
 		counter=0;
 		balance=0;
+
+
 	}
 	public Customers( int i,String onoma,String epitheto,int til1,int til2,String diefthinsi,float ipolipo){
 		name=onoma;
@@ -65,5 +72,13 @@ public class Customers {
 	}
 	public float getBalance() {
 		return balance;
+	}
+
+	public ObservableList<Cars> getCustomerCars() {
+		return customerCars;
+	}
+	public void addCar(Cars aftokinito){
+		customerCars.add(aftokinito);
+
 	}
 }
