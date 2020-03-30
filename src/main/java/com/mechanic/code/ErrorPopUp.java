@@ -23,7 +23,7 @@ public class ErrorPopUp {
 	*/
 
 
-	ErrorPopUp(int type, Stage primaryStage) {
+	public ErrorPopUp(int type, Stage primaryStage) {
 		stage = new Stage();
 		stage.setTitle("Error");
 		stage.initModality(Modality.WINDOW_MODAL);

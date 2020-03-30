@@ -28,6 +28,7 @@ public class MainScreen extends Application {
     private Stage primaryStage;
     private ObservableList<Customers>allCustomers;
     private ObservableList<Cars>allCars;
+    private ObservableList<Mechanic>allMechanics;
     private ErrorPopUp errorPopUp0;
     private ErrorPopUp errorPopUp1;
     private ErrorPopUp errorPopUp2;
@@ -409,7 +410,7 @@ public class MainScreen extends Application {
         Button buttonNewInvoice= new Button("Create invoice");
         buttonNewInvoice.setPadding(padding);
         buttonNewInvoice.setOnAction(actionEvent -> {
-            InvoiceForm invoiceForm=new InvoiceForm(primaryStage,connection);
+            InvoiceForm invoiceForm=new InvoiceForm(primaryStage,connection,allMechanics);
             invoiceForm.showForm();
             if (invoiceForm.isClickedOK()){
                 System.out.println("Clicked Okay creating invoice");
@@ -422,6 +423,7 @@ public class MainScreen extends Application {
         boxTab2.setSpacing(10);
 
         //
+        importFromMechanics();
         Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Invoice",boxTab2);
         Tab tab3 = new Tab("Unfinished...", boxInvoice);
@@ -487,6 +489,24 @@ public class MainScreen extends Application {
         }
         return allCars;
     }
+
+    //class needs to be changed to import data to a table
+    //temporary void just to get mechanics
+    public void importFromMechanics() {
+        allMechanics = FXCollections.observableArrayList();
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from mechanics");
+            Mechanic mechanic;
+            while (rs.next()) {
+                mechanic=new Mechanic(rs.getInt(1),rs.getString(2),rs.getString(3));
+                allMechanics.add(mechanic);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error with getting data");
+        }
+    }
+
 
     public ObservableList<Cars>searchFromCars(int searchType,String searchString) {
         ObservableList<Cars> carsSearched = FXCollections.observableArrayList();

@@ -1,6 +1,8 @@
 package com.mechanic.code.databaseClasses;
 
+import com.mechanic.code.ErrorPopUp;
 import com.mechanic.code.MainScreen;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -23,17 +25,22 @@ import java.sql.Statement;
 public class InvoiceForm {
 	private Stage stageForm;
 	private String licensePlates = null;
-	private Integer phone = null;
-	private TextField textFieldLicensePlates, textFieldPhone;
+	private TextField textFieldLicensePlates;
 	private Button buttonOK, buttonCancel, buttonNext, buttonBack;
 	private boolean clickedOK = false;
 	private Label labelEmpty;
 	private Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
 	private Font fontBold = Font.font("Arial", FontWeight.BOLD, FontPosture.REGULAR, 16);
 	private Connection connection;
-	private Label labelCustomerIDfound, labelNamefound, labelSurnamefound, labelBrandfound, labelModelfound, labelVINfound;
+	private Label labelCustomerIDfound, labelNamefound, labelSurnamefound,labelPhonefound, labelBrandfound, labelModelfound, labelVINfound;
+	private ErrorPopUp errorPopUp;
+	private ObservableList<Mechanic>allMechanics;
+	ChoiceBox<String> choiceBoxMechanic;
 
-	public InvoiceForm(Stage primaryStage, Connection connectionMain) {
+
+	public InvoiceForm(Stage primaryStage, Connection connectionMain, ObservableList<Mechanic>mechanics) {
+		errorPopUp=new ErrorPopUp(0,primaryStage);
+		allMechanics=mechanics;
 		connection = connectionMain;
 		GridPane gridFirst = invoiceFormFirst();
 		GridPane gridSecond = invoiceFormSecond();
@@ -53,23 +60,27 @@ public class InvoiceForm {
 		buttonNext.setOnAction(actionEvent -> {
 			System.out.println("Next Pressed");
 			licensePlates = textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
-			if (!textFieldPhone.getText().equals("")) {
-				phone = Integer.parseInt(textFieldPhone.getText().replaceAll("[^0-9]", ""));
-			}
-			if (licensePlates.equals("") || phone == null) {
+			if (licensePlates.equals("") || choiceBoxMechanic.getSelectionModel().isEmpty()) {
 				labelEmpty.setText("Please fill all the details!");
 			} else {
-				Customers customer = findCustomer(phone);
-				Cars car = findCar(licensePlates);
-				labelCustomerIDfound.setText(String.valueOf(customer.getCounter()));
-				labelNamefound.setText(customer.getName());
-				labelSurnamefound.setText(customer.getSurname());
-				labelBrandfound.setText(car.getBrand());
-				labelModelfound.setText(car.getModel());
-				labelVINfound.setText(car.getVin());
-				tab1.setDisable(true);
-				tab2.setDisable(false);
-				tabPane.getSelectionModel().select(1);
+				try {
+					System.out.println("Mechanic Selected is: " + allMechanics.get(choiceBoxMechanic.getSelectionModel().getSelectedIndex()).getMechanicID());
+					Cars car = findCar(licensePlates);
+					Customers customer = findCustomer(car.getCustomerId());
+					labelCustomerIDfound.setText(String.valueOf(customer.getCounter()));
+					labelNamefound.setText(customer.getName());
+					labelSurnamefound.setText(customer.getSurname());
+					labelPhonefound.setText(String.valueOf(customer.getPhone1()));
+					labelBrandfound.setText(car.getBrand());
+					labelModelfound.setText(car.getModel());
+					labelVINfound.setText(car.getVin());
+					tab1.setDisable(true);
+					tab2.setDisable(false);
+					tabPane.getSelectionModel().select(1);
+				}catch (NullPointerException exep){
+					errorPopUp.setErrorMessage("License Plates not found!");
+					errorPopUp.showError();
+				}
 			}
 		});
 		buttonBack.setOnAction(actionEvent -> {
@@ -88,34 +99,39 @@ public class InvoiceForm {
 
 	private GridPane invoiceFormFirst() {
 		//Labels
-		Label labelTitle = new Label("Give customer and car details");
+		Label labelTitle = new Label("Invoice details");
 		labelTitle.setFont(fontBold);
 		labelTitle.setTextFill(Color.BLACK);
-		Label labelPhone = new Label("Phone:");
-		labelPhone.setFont(font);
-		labelPhone.setTextFill(Color.BLACK);
 		Label labelLicensePlates = new Label("License Plates:");
 		labelLicensePlates.setFont(font);
 		labelLicensePlates.setTextFill(Color.BLACK);
+		Label labelMechanic=new Label("Mechanic:");
+		labelMechanic.setFont(font);
+		labelMechanic.setTextFill(Color.BLACK);
 		labelEmpty = new Label("");
 		labelEmpty.setFont(font);
 		labelEmpty.setTextFill(Color.FIREBRICK);
 		//TextFields
 		textFieldLicensePlates = new TextField();
-		textFieldPhone = new TextField();
+		//choiceBox
+		choiceBoxMechanic = new ChoiceBox<>();
+		for (Mechanic m :allMechanics){
+			choiceBoxMechanic.getItems().add(m.getName());
+		}
 		//Buttons
 		buttonNext = new Button("Next");
 		buttonCancel = new Button("Cancel");
 		//Grid control
 		GridPane grid = new GridPane();
 		grid.add(labelTitle, 0, 0, 2, 1);
-		grid.add(labelPhone, 0, 1);
-		grid.add(textFieldPhone, 1, 1);
-		grid.add(labelLicensePlates, 0, 2);
-		grid.add(textFieldLicensePlates, 1, 2);
+		grid.add(labelLicensePlates, 0, 1);
+		grid.add(textFieldLicensePlates, 1, 1);
+		grid.add(labelMechanic, 0, 2);
+		grid.add(choiceBoxMechanic, 1, 2);
 		grid.add(labelEmpty, 0, 3, 2, 1);
-		grid.add(buttonNext, 0, 4);
-		grid.add(buttonCancel, 1, 4);
+		HBox buttonBox = new HBox(buttonNext, buttonCancel);
+		buttonBox.setSpacing(20);
+		grid.add(buttonBox, 0, 4,2,1);
 		grid.setPadding(new Insets(25, 25, 25, 25));
 		grid.setHgap(20);
 		grid.setVgap(15);
@@ -136,6 +152,9 @@ public class InvoiceForm {
 		Label labelSurname = new Label("Surname:");
 		labelSurname.setFont(font);
 		labelSurname.setTextFill(Color.BLACK);
+		Label labelPhone=new Label("Phone:");
+		labelPhone.setFont(font);
+		labelPhone.setTextFill(Color.BLACK);
 		Label labelBrand = new Label("Brand:");
 		labelBrand.setFont(font);
 		labelBrand.setTextFill(Color.BLACK);
@@ -154,6 +173,9 @@ public class InvoiceForm {
 		labelSurnamefound = new Label("");
 		labelSurnamefound.setFont(font);
 		labelSurnamefound.setTextFill(Color.BLACK);
+		labelPhonefound = new Label("");
+		labelPhonefound.setFont(font);
+		labelPhonefound.setTextFill(Color.BLACK);
 		labelBrandfound = new Label("");
 		labelBrandfound.setFont(font);
 		labelBrandfound.setTextFill(Color.BLACK);
@@ -172,16 +194,18 @@ public class InvoiceForm {
 		grid.add(labelNamefound, 1, 1);
 		grid.add(labelSurname, 0, 2);
 		grid.add(labelSurnamefound, 1, 2);
-		grid.add(labelCustomerID, 0, 3);
-		grid.add(labelCustomerIDfound, 1, 3);
-		grid.add(labelBrand, 0, 4);
-		grid.add(labelBrandfound, 1, 4);
-		grid.add(labelVIN, 0, 5);
-		grid.add(labelVINfound, 1, 5);
-		grid.add(labelfound, 0, 7, 2, 1);
+		grid.add(labelPhone, 0, 3);
+		grid.add(labelPhonefound, 1, 3);
+		grid.add(labelCustomerID, 0, 4);
+		grid.add(labelCustomerIDfound, 1, 4);
+		grid.add(labelBrand, 0, 5);
+		grid.add(labelBrandfound, 1, 5);
+		grid.add(labelVIN, 0, 6);
+		grid.add(labelVINfound, 1, 6);
+		grid.add(labelfound, 0, 8, 2, 1);
 		HBox buttonBox2 = new HBox(buttonBack, buttonOK, buttonCancel);
 		buttonBox2.setSpacing(20);
-		grid.add(buttonBox2, 0, 8, 2, 1);
+		grid.add(buttonBox2, 0, 9, 2, 1);
 		grid.setPadding(new Insets(25, 25, 25, 25));
 		grid.setHgap(20);
 		grid.setVgap(15);
@@ -210,19 +234,10 @@ public class InvoiceForm {
 	private Customers findCustomer(Integer kinito) {
 		Customers customerSearched = null;
 		try {
-			final String querySearch = "SELECT * FROM customers WHERE Phone_1=" + kinito + ";";
+			final String querySearch = "SELECT * FROM customers WHERE CustomerID=" + kinito + ";";
 			System.out.println(querySearch);
 			Statement statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery(querySearch);
-			while (rs.next()) {
-				customerSearched = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
-			}
-			if (!customerSearched.equals(null)) {
-				return customerSearched;
-			}
-			final String querySearch2 = "SELECT * FROM customers WHERE Phone_2=" + kinito + ";";
-			System.out.println(querySearch2);
-			rs = statement.executeQuery(querySearch2);
 			while (rs.next()) {
 				customerSearched = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
 			}
@@ -241,7 +256,7 @@ public class InvoiceForm {
 	}
 
 	public Integer getPhone() {
-		return phone;
+		return (Integer.parseInt(labelPhonefound.getText()));
 	}
 
 	public String getFullName(){
@@ -260,10 +275,9 @@ public class InvoiceForm {
 		return (labelVINfound.getText());
 	}
 
-
-
-
-
+	public Integer getMechanicIndex(){
+		return (choiceBoxMechanic.getSelectionModel().getSelectedIndex());
+	}
 	public boolean isClickedOK() {
 		return clickedOK;
 	}
