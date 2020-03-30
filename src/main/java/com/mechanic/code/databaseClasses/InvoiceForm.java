@@ -37,8 +37,8 @@ public class InvoiceForm {
 		connection = connectionMain;
 		GridPane gridFirst = invoiceFormFirst();
 		GridPane gridSecond = invoiceFormSecond();
-		Tab tab1 = new Tab("Βήμα 1ο", gridFirst);
-		Tab tab2 = new Tab("Βήμα 2ο", gridSecond);
+		Tab tab1 = new Tab("1st Step", gridFirst);
+		Tab tab2 = new Tab("2nd Step", gridSecond);
 		tab2.setDisable(true);
 		TabPane tabPane = new TabPane();
 		tabPane.getTabs().addAll(tab1, tab2);
@@ -57,7 +57,7 @@ public class InvoiceForm {
 				phone = Integer.parseInt(textFieldPhone.getText().replaceAll("[^0-9]", ""));
 			}
 			if (licensePlates.equals("") || phone == null) {
-				labelEmpty.setText("Συμπληρώστε όλα τα στοιχεία");
+				labelEmpty.setText("Please fill all the details!");
 			} else {
 				Customers customer = findCustomer(phone);
 				Cars car = findCar(licensePlates);
@@ -88,13 +88,13 @@ public class InvoiceForm {
 
 	private GridPane invoiceFormFirst() {
 		//Labels
-		Label labelTitle = new Label("Δώστε τα στοιχεία πελάτη και αυτοκινήτου");
+		Label labelTitle = new Label("Give customer and car details");
 		labelTitle.setFont(fontBold);
 		labelTitle.setTextFill(Color.BLACK);
-		Label labelPhone = new Label("Τηλέφωνο:");
+		Label labelPhone = new Label("Phone:");
 		labelPhone.setFont(font);
 		labelPhone.setTextFill(Color.BLACK);
-		Label labelLicensePlates = new Label("Νούμερα Αυτοκινήτου:");
+		Label labelLicensePlates = new Label("License Plates:");
 		labelLicensePlates.setFont(font);
 		labelLicensePlates.setTextFill(Color.BLACK);
 		labelEmpty = new Label("");
@@ -104,8 +104,8 @@ public class InvoiceForm {
 		textFieldLicensePlates = new TextField();
 		textFieldPhone = new TextField();
 		//Buttons
-		buttonNext = new Button("Επόμενο");
-		buttonCancel = new Button("Ακύρωση");
+		buttonNext = new Button("Next");
+		buttonCancel = new Button("Cancel");
 		//Grid control
 		GridPane grid = new GridPane();
 		grid.add(labelTitle, 0, 0, 2, 1);
@@ -124,22 +124,22 @@ public class InvoiceForm {
 	}
 
 	private GridPane invoiceFormSecond() {
-		Label labelTitle = new Label("Στοιχεία που βρέθηκαν");
+		Label labelTitle = new Label("Data found");
 		labelTitle.setFont(fontBold);
 		labelTitle.setTextFill(Color.BLACK);
-		Label labelCustomerID = new Label("Κωδικός Πελάτη:");
+		Label labelCustomerID = new Label("Customer ID:");
 		labelCustomerID.setFont(font);
 		labelCustomerID.setTextFill(Color.BLACK);
-		Label labelName = new Label("Όνομα:");
+		Label labelName = new Label("Name:");
 		labelName.setFont(font);
 		labelName.setTextFill(Color.BLACK);
-		Label labelSurname = new Label("Επίθετο:");
+		Label labelSurname = new Label("Surname:");
 		labelSurname.setFont(font);
 		labelSurname.setTextFill(Color.BLACK);
-		Label labelBrand = new Label("Μάρκα:");
+		Label labelBrand = new Label("Brand:");
 		labelBrand.setFont(font);
 		labelBrand.setTextFill(Color.BLACK);
-		Label labelModel = new Label("Μοντέλο:");
+		Label labelModel = new Label("Model:");
 		labelModel.setFont(font);
 		labelModel.setTextFill(Color.BLACK);
 		Label labelVIN = new Label("VIN:");
@@ -163,9 +163,9 @@ public class InvoiceForm {
 		labelVINfound = new Label("");
 		labelVINfound.setFont(font);
 		labelVINfound.setTextFill(Color.BLACK);
-		Label labelfound = new Label("Θέλετε να συνεχίσετε στην δημιουργία τιμολογίου;");
-		buttonOK = new Button("Επιβεβαιωση");
-		buttonBack = new Button("Προηγούμενο");
+		Label labelfound = new Label("Do you want to continue with the creation of the invoice?");
+		buttonOK = new Button("Confirm");
+		buttonBack = new Button("Back");
 		GridPane grid = new GridPane();
 		grid.add(labelTitle, 0, 0, 2, 1);
 		grid.add(labelName, 0, 1);
@@ -245,7 +245,7 @@ public class InvoiceForm {
 	}
 
 	public String getFullName(){
-		return (labelNamefound.getText()+labelSurnamefound.getText());
+		return (labelNamefound.getText()+" "+labelSurnamefound.getText());
 	}
 
 	public Integer getCustomerID(){
@@ -253,7 +253,7 @@ public class InvoiceForm {
 	}
 
 	public String getBrandModel(){
-		return (labelBrandfound.getText()+labelModelfound.getText());
+		return (labelBrandfound.getText()+" "+labelModelfound.getText());
 	}
 
 	public String getVin(){

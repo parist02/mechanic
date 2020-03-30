@@ -177,7 +177,7 @@ public class CustomersForm {
 		labelEmpty.setFont(font);
 		labelEmpty.setTextFill(Color.FIREBRICK);
 		labelEmpty.setPadding(new Insets(10, 10, 10, 10));
-		Label labelTitle = new Label("Στοιχεία Πελάτη");
+		Label labelTitle = new Label("Customer details");
 		labelTitle.setTextFill(Color.BLACK);
 		labelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 		labelTitle.setPadding(new Insets(10, 10, 10, 10));
