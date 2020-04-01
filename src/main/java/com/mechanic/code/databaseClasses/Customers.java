@@ -8,7 +8,6 @@ public class Customers {
 	private String name,surname,address;
 	private int phone1,phone2,counter;
 	private float balance;
-	private ObservableList<Cars> customerCars=FXCollections.observableArrayList();
 
 	public Customers(){
 		name="";
@@ -72,13 +71,5 @@ public class Customers {
 	}
 	public float getBalance() {
 		return balance;
-	}
-
-	public ObservableList<Cars> getCustomerCars() {
-		return customerCars;
-	}
-	public void addCar(Cars aftokinito){
-		customerCars.add(aftokinito);
-
 	}
 }
