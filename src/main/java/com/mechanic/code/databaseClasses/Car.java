@@ -2,11 +2,11 @@ package com.mechanic.code.databaseClasses;
 
 
 
-public class Cars {
+public class Car {
 	private String licencePlates,brand,model,date,vin;
 	private int customerId;
 
-	public Cars(){
+	public Car(){
 		licencePlates="";
 		brand="";
 		model="";
@@ -15,7 +15,7 @@ public class Cars {
 		customerId=0;
 	}
 
-	public Cars(String noumeraAftokinitou,String marka,String montelo,String chassis,String imerominia,int metritis){
+	public Car(String noumeraAftokinitou, String marka, String montelo, String chassis, String imerominia, int metritis){
 		licencePlates=noumeraAftokinitou;
 		brand=marka;
 		model=montelo;

@@ -1,11 +1,9 @@
 package com.mechanic.code;
-
 import com.mechanic.code.databaseClasses.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -20,21 +18,21 @@ import javafx.stage.Stage;
 import java.sql.*;
 
 public class MainScreen extends Application {
-    private TableView<Customers> tableViewCustomers = new TableView<>();
-    private TableView<Cars> tableViewCars = new TableView<>();
+    private TableView<Customer> tableViewCustomers = new TableView<>();
+    private TableView<Car> tableViewCars = new TableView<>();
     private TableView<Invoice> tableViewInvoice = new TableView<>();
     private static Insets padding = new Insets(10, 10, 10, 10);
     private static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     private Connection connection;
     private Stage primaryStage;
-    private ObservableList<Customers> allCustomers = FXCollections.observableArrayList();
-    private ObservableList<Cars> allCars = FXCollections.observableArrayList();
+    private ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
+    private ObservableList<Car> allCars = FXCollections.observableArrayList();
     private ObservableList<Mechanic> allMechanics;
     private ErrorPopUp errorPopUp0;
     private ErrorPopUp errorPopUp1;
     private ErrorPopUp errorPopUp2;
-    private FilteredList<Customers> filteredListCustomers;
-    private FilteredList<Cars> filteredListCars;
+    private FilteredList<Customer> filteredListCustomers;
+    private FilteredList<Car> filteredListCars;
     private boolean carsFiltered = false;
     private boolean customersFiltered = false;
 
@@ -73,50 +71,48 @@ public class MainScreen extends Application {
         boxInvoice.setPadding(padding);
         buttonForm.setOnAction(e -> form.showForm());
 
-
         //Tab 1
-        TableColumn<Customers, Integer> counterColumn = new TableColumn<>("No.");
+        TableColumn<Customer, Integer> counterColumn = new TableColumn<>("No.");
         counterColumn.setReorderable(false);
         counterColumn.setResizable(false);
         counterColumn.setMinWidth(50);
         counterColumn.setCellValueFactory(new PropertyValueFactory<>("counter"));
 
-        TableColumn<Customers, Integer> nameColumn = new TableColumn<>("Name");
+        TableColumn<Customer, Integer> nameColumn = new TableColumn<>("Name");
         nameColumn.setReorderable(false);
         nameColumn.setResizable(false);
         nameColumn.setMinWidth(100);
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Customers, Integer> surnameColumn = new TableColumn<>("Surname");
+        TableColumn<Customer, Integer> surnameColumn = new TableColumn<>("Surname");
         surnameColumn.setReorderable(false);
         surnameColumn.setResizable(false);
         surnameColumn.setMinWidth(100);
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>("surname"));
 
-        TableColumn<Customers, Integer> phone1Column = new TableColumn<>("Phone1");
+        TableColumn<Customer, Integer> phone1Column = new TableColumn<>("Phone1");
         phone1Column.setReorderable(false);
         phone1Column.setResizable(false);
         phone1Column.setMinWidth(100);
         phone1Column.setCellValueFactory(new PropertyValueFactory<>("phone1"));
 
-        TableColumn<Customers, Integer> phone2Column = new TableColumn<>("Phone2");
+        TableColumn<Customer, Integer> phone2Column = new TableColumn<>("Phone2");
         phone2Column.setReorderable(false);
         phone2Column.setResizable(false);
         phone2Column.setMinWidth(100);
         phone2Column.setCellValueFactory(new PropertyValueFactory<>("phone2"));
 
-        TableColumn<Customers, Integer> addressColumn = new TableColumn<>("Address");
+        TableColumn<Customer, Integer> addressColumn = new TableColumn<>("Address");
         addressColumn.setReorderable(false);
         addressColumn.setResizable(false);
         addressColumn.setMinWidth(200);
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
 
-        TableColumn<Customers, Float> balanceColumn = new TableColumn<>("Balance");
+        TableColumn<Customer, Float> balanceColumn = new TableColumn<>("Balance");
         balanceColumn.setReorderable(false);
         balanceColumn.setResizable(false);
         balanceColumn.setMinWidth(100);
         balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
-
 
         tableViewCustomers.getColumns().add(counterColumn);
         tableViewCustomers.getColumns().add(nameColumn);
@@ -147,7 +143,7 @@ public class MainScreen extends Application {
         Button buttonDeleteCustomers = new Button("Delete");
         buttonDeleteCustomers.setPadding(padding);
 
-        //deleting a customer, needs a rewrite
+        //deleting a customer
         buttonDeleteCustomers.setOnAction(del -> {
             if (tableViewCustomers.getSelectionModel().isEmpty()) {
                 errorPopUp0.setErrorMessage("Select a customer first.");
@@ -172,37 +168,37 @@ public class MainScreen extends Application {
         Button buttonSearchCustomers = new Button("Search");
         Button buttonSearchClearCustomers = new Button("Clear");
 
-        TableColumn<Cars, String> licencePlatesColumn = new TableColumn<>("License Plates");
+        TableColumn<Car, String> licencePlatesColumn = new TableColumn<>("License Plates");
         licencePlatesColumn.setReorderable(false);
         licencePlatesColumn.setResizable(false);
         licencePlatesColumn.setMinWidth(100);
         licencePlatesColumn.setCellValueFactory(new PropertyValueFactory<>("licencePlates"));
 
-        TableColumn<Cars, String> brandColumn = new TableColumn<>("Brand");
+        TableColumn<Car, String> brandColumn = new TableColumn<>("Brand");
         brandColumn.setReorderable(false);
         brandColumn.setResizable(false);
         brandColumn.setMinWidth(150);
         brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
-        TableColumn<Cars, String> modelColumn = new TableColumn<>("Model");
+        TableColumn<Car, String> modelColumn = new TableColumn<>("Model");
         modelColumn.setReorderable(false);
         modelColumn.setResizable(false);
         modelColumn.setMinWidth(150);
         modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
 
-        TableColumn<Cars, String> vinColumn = new TableColumn<>("VIN");
+        TableColumn<Car, String> vinColumn = new TableColumn<>("VIN");
         vinColumn.setReorderable(false);
         vinColumn.setResizable(false);
         vinColumn.setMinWidth(200);
         vinColumn.setCellValueFactory(new PropertyValueFactory<>("vin"));
 
-        TableColumn<Cars, Date> dateCarColumn = new TableColumn<>("Date");
+        TableColumn<Car, Date> dateCarColumn = new TableColumn<>("Date");
         dateCarColumn.setReorderable(false);
         dateCarColumn.setResizable(false);
         dateCarColumn.setMinWidth(100);
         dateCarColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
-        TableColumn<Cars, Integer> customerIdColumn = new TableColumn<>("CustomerID");
+        TableColumn<Car, Integer> customerIdColumn = new TableColumn<>("CustomerID");
         customerIdColumn.setReorderable(false);
         customerIdColumn.setResizable(false);
         customerIdColumn.setMinWidth(50);
@@ -461,14 +457,14 @@ public class MainScreen extends Application {
     }
 
 
-    public ObservableList<Customers> importFromCustomers() {
-        ObservableList<Customers> importingCustomers = FXCollections.observableArrayList();
+    public ObservableList<Customer> importFromCustomers() {
+        ObservableList<Customer> importingCustomers = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from customers");
-            Customers customer;
+            Customer customer;
             while (rs.next()) {
-                customer = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
+                customer = new Customer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
                 importingCustomers.add(customer);
             }
         } catch (SQLException e) {
@@ -477,14 +473,14 @@ public class MainScreen extends Application {
         return importingCustomers;
     }
 
-    public ObservableList<Cars> importFromCars() {
-        ObservableList<Cars> importingCars = FXCollections.observableArrayList();
+    public ObservableList<Car> importFromCars() {
+        ObservableList<Car> importingCars = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from cars");
-            Cars cars;
+            Car cars;
             while (rs.next()) {
-                cars = new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
+                cars = new Car(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
                 importingCars.add(cars);
 
             }
@@ -513,7 +509,7 @@ public class MainScreen extends Application {
 
     public void deleteFromCustomers() {
         try {
-            Customers selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItem();
+            Customer selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItem();
             final int index = selectedCustomer.getCounter();
             filteredListCars = new FilteredList<>(allCars.filtered(cars -> cars.getCustomerId() == selectedCustomer.getCounter()));
             if (!filteredListCars.isEmpty()) {
@@ -533,7 +529,7 @@ public class MainScreen extends Application {
 
     public void deleteFromCars() {
         try {
-            Cars selectedCar = tableViewCars.getSelectionModel().getSelectedItem();
+            Car selectedCar = tableViewCars.getSelectionModel().getSelectedItem();
             final String index = selectedCar.getLicencePlates();
             allCars.remove(selectedCar);
             tableViewCars.refresh();
@@ -551,7 +547,7 @@ public class MainScreen extends Application {
     public void updateFromCustomers() {
         try {
             final int index2;
-            Customers selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItem();
+            Customer selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItem();
             if(customersFiltered){
                 index2=filteredListCustomers.getSourceIndexFor(allCustomers,0);
             }else{
@@ -586,7 +582,7 @@ public class MainScreen extends Application {
     public void updateFromCars() {
         try {
             final int index2;
-            Cars selectedCar = tableViewCars.getSelectionModel().getSelectedItem();
+            Car selectedCar = tableViewCars.getSelectionModel().getSelectedItem();
             if(carsFiltered){
                 index2=filteredListCars.getSourceIndexFor(allCars,0);
             }else {
@@ -633,7 +629,7 @@ public class MainScreen extends Application {
                 Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(querySearch);
                 rs.next();
-                Customers customerNew = new Customers(rs.getInt(1), customersForm.getName(), customersForm.getSurname(), customersForm.getPhone1(), ((customersForm.getPhone2() == null) ? 0 : customersForm.getPhone2()), customersForm.getAddress(), customersForm.getBalance());
+                Customer customerNew = new Customer(rs.getInt(1), customersForm.getName(), customersForm.getSurname(), customersForm.getPhone1(), ((customersForm.getPhone2() == null) ? 0 : customersForm.getPhone2()), customersForm.getAddress(), customersForm.getBalance());
                 allCustomers.add(customerNew);
                 tableViewCustomers.refresh();
             } else {
@@ -641,7 +637,7 @@ public class MainScreen extends Application {
             }
         } catch (SQLException e) {
             System.out.println("Error with adding data to database");
-            errorPopUp0.setErrorMessage("Πρόβλημα στην εισαγωγή δεδομένων. Ελέξτε αν βάλατε τα σωστά στοιχεία.");
+            errorPopUp0.setErrorMessage("Error with adding data to database.");
             errorPopUp0.showError();
         }
     }
@@ -656,7 +652,7 @@ public class MainScreen extends Application {
                 System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
-                Cars carNew = new Cars(carsForm.getLicensePlates(), carsForm.getBrand(), carsForm.getModel(), carsForm.getVin(), carsForm.getDate(), carsForm.getCustomerID());
+                Car carNew = new Car(carsForm.getLicensePlates(), carsForm.getBrand(), carsForm.getModel(), carsForm.getVin(), carsForm.getDate(), carsForm.getCustomerID());
                 allCars.add(carNew);
                 tableViewCars.refresh();
             } else {
@@ -664,7 +660,7 @@ public class MainScreen extends Application {
             }
         } catch (SQLException e) {
             System.out.println("Error with adding data to database");
-            errorPopUp0.setErrorMessage("Πρόβλημα στην εισαγωγή δεδομένων. Ελέξτε αν βάλατε τα σωστά στοιχεία.");
+            errorPopUp0.setErrorMessage("Error with adding data to database.");
             errorPopUp0.showError();
         }
     }

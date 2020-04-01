@@ -31,14 +31,14 @@ public class ErrorPopUp {
 		labelErrorMsg.setStyle("-fx-font-size: 14;" +
 				"-fx-font-weight: bold;" +
 				"-fx-font-family: Arial");
-		Button buttonOk = new Button("Έξοδος");
+		Button buttonOk = new Button("Exit");
 		buttonOk.setStyle("-fx-font-size: 12;" +
 				"-fx-font-family: Arial;");
 		buttonOk.setOnAction(e -> {
 			added = false;
 			stage.close();
 		});
-		Button buttonAdd = new Button("Προσθήκη");
+		Button buttonAdd = new Button("Add");
 		buttonAdd.setStyle("-fx-font-size: 12;" +
 				"-fx-font-family: Arial;");
 		VBox box;
@@ -58,7 +58,7 @@ public class ErrorPopUp {
 				break;
 			}
 			case 2:{
-				buttonAdd.setText("Διαγραφή");
+				buttonAdd.setText("Delete");
 				buttonAdd.setOnAction(e -> {
 					added = true;
 					stage.close();

@@ -1,11 +1,8 @@
 package com.mechanic.code.databaseClasses;
 
 import com.mechanic.code.ErrorPopUp;
-import com.mechanic.code.MainScreen;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -65,8 +62,8 @@ public class InvoiceForm {
 			} else {
 				try {
 					System.out.println("Mechanic Selected is: " + allMechanics.get(choiceBoxMechanic.getSelectionModel().getSelectedIndex()).getMechanicID());
-					Cars car = findCar(licensePlates);
-					Customers customer = findCustomer(car.getCustomerId());
+					Car car = findCar(licensePlates);
+					Customer customer = findCustomer(car.getCustomerId());
 					labelCustomerIDfound.setText(String.valueOf(customer.getCounter()));
 					labelNamefound.setText(customer.getName());
 					labelSurnamefound.setText(customer.getSurname());
@@ -214,8 +211,8 @@ public class InvoiceForm {
 
 	}
 
-	private Cars findCar(String noumera) {
-		Cars carSearched = null;
+	private Car findCar(String noumera) {
+		Car carSearched = null;
 		try {
 			final String querySearch = "SELECT * FROM cars WHERE LicensePlates= '" + noumera + "';";
 			System.out.println(querySearch);
@@ -223,7 +220,7 @@ public class InvoiceForm {
 			ResultSet rs = statement.executeQuery(querySearch);
 
 			while (rs.next()) {
-				carSearched = new Cars(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
+				carSearched = new Car(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
 			}
 		} catch (SQLException ex) {
 			System.out.println("Error with searching");
@@ -231,15 +228,15 @@ public class InvoiceForm {
 		return carSearched;
 	}
 
-	private Customers findCustomer(Integer kinito) {
-		Customers customerSearched = null;
+	private Customer findCustomer(Integer kinito) {
+		Customer customerSearched = null;
 		try {
 			final String querySearch = "SELECT * FROM customers WHERE CustomerID=" + kinito + ";";
 			System.out.println(querySearch);
 			Statement statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery(querySearch);
 			while (rs.next()) {
-				customerSearched = new Customers(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
+				customerSearched = new Customer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
 			}
 		} catch (SQLException ex) {
 			System.out.println("Error with searching");

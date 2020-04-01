@@ -4,12 +4,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 
-public class Customers {
+public class Customer {
 	private String name,surname,address;
 	private int phone1,phone2,counter;
 	private float balance;
 
-	public Customers(){
+	public Customer(){
 		name="";
 		surname="";
 		address="";
@@ -20,7 +20,7 @@ public class Customers {
 
 
 	}
-	public Customers( int i,String onoma,String epitheto,int til1,int til2,String diefthinsi,float ipolipo){
+	public Customer(int i, String onoma, String epitheto, int til1, int til2, String diefthinsi, float ipolipo){
 		name=onoma;
 		surname=epitheto;
 		address=diefthinsi;
