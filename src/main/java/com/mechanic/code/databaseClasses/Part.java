@@ -1,24 +1,35 @@
 package com.mechanic.code.databaseClasses;
 
 public class Part {
-	private int invoiceID,quantity;
-	private String partsID;
+	private int counter,invoiceID,quantity;
+	private String partsID,description;
 	private float price;
 
 	public Part(){
+		counter=0;
 		invoiceID=0;
 		quantity=0;
 		partsID="";
 		price= 0;
+		description="";
 	}
 
-	public Part(int arithmosTimologiou,int posotita,String kodikos,float timi){
+	public Part(int count,int arithmosTimologiou,int posotita,String onoma,String kodikos,float timi){
 		invoiceID=arithmosTimologiou;
 		quantity=posotita;
 		partsID=kodikos;
 		price=timi;
+		description=onoma;
+		counter=count;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public int getCounter() {
+		return counter;
+	}
 
 	public String getPartsID() {
 		return partsID;
@@ -50,5 +61,13 @@ public class Part {
 
 	public void setPrice(float price) {
 		this.price = price;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setCounter(int counter) {
+		this.counter = counter;
 	}
 }

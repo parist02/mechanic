@@ -1,26 +1,33 @@
 package com.mechanic.code.databaseClasses;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.print.Paper;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.StringConverter;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 
 public class InvoicePrintPreview {
 	public Stage stagePrint=new Stage();
-	private static javafx.geometry.Insets padding = new Insets(20, 20, 20, 20);
+	private static javafx.geometry.Insets padding = new Insets(10, 10, 10, 10);
 	private static javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
 	private static double height= Paper.A4.getHeight();
 	private static double width=Paper.A4.getWidth();
+	private ObservableList<Part>allParts= FXCollections.observableArrayList();
 
 	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates,String brandModel, String vin) {
 		//1st Part, import from database except date
@@ -38,7 +45,29 @@ public class InvoicePrintPreview {
 		Label labelCompany7=new Label("Invoice No.:");
 		Label labelCompany8=new Label("123456");//get from database
 		Label labelCompany9=new Label("Date:");
+		//xrisimopoiite gia metatropi imerominies sto format pou theloume
+		StringConverter<LocalDate> stringConverter = new StringConverter<>() {
+			private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+			@Override
+			public String toString(LocalDate localDate) {
+				if (localDate == null)
+					return "";
+				return dateTimeFormatter.format(localDate);
+			}
+
+			@Override
+			public LocalDate fromString(String dateString) {
+				if (dateString == null || dateString.trim().isEmpty()) {
+					return null;
+				}
+				return LocalDate.parse(dateString, dateTimeFormatter);
+			}
+		};
 		DatePicker datePickerInvoice = new DatePicker();
+		datePickerInvoice.setConverter(stringConverter);
+		datePickerInvoice.setValue(LocalDate.now());
+
 		//Label labelCompany10=new Label("D/MMM/YYYY"); //depends if new  or not
 		GridPane gridCompany=new GridPane();
 		gridCompany.add(labelCompany7,0,0);
@@ -77,8 +106,10 @@ public class InvoicePrintPreview {
 
 		Label labelCustomer6=new Label("Date In:");
 		DatePicker datePickerIN = new DatePicker();
+		datePickerIN.setConverter(stringConverter);
 		Label labelCustomer7=new Label("Date Out:");
 		DatePicker datePickerOUT = new DatePicker();
+		datePickerOUT.setConverter(stringConverter);
 
 		GridPane gridCustomer2=new GridPane();
 		gridCustomer2.add(labelCustomer6,0,0);
@@ -107,7 +138,81 @@ public class InvoicePrintPreview {
 		gridCustomer3.add(textFieldNextService, 1, 3);
 
 		//3rd part
+		TableColumn<Part,Integer> counterColumn=new TableColumn<>("No.");
+		counterColumn.setReorderable(false);
+		counterColumn.setResizable(false);
+		counterColumn.setMinWidth(100);
+		counterColumn.setCellValueFactory(new PropertyValueFactory<>("counter"));
 
+		TableColumn<Part,String> partsIDColumn=new TableColumn<>("Parts ID");
+		partsIDColumn.setReorderable(false);
+		partsIDColumn.setResizable(false);
+		partsIDColumn.setMinWidth(100);
+		partsIDColumn.setCellValueFactory(new PropertyValueFactory<>("partsID"));
+
+		TableColumn<Part,String> descriptionColumn=new TableColumn<>("Description");
+		descriptionColumn.setReorderable(false);
+		descriptionColumn.setResizable(false);
+		descriptionColumn.setMinWidth(300);
+		descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+		TableColumn<Part,Integer> quantityColumn=new TableColumn<>("Quantity");
+		quantityColumn.setReorderable(false);
+		quantityColumn.setResizable(false);
+		quantityColumn.setMinWidth(100);
+		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+		TableColumn<Part,Float> priceColumn=new TableColumn<>("Price");
+		priceColumn.setReorderable(false);
+		priceColumn.setResizable(false);
+		priceColumn.setMinWidth(100);
+		priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+
+		TableView<Part> tableViewParts = new TableView<>();
+		tableViewParts.getColumns().add(counterColumn);
+		tableViewParts.getColumns().add(partsIDColumn);
+		tableViewParts.getColumns().add(descriptionColumn);
+		tableViewParts.getColumns().add(quantityColumn);
+		tableViewParts.getColumns().add(priceColumn);
+		tableViewParts.setPadding(padding);
+		tableViewParts.setMaxHeight(400);
+		tableViewParts.setItems(allParts);
+
+		TextField textFieldPartsID=new TextField();
+		textFieldPartsID.setPromptText("Parts ID");
+		//textFieldPartsID.setMinWidth(100);
+		TextField textFieldDescription=new TextField();
+		textFieldDescription.setPromptText("Description");
+		//textFieldDescription.setMinWidth(300);
+		TextField textFieldQuantity=new TextField();
+		textFieldQuantity.setPromptText("Quantity");
+		//textFieldQuantity.setMinWidth(100);
+		TextField textFieldPrice=new TextField();
+		textFieldPrice.setPromptText("Price");
+		//textFieldPrice.setMinWidth(100);
+		Label labelAddPart=new Label("Add new Part:");
+		//labelAddPart.setMinWidth(50);
+		Button buttonAddPart=new Button("Add");
+		//buttonAddPart.setMinWidth(50);
+		HBox hBoxAddPart=new HBox(labelAddPart,textFieldPartsID,textFieldDescription,textFieldQuantity,textFieldPrice,buttonAddPart);
+		VBox vBoxParts=new VBox(tableViewParts,hBoxAddPart);
+		vBoxParts.setPadding(padding);
+		buttonAddPart.setOnAction(actionEvent -> {
+			String partID=textFieldPartsID.getText().replaceAll("[^a-zA-Z0-9]", "");
+			textFieldPartsID.setText("");
+			String description=textFieldDescription.getText().replaceAll("[^a-zA-Z0-9]\\s", "");
+			textFieldDescription.setText("");
+			int quantity=Integer.parseInt(textFieldQuantity.getText().replaceAll("[^0-9]", ""));
+			textFieldQuantity.setText("");
+			float price=Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
+			textFieldPrice.setText("");
+			int counter=allParts.size()+1;
+			Part partNew=new Part(counter,0,quantity,partID,description,price);
+			allParts.add(partNew);
+			tableViewParts.refresh();
+
+		});
 
 		//4th part
 		Label labelComments=new Label("Comments:");
@@ -157,9 +262,11 @@ public class InvoicePrintPreview {
 		grid.add(gridCustomer1,0,1);
 		grid.add(gridCustomer2,1,1);
 		grid.add(gridCustomer3,2,1);
-		grid.add(boxComments,0,2,2,1);
-		grid.add(gridTotal,2,2);
+		grid.add(vBoxParts,0,2,3,1);
+		grid.add(boxComments,0,3,2,1);
+		grid.add(gridTotal,2,3);
 		grid.setGridLinesVisible(false);
+		grid.setPadding(padding);
 		grid.setHgap(20);
 		grid.setVgap(20);
 		grid.setAlignment(Pos.TOP_CENTER);
@@ -176,9 +283,7 @@ public class InvoicePrintPreview {
 		stagePrint.initOwner(primaryStage);
 		stagePrint.setResizable(false);
 		stagePrint.setScene(scene);
-		buttonPrint.setOnAction(e->{
-			System.out.println("Button Print Pressed");
-		});
+		buttonPrint.setOnAction(e->System.out.println("Button Print Pressed"));
 
 	}
 
