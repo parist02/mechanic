@@ -27,7 +27,8 @@ public class MainScreen extends Application {
     private Stage primaryStage;
     private ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
     private ObservableList<Car> allCars = FXCollections.observableArrayList();
-    private ObservableList<Mechanic> allMechanics;
+    private ObservableList<Mechanic> allMechanics=FXCollections.observableArrayList();
+    private ObservableList<Repair>allRepairs=FXCollections.observableArrayList();
     private ErrorPopUp errorPopUp0;
     private ErrorPopUp errorPopUp1;
     private ErrorPopUp errorPopUp2;
@@ -410,7 +411,7 @@ public class MainScreen extends Application {
         Button buttonNewInvoice = new Button("Create invoice");
         buttonNewInvoice.setPadding(padding);
         buttonNewInvoice.setOnAction(actionEvent -> {
-            InvoiceForm invoiceForm = new InvoiceForm(primaryStage, connection, allMechanics);
+            InvoiceForm invoiceForm = new InvoiceForm(primaryStage, connection, allMechanics,allRepairs);
             invoiceForm.showForm();
             if (invoiceForm.isClickedOK()) {
                 System.out.println("Clicked Okay creating invoice");
@@ -424,6 +425,7 @@ public class MainScreen extends Application {
 
         //
         importFromMechanics();
+        importFromRepairs();
         Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Invoice", boxTab2);
         Tab tab3 = new Tab("Unfinished...", boxInvoice);
@@ -493,7 +495,6 @@ public class MainScreen extends Application {
     //class needs to be changed to import data to a table
     //temporary void just to get mechanics
     public void importFromMechanics() {
-        allMechanics = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from mechanics");
@@ -506,6 +507,27 @@ public class MainScreen extends Application {
             System.out.println("Error with getting data");
         }
     }
+
+    //class needs to be changed to import data to a table
+    //temporary void just to get repairs
+    public void importFromRepairs() {
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from repairs");
+            Repair repair;
+            while (rs.next()) {
+                repair = new Repair(rs.getInt(1),rs.getString(2));
+                allRepairs.add(repair);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error with getting data");
+        }
+    }
+
+
+
+
+
 
     public void deleteFromCustomers() {
         try {

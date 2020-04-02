@@ -1,6 +1,7 @@
 package com.mechanic.code.databaseClasses;
 
 import com.mechanic.code.ErrorPopUp;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -31,13 +32,17 @@ public class InvoiceForm {
 	private Connection connection;
 	private Label labelCustomerIDfound, labelNamefound, labelSurnamefound,labelPhonefound, labelBrandfound, labelModelfound, labelVINfound;
 	private ErrorPopUp errorPopUp;
-	private ObservableList<Mechanic>allMechanics;
-	ChoiceBox<String> choiceBoxMechanic;
+	private ObservableList<Mechanic>allMechanics=FXCollections.observableArrayList();
+	private ObservableList<Repair>allRepairs= FXCollections.observableArrayList();
+	private ChoiceBox<String> choiceBoxMechanic;
+	private ChoiceBox<String>choiceBoxRepair;
+	private CheckBox checkBoxCredit;
 
 
-	public InvoiceForm(Stage primaryStage, Connection connectionMain, ObservableList<Mechanic>mechanics) {
+	public InvoiceForm(Stage primaryStage, Connection connectionMain, ObservableList<Mechanic>mechanics,ObservableList<Repair>repairs) {
 		errorPopUp=new ErrorPopUp(0,primaryStage);
 		allMechanics=mechanics;
+		allRepairs=repairs;
 		connection = connectionMain;
 		GridPane gridFirst = invoiceFormFirst();
 		GridPane gridSecond = invoiceFormSecond();
@@ -57,7 +62,7 @@ public class InvoiceForm {
 		buttonNext.setOnAction(actionEvent -> {
 			System.out.println("Next Pressed");
 			licensePlates = textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
-			if (licensePlates.equals("") || choiceBoxMechanic.getSelectionModel().isEmpty()) {
+			if (licensePlates.equals("") || choiceBoxMechanic.getSelectionModel().isEmpty() || choiceBoxRepair.getSelectionModel().isEmpty()) {
 				labelEmpty.setText("Please fill all the details!");
 			} else {
 				try {
@@ -105,16 +110,27 @@ public class InvoiceForm {
 		Label labelMechanic=new Label("Mechanic:");
 		labelMechanic.setFont(font);
 		labelMechanic.setTextFill(Color.BLACK);
+		Label labelRepair=new Label("Repair:");
+		labelRepair.setFont(font);
+		labelRepair.setTextFill(Color.BLACK);
 		labelEmpty = new Label("");
 		labelEmpty.setFont(font);
 		labelEmpty.setTextFill(Color.FIREBRICK);
 		//TextFields
 		textFieldLicensePlates = new TextField();
+		//Credit
+		checkBoxCredit=new CheckBox("Credit");
 		//choiceBox
 		choiceBoxMechanic = new ChoiceBox<>();
 		for (Mechanic m :allMechanics){
 			choiceBoxMechanic.getItems().add(m.getName());
 		}
+		choiceBoxRepair=new ChoiceBox<>();
+		for (Repair r :allRepairs){
+			choiceBoxRepair.getItems().add(r.getName());
+		}
+		//CheckBox
+
 		//Buttons
 		buttonNext = new Button("Next");
 		buttonCancel = new Button("Cancel");
@@ -125,10 +141,13 @@ public class InvoiceForm {
 		grid.add(textFieldLicensePlates, 1, 1);
 		grid.add(labelMechanic, 0, 2);
 		grid.add(choiceBoxMechanic, 1, 2);
-		grid.add(labelEmpty, 0, 3, 2, 1);
+		grid.add(labelRepair, 0, 3);
+		grid.add(choiceBoxRepair, 1, 3);
+		grid.add(checkBoxCredit, 0, 4, 2, 1);
+		grid.add(labelEmpty, 0, 5, 2, 1);
 		HBox buttonBox = new HBox(buttonNext, buttonCancel);
 		buttonBox.setSpacing(20);
-		grid.add(buttonBox, 0, 4,2,1);
+		grid.add(buttonBox, 0, 6,2,1);
 		grid.setPadding(new Insets(25, 25, 25, 25));
 		grid.setHgap(20);
 		grid.setVgap(15);
@@ -244,6 +263,7 @@ public class InvoiceForm {
 		return customerSearched;
 	}
 
+
 	public void showForm() {
 		stageForm.showAndWait();
 	}
@@ -275,7 +295,15 @@ public class InvoiceForm {
 	public Integer getMechanicIndex(){
 		return (choiceBoxMechanic.getSelectionModel().getSelectedIndex());
 	}
+
+	public Integer getRepairIndex(){
+		return (choiceBoxRepair.getSelectionModel().getSelectedIndex());
+	}
 	public boolean isClickedOK() {
 		return clickedOK;
+	}
+
+	private boolean isCredit(){
+		return (checkBoxCredit.isSelected());
 	}
 }

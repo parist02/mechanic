@@ -208,7 +208,7 @@ public class InvoicePrintPreview {
 			float price=Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
 			textFieldPrice.setText("");
 			int counter=allParts.size()+1;
-			Part partNew=new Part(counter,0,quantity,partID,description,price);
+			Part partNew=new Part(counter,0,quantity,description,partID,price);
 			allParts.add(partNew);
 			tableViewParts.refresh();
 
