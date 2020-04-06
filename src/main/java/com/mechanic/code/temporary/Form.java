@@ -1,4 +1,4 @@
-package com.mechanic.code;
+package com.mechanic.code.temporary;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

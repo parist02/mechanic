@@ -1,4 +1,4 @@
-package com.mechanic.code;
+package com.mechanic.code.main;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;

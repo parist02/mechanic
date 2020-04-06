@@ -1,7 +1,4 @@
-package com.mechanic.code.databaseClasses;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+package com.mechanic.code.database;
 
 
 public class Customer {

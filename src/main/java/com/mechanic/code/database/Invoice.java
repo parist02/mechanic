@@ -1,7 +1,6 @@
-package com.mechanic.code.databaseClasses;
+package com.mechanic.code.database;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 
 public class Invoice {
 	private Date date;
@@ -21,18 +20,11 @@ public class Invoice {
 		customerID = 0;
 		balance = 0;
 	}
-	public  Invoice(Integer counter,Date imerominia,String onomateponimo, String noumeraA,String onomaMixanikou, String eidos, Integer tilefono, Integer i, Float ipolipo){
-		invoiceID=counter;
-		date=imerominia;
-		fullName=onomateponimo;
-		licencePlates = noumeraA;
-		mechanicName = onomaMixanikou;
-		repairType = eidos;
-		phone = tilefono;
-		customerID = i;
-		balance = ipolipo;
-	}
 
+
+	public void setInvoiceID(int invoiceID) {
+		this.invoiceID = invoiceID;
+	}
 	public void setDate(Date date) {
 		this.date = date;
 	}
@@ -61,7 +53,7 @@ public class Invoice {
 		this.repairType = repairType;
 	}
 
-	public void setCustomeID(int customerID) {
+	public void setCustomerID(int customerID) {
 		this.customerID = customerID;
 	}
 
@@ -95,5 +87,9 @@ public class Invoice {
 
 	public int getCustomerID() {
 		return customerID;
+	}
+
+	public int getInvoiceID() {
+		return invoiceID;
 	}
 }

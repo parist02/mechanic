@@ -1,4 +1,4 @@
-package com.mechanic.code.databaseClasses;
+package com.mechanic.code.database;
 
 public class Mechanic {
 	private Integer mechanicID;

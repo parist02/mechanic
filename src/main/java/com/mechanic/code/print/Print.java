@@ -1,4 +1,4 @@
-package com.mechanic.code;
+package com.mechanic.code.print;
 
 import javafx.print.*;
 import javafx.scene.image.WritableImage;

@@ -1,5 +1,10 @@
-package com.mechanic.code;
-import com.mechanic.code.databaseClasses.*;
+package com.mechanic.code.main;
+import com.mechanic.code.temporary.Form;
+import com.mechanic.code.forms.CarsForm;
+import com.mechanic.code.forms.CustomersForm;
+import com.mechanic.code.forms.InvoiceForm;
+import com.mechanic.code.database.*;
+import com.mechanic.code.print.InvoicePrintPreview;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +21,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.sql.*;
+import java.time.LocalDate;
 
 public class MainScreen extends Application {
     private TableView<Customer> tableViewCustomers = new TableView<>();
@@ -29,13 +35,20 @@ public class MainScreen extends Application {
     private ObservableList<Car> allCars = FXCollections.observableArrayList();
     private ObservableList<Mechanic> allMechanics=FXCollections.observableArrayList();
     private ObservableList<Repair>allRepairs=FXCollections.observableArrayList();
+    private ObservableList<Invoice>allInvoices=FXCollections.observableArrayList();
+    private ObservableList<InvoiceMetaData>allInvoicesMetaData=FXCollections.observableArrayList();
     private ErrorPopUp errorPopUp0;
     private ErrorPopUp errorPopUp1;
     private ErrorPopUp errorPopUp2;
     private FilteredList<Customer> filteredListCustomers;
     private FilteredList<Car> filteredListCars;
+    private FilteredList<Mechanic> filteredMechanics;
+    private FilteredList<Repair>filteredRepairs;
+    private FilteredList<Invoice>filteredInvoices;
+    private FilteredList<InvoiceMetaData>filteredInvoicesMetaData;
     private boolean carsFiltered = false;
     private boolean customersFiltered = false;
+    private Company company;
 
     @Override
     public void init() throws Exception {
@@ -407,6 +420,9 @@ public class MainScreen extends Application {
         tableViewInvoice.getColumns().add(balanceInvoiceColumn);
         tableViewInvoice.setEditable(false);
         tableViewInvoice.setPadding(padding);
+        //importing all invoices from database
+        allInvoices=importFromInvoices();
+        tableViewInvoice.setItems(allInvoices);
 
         Button buttonNewInvoice = new Button("Create invoice");
         buttonNewInvoice.setPadding(padding);
@@ -426,6 +442,8 @@ public class MainScreen extends Application {
         //
         importFromMechanics();
         importFromRepairs();
+        importCompanyDetails();
+        importFromInvoiceMetaData();
         Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Invoice", boxTab2);
         Tab tab3 = new Tab("Unfinished...", boxInvoice);
@@ -475,6 +493,9 @@ public class MainScreen extends Application {
         return importingCustomers;
     }
 
+
+
+
     public ObservableList<Car> importFromCars() {
         ObservableList<Car> importingCars = FXCollections.observableArrayList();
         try {
@@ -523,8 +544,79 @@ public class MainScreen extends Application {
             System.out.println("Error with getting data");
         }
     }
+    public ObservableList<Invoice> importFromInvoices(){
+        ObservableList<Invoice>importingInvoices=FXCollections.observableArrayList();
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from invoice");
+            Invoice invoice;
+            while (rs.next()) {
+                invoice=new Invoice();
+                invoice.setInvoiceID(rs.getInt(1));
+                invoice.setDate(rs.getDate(2));
+                int arithmosPelati=rs.getInt(3);
+                filteredListCustomers=new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter()==arithmosPelati));
+                invoice.setFullName(filteredListCustomers.get(0).getName()+" "+filteredListCustomers.get(0).getSurname());
+                invoice.setLicensePlates(rs.getString(4));
+                int arithmosRepair=rs.getInt(5);
+                filteredRepairs=new FilteredList<>(allRepairs.filtered(repair -> repair.getRepairID()==arithmosRepair));
+                invoice.setRepairType(filteredRepairs.get(0).getName());
+                int arithmosMixanikou=rs.getInt(6);
+                filteredMechanics=new FilteredList<>(allMechanics.filtered(mechanic -> mechanic.getMechanicID()==arithmosMixanikou));
+                invoice.setMechanicName(filteredMechanics.get(0).getName()+" "+filteredMechanics.get(0).getSurname());
+                int cash=rs.getInt(7);
+                if (cash==1){
+                    invoice.setBalance(0);
+                }else{
+                    invoice.setBalance(rs.getFloat(8));
+                }
+                importingInvoices.add(invoice);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error with getting data");
+        }
+        return importingInvoices;
+    }
 
+    public void importFromInvoiceMetaData(){
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from invoicemetadata");
+            InvoiceMetaData invoiceMetaData;
+            while (rs.next()) {
+                invoiceMetaData=new InvoiceMetaData(rs.getFloat(10));
+                invoiceMetaData.setInvoiceId(rs.getInt(1));
+                invoiceMetaData.setDateIn(LocalDate.parse(rs.getString(2)));
+                invoiceMetaData.setDateOut(LocalDate.parse(rs.getString(3)));
+                invoiceMetaData.setMileage(rs.getInt(4));
+                invoiceMetaData.setFirstOil(rs.getInt(5));
+                invoiceMetaData.setNextOil(rs.getInt(6));
+                invoiceMetaData.setNextService(rs.getInt(7));
+                invoiceMetaData.setComments(rs.getString(8));
+                invoiceMetaData.setDiscount(rs.getFloat(9));
+                allInvoicesMetaData.add(invoiceMetaData);
 
+            }
+        } catch (SQLException e) {
+            System.out.println("Error with getting data");
+        }
+    }
+
+    public void importCompanyDetails(){
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from company");
+            company=new Company();
+            while (rs.next()) {
+                company.setPhone(rs.getInt(1));
+                company.setAddress(rs.getString(2));
+                company.setVat(rs.getFloat(3));
+                company.setTaxNumber(rs.getString(4));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error with getting data");
+        }
+    }
 
 
 

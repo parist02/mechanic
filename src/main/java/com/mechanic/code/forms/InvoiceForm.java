@@ -1,6 +1,10 @@
-package com.mechanic.code.databaseClasses;
+package com.mechanic.code.forms;
 
-import com.mechanic.code.ErrorPopUp;
+import com.mechanic.code.main.ErrorPopUp;
+import com.mechanic.code.database.Car;
+import com.mechanic.code.database.Customer;
+import com.mechanic.code.database.Mechanic;
+import com.mechanic.code.database.Repair;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
