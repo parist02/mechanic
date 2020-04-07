@@ -1,9 +1,14 @@
 package com.mechanic.code.database;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 public class Part {
 	private int counter,invoiceID,quantity;
 	private String partsID,description;
 	private float price;
+	private static DecimalFormat decimalFormat=new DecimalFormat("0.00");
 
 	public Part(){
 		counter=0;

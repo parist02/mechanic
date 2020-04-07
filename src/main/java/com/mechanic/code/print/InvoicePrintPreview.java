@@ -1,6 +1,9 @@
 package com.mechanic.code.print;
 import com.mechanic.code.main.ErrorPopUp;
 import com.mechanic.code.database.Part;
+import com.mechanic.code.main.MainScreen;
+import javafx.beans.binding.Binding;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -19,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -35,6 +39,7 @@ public class InvoicePrintPreview {
 	private ObservableList<Part>allParts= FXCollections.observableArrayList();
 	private ErrorPopUp errorPopUp=new ErrorPopUp(0,stagePrint);
 	private boolean beingPrinted=false;
+	private float amount=0,net=0,vat=0,total=0;
 
 	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates,String brandModel, String vin) {
 		//1st Part, import from database except date
@@ -205,21 +210,6 @@ public class InvoicePrintPreview {
 		HBox hBoxAddPart = new HBox(labelAddPart, textFieldPartsID, textFieldDescription, textFieldQuantity, textFieldPrice, buttonAddPart);
 		VBox vBoxParts = new VBox(tableViewParts, hBoxAddPart);
 		vBoxParts.setPadding(padding);
-		buttonAddPart.setOnAction(actionEvent -> {
-			String partID = textFieldPartsID.getText().replaceAll("[^a-zA-Z0-9]", "");
-			textFieldPartsID.setText("");
-			String description = textFieldDescription.getText().replaceAll("[^a-zA-Z0-9]\\s", "");
-			textFieldDescription.setText("");
-			int quantity = Integer.parseInt(textFieldQuantity.getText().replaceAll("[^0-9]", ""));
-			textFieldQuantity.setText("");
-			float price = Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
-			textFieldPrice.setText("");
-			int counter = allParts.size() + 1;
-			Part partNew = new Part(counter, 0, quantity, description, partID, price);
-			allParts.add(partNew);
-			tableViewParts.refresh();
-
-		});
 
 		//4th part
 		Label labelComments = new Label("Comments:");
@@ -234,29 +224,29 @@ public class InvoicePrintPreview {
 		boxComments.setSpacing(5);
 
 		Label labelTotal1 = new Label("Amount:");
-		Label labelTotal1_1 = new Label("€1234.123");
+		Label labelAmount = new Label("");
 		Label labelTotal2 = new Label("Discount:");
-		Label labelTotal2_2 = new Label("€1234.123");
+		Label labelDiscount = new Label("");
 		Label labelTotal3 = new Label("Net:");
-		Label labelTotal3_3 = new Label("€1234.123");
+		Label labelNet = new Label("");
 		Label labelTotal4 = new Label("Vat:");
-		Label labelTotal4_4 = new Label("€1234.123");
+		Label labelVat= new Label("");
 		Label labelTotal5 = new Label("GTotal:");
-		Label labelTotal5_5 = new Label("€1234.123");
+		Label labelTotal = new Label("");
 		Label labelTotal6 = new Label("Received By");
 		Label labelDots2 = new Label("..........................................");
 
 		GridPane gridTotal = new GridPane();
 		gridTotal.add(labelTotal1, 0, 0);
-		gridTotal.add(labelTotal1_1, 1, 0);
+		gridTotal.add(labelAmount, 1, 0);
 		gridTotal.add(labelTotal2, 0, 1);
-		gridTotal.add(labelTotal2_2, 1, 1);
+		gridTotal.add(labelDiscount, 1, 1);
 		gridTotal.add(labelTotal3, 0, 2);
-		gridTotal.add(labelTotal3_3, 1, 2);
+		gridTotal.add(labelNet, 1, 2);
 		gridTotal.add(labelTotal4, 0, 3);
-		gridTotal.add(labelTotal4_4, 1, 3);
+		gridTotal.add(labelVat, 1, 3);
 		gridTotal.add(labelTotal5, 0, 4);
-		gridTotal.add(labelTotal5_5, 1, 4);
+		gridTotal.add(labelTotal, 1, 4);
 		gridTotal.add(labelTotal6, 0, 5, 2, 1);
 		gridTotal.add(labelDots2, 0, 6, 2, 1);
 
@@ -294,6 +284,29 @@ public class InvoicePrintPreview {
 		stagePrint.initOwner(primaryStage);
 		stagePrint.setResizable(false);
 		stagePrint.setScene(scene);
+		buttonAddPart.setOnAction(actionEvent -> {
+			String partID = textFieldPartsID.getText().replaceAll("[^a-zA-Z0-9]", "");
+			textFieldPartsID.setText("");
+			String description = textFieldDescription.getText().replaceAll("[^a-zA-Z0-9/.-]\\s", "");
+			textFieldDescription.setText("");
+			int quantity = Integer.parseInt(textFieldQuantity.getText().replaceAll("[^0-9]", ""));
+			textFieldQuantity.setText("");
+			float price = Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
+			textFieldPrice.setText("");
+			int counter = allParts.size() + 1;
+			Part partNew = new Part(counter, 0, quantity, description, partID, price);
+			amount=amount + quantity*price;
+			net=amount/*- discount*/ ; //needs to change after discount
+			vat=net*MainScreen.company.getVat();
+			total=net+vat;
+			labelAmount.setText(String.valueOf(amount));
+			labelNet.setText(String.valueOf(net));
+			labelVat.setText(String.valueOf(vat));
+			labelTotal.setText(String.valueOf(total));
+			allParts.add(partNew);
+			tableViewParts.refresh();
+		});
+
 		buttonPrint.setOnAction(actionEvent -> {
 			dateInvoice = datePickerInvoice.getValue();
 			dateIN = datePickerIN.getValue();
@@ -350,6 +363,10 @@ public class InvoicePrintPreview {
 				stagePrint.close();
 			}
 		});
+
+
+
+
 	}
 
 	public void show(){

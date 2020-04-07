@@ -33,22 +33,22 @@ public class MainScreen extends Application {
     private Stage primaryStage;
     private ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
     private ObservableList<Car> allCars = FXCollections.observableArrayList();
-    private ObservableList<Mechanic> allMechanics=FXCollections.observableArrayList();
-    private ObservableList<Repair>allRepairs=FXCollections.observableArrayList();
-    private ObservableList<Invoice>allInvoices=FXCollections.observableArrayList();
-    private ObservableList<InvoiceMetaData>allInvoicesMetaData=FXCollections.observableArrayList();
+    private ObservableList<Mechanic> allMechanics = FXCollections.observableArrayList();
+    private ObservableList<Repair> allRepairs = FXCollections.observableArrayList();
+    private ObservableList<Invoice> allInvoices = FXCollections.observableArrayList();
+    private ObservableList<InvoiceMetaData> allInvoicesMetaData = FXCollections.observableArrayList();
     private ErrorPopUp errorPopUp0;
     private ErrorPopUp errorPopUp1;
     private ErrorPopUp errorPopUp2;
     private FilteredList<Customer> filteredListCustomers;
     private FilteredList<Car> filteredListCars;
     private FilteredList<Mechanic> filteredMechanics;
-    private FilteredList<Repair>filteredRepairs;
-    private FilteredList<Invoice>filteredInvoices;
-    private FilteredList<InvoiceMetaData>filteredInvoicesMetaData;
+    private FilteredList<Repair> filteredRepairs;
+    private FilteredList<Invoice> filteredInvoices;
+    private FilteredList<InvoiceMetaData> filteredInvoicesMetaData;
     private boolean carsFiltered = false;
     private boolean customersFiltered = false;
-    private Company company;
+    public static Company company;
 
     @Override
     public void init() throws Exception {
@@ -421,13 +421,13 @@ public class MainScreen extends Application {
         tableViewInvoice.setEditable(false);
         tableViewInvoice.setPadding(padding);
         //importing all invoices from database
-        allInvoices=importFromInvoices();
+        allInvoices = importFromInvoices();
         tableViewInvoice.setItems(allInvoices);
 
         Button buttonNewInvoice = new Button("Create invoice");
         buttonNewInvoice.setPadding(padding);
         buttonNewInvoice.setOnAction(actionEvent -> {
-            InvoiceForm invoiceForm = new InvoiceForm(primaryStage, connection, allMechanics,allRepairs);
+            InvoiceForm invoiceForm = new InvoiceForm(primaryStage, connection, allMechanics, allRepairs);
             invoiceForm.showForm();
             if (invoiceForm.isClickedOK()) {
                 System.out.println("Clicked Okay creating invoice");
@@ -494,8 +494,6 @@ public class MainScreen extends Application {
     }
 
 
-
-
     public ObservableList<Car> importFromCars() {
         ObservableList<Car> importingCars = FXCollections.observableArrayList();
         try {
@@ -537,37 +535,38 @@ public class MainScreen extends Application {
             ResultSet rs = stmt.executeQuery("select * from repairs");
             Repair repair;
             while (rs.next()) {
-                repair = new Repair(rs.getInt(1),rs.getString(2));
+                repair = new Repair(rs.getInt(1), rs.getString(2));
                 allRepairs.add(repair);
             }
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
     }
-    public ObservableList<Invoice> importFromInvoices(){
-        ObservableList<Invoice>importingInvoices=FXCollections.observableArrayList();
+
+    public ObservableList<Invoice> importFromInvoices() {
+        ObservableList<Invoice> importingInvoices = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from invoice");
             Invoice invoice;
             while (rs.next()) {
-                invoice=new Invoice();
+                invoice = new Invoice();
                 invoice.setInvoiceID(rs.getInt(1));
                 invoice.setDate(rs.getDate(2));
-                int arithmosPelati=rs.getInt(3);
-                filteredListCustomers=new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter()==arithmosPelati));
-                invoice.setFullName(filteredListCustomers.get(0).getName()+" "+filteredListCustomers.get(0).getSurname());
+                int arithmosPelati = rs.getInt(3);
+                filteredListCustomers = new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter() == arithmosPelati));
+                invoice.setFullName(filteredListCustomers.get(0).getName() + " " + filteredListCustomers.get(0).getSurname());
                 invoice.setLicensePlates(rs.getString(4));
-                int arithmosRepair=rs.getInt(5);
-                filteredRepairs=new FilteredList<>(allRepairs.filtered(repair -> repair.getRepairID()==arithmosRepair));
+                int arithmosRepair = rs.getInt(5);
+                filteredRepairs = new FilteredList<>(allRepairs.filtered(repair -> repair.getRepairID() == arithmosRepair));
                 invoice.setRepairType(filteredRepairs.get(0).getName());
-                int arithmosMixanikou=rs.getInt(6);
-                filteredMechanics=new FilteredList<>(allMechanics.filtered(mechanic -> mechanic.getMechanicID()==arithmosMixanikou));
-                invoice.setMechanicName(filteredMechanics.get(0).getName()+" "+filteredMechanics.get(0).getSurname());
-                int cash=rs.getInt(7);
-                if (cash==1){
+                int arithmosMixanikou = rs.getInt(6);
+                filteredMechanics = new FilteredList<>(allMechanics.filtered(mechanic -> mechanic.getMechanicID() == arithmosMixanikou));
+                invoice.setMechanicName(filteredMechanics.get(0).getName() + " " + filteredMechanics.get(0).getSurname());
+                int cash = rs.getInt(7);
+                if (cash == 1) {
                     invoice.setBalance(0);
-                }else{
+                } else {
                     invoice.setBalance(rs.getFloat(8));
                 }
                 importingInvoices.add(invoice);
@@ -578,13 +577,13 @@ public class MainScreen extends Application {
         return importingInvoices;
     }
 
-    public void importFromInvoiceMetaData(){
+    public void importFromInvoiceMetaData() {
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from invoicemetadata");
             InvoiceMetaData invoiceMetaData;
             while (rs.next()) {
-                invoiceMetaData=new InvoiceMetaData(rs.getFloat(10));
+                invoiceMetaData = new InvoiceMetaData(rs.getFloat(10));
                 invoiceMetaData.setInvoiceId(rs.getInt(1));
                 invoiceMetaData.setDateIn(LocalDate.parse(rs.getString(2)));
                 invoiceMetaData.setDateOut(LocalDate.parse(rs.getString(3)));
@@ -602,11 +601,11 @@ public class MainScreen extends Application {
         }
     }
 
-    public void importCompanyDetails(){
+    public void importCompanyDetails() {
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from company");
-            company=new Company();
+            company = new Company();
             while (rs.next()) {
                 company.setPhone(rs.getInt(1));
                 company.setAddress(rs.getString(2));
@@ -617,8 +616,6 @@ public class MainScreen extends Application {
             System.out.println("Error with getting data");
         }
     }
-
-
 
 
     public void deleteFromCustomers() {
@@ -662,9 +659,9 @@ public class MainScreen extends Application {
         try {
             final int index2;
             Customer selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItem();
-            if(customersFiltered){
-                index2=filteredListCustomers.getSourceIndexFor(allCustomers,0);
-            }else{
+            if (customersFiltered) {
+                index2 = filteredListCustomers.getSourceIndexFor(allCustomers, 0);
+            } else {
                 index2 = tableViewCustomers.getSelectionModel().getFocusedIndex();
             }
             final int index = selectedCustomer.getCounter();
@@ -697,9 +694,9 @@ public class MainScreen extends Application {
         try {
             final int index2;
             Car selectedCar = tableViewCars.getSelectionModel().getSelectedItem();
-            if(carsFiltered){
-                index2=filteredListCars.getSourceIndexFor(allCars,0);
-            }else {
+            if (carsFiltered) {
+                index2 = filteredListCars.getSourceIndexFor(allCars, 0);
+            } else {
                 index2 = tableViewCars.getSelectionModel().getFocusedIndex();
             }
             final String index = selectedCar.getLicencePlates();
