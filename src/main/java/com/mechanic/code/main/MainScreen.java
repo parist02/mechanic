@@ -21,6 +21,8 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
 public class MainScreen extends Application {
@@ -37,6 +39,7 @@ public class MainScreen extends Application {
     private ObservableList<Repair> allRepairs = FXCollections.observableArrayList();
     private ObservableList<Invoice> allInvoices = FXCollections.observableArrayList();
     private ObservableList<InvoiceMetaData> allInvoicesMetaData = FXCollections.observableArrayList();
+    private ObservableList<Part> allParts = FXCollections.observableArrayList();
     private ErrorPopUp errorPopUp0;
     private ErrorPopUp errorPopUp1;
     private ErrorPopUp errorPopUp2;
@@ -46,9 +49,11 @@ public class MainScreen extends Application {
     private FilteredList<Repair> filteredRepairs;
     private FilteredList<Invoice> filteredInvoices;
     private FilteredList<InvoiceMetaData> filteredInvoicesMetaData;
+    private FilteredList<Part> filteredParts;
     private boolean carsFiltered = false;
     private boolean customersFiltered = false;
     public static Company company;
+    private SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd/MM/yyyy");
 
     @Override
     public void init() throws Exception {
@@ -420,19 +425,23 @@ public class MainScreen extends Application {
         tableViewInvoice.getColumns().add(balanceInvoiceColumn);
         tableViewInvoice.setEditable(false);
         tableViewInvoice.setPadding(padding);
-        //importing all invoices from database
-        allInvoices = importFromInvoices();
-        tableViewInvoice.setItems(allInvoices);
 
         Button buttonNewInvoice = new Button("Create invoice");
         buttonNewInvoice.setPadding(padding);
         buttonNewInvoice.setOnAction(actionEvent -> {
-            InvoiceForm invoiceForm = new InvoiceForm(primaryStage, connection, allMechanics, allRepairs);
+            InvoiceForm invoiceForm = new InvoiceForm(primaryStage, connection, allMechanics, allRepairs,allCustomers,allCars);
             invoiceForm.showForm();
             if (invoiceForm.isClickedOK()) {
                 System.out.println("Clicked Okay creating invoice");
                 InvoicePrintPreview invoicePrintPreview = new InvoicePrintPreview(primaryStage, invoiceForm.getCustomerID(), invoiceForm.getFullName(), invoiceForm.getLicensePlates(), invoiceForm.getBrandModel(), invoiceForm.getVin());
                 invoicePrintPreview.show();
+                if(invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()){
+                    System.out.println("Printing...not implemented yet");
+                    addToInvoice(invoiceForm,invoicePrintPreview);
+                }else if(invoicePrintPreview.isBeingSaved()){
+                    System.out.println("Saving");
+                    addToInvoice(invoiceForm,invoicePrintPreview);
+                }
             }
         });
         VBox boxTab2 = new VBox(tableViewInvoice, buttonNewInvoice);
@@ -443,7 +452,11 @@ public class MainScreen extends Application {
         importFromMechanics();
         importFromRepairs();
         importCompanyDetails();
+        //importing invoice data
+        allInvoices = importFromInvoices();
+        tableViewInvoice.setItems(allInvoices);
         importFromInvoiceMetaData();
+        importFromInvoiceParts();
         Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Invoice", boxTab2);
         Tab tab3 = new Tab("Unfinished...", boxInvoice);
@@ -552,10 +565,12 @@ public class MainScreen extends Application {
             while (rs.next()) {
                 invoice = new Invoice();
                 invoice.setInvoiceID(rs.getInt(1));
-                invoice.setDate(rs.getDate(2));
+                invoice.setDate(rs.getDate(2).toLocalDate());
                 int arithmosPelati = rs.getInt(3);
+                invoice.setCustomerID(arithmosPelati);
                 filteredListCustomers = new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter() == arithmosPelati));
                 invoice.setFullName(filteredListCustomers.get(0).getName() + " " + filteredListCustomers.get(0).getSurname());
+                invoice.setPhone(filteredListCustomers.get(0).getPhone1());
                 invoice.setLicensePlates(rs.getString(4));
                 int arithmosRepair = rs.getInt(5);
                 filteredRepairs = new FilteredList<>(allRepairs.filtered(repair -> repair.getRepairID() == arithmosRepair));
@@ -563,12 +578,7 @@ public class MainScreen extends Application {
                 int arithmosMixanikou = rs.getInt(6);
                 filteredMechanics = new FilteredList<>(allMechanics.filtered(mechanic -> mechanic.getMechanicID() == arithmosMixanikou));
                 invoice.setMechanicName(filteredMechanics.get(0).getName() + " " + filteredMechanics.get(0).getSurname());
-                int cash = rs.getInt(7);
-                if (cash == 1) {
-                    invoice.setBalance(0);
-                } else {
-                    invoice.setBalance(rs.getFloat(8));
-                }
+                invoice.setBalance(rs.getFloat(8));
                 importingInvoices.add(invoice);
             }
         } catch (SQLException e) {
@@ -595,6 +605,20 @@ public class MainScreen extends Application {
                 invoiceMetaData.setDiscount(rs.getFloat(9));
                 allInvoicesMetaData.add(invoiceMetaData);
 
+            }
+        } catch (SQLException e) {
+            System.out.println("Error with getting data");
+        }
+    }
+
+    public void importFromInvoiceParts() {
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from invoiceparts");
+            Part part;
+            while (rs.next()) {
+                part=new Part(allParts.size(),rs.getInt(1),rs.getInt(4),rs.getString(3),rs.getString(2),rs.getInt(5));
+                allParts.add(part);
             }
         } catch (SQLException e) {
             System.out.println("Error with getting data");
@@ -775,4 +799,80 @@ public class MainScreen extends Application {
             errorPopUp0.showError();
         }
     }
+    public void addToInvoice(InvoiceForm invoiceForm,InvoicePrintPreview invoicePrintPreview){
+        try {
+            String queryBegin="BEGIN;";
+            String query="INSERT INTO invoice (InvoiceID, Date, CustomerID, LicensePlates, RepairID, MechanicID, Cash, Remaining) VALUES (NULL";
+            query=query+", '"+invoicePrintPreview.getDateInvoice()+"', ";
+            query=query+invoiceForm.getCustomerID()+", ";
+            query=query+ "'"+invoiceForm.getLicensePlates()+"', ";
+            query=query+(invoiceForm.getRepairIndex()+1)+", ";
+            query=query+(invoiceForm.getMechanicIndex()+1)+", ";
+            query=query+(invoiceForm.getCreditCash().equals("Credit")? 0:1)+", ";
+            query=query+(invoiceForm.getCreditCash().equals("Credit")? 0:invoicePrintPreview.getAmount())+");";
+            final String queryInvoice=query;
+            //invoice
+            Invoice invoice=new Invoice();
+            invoice.setBalance(invoiceForm.getCreditCash().equals("Credit")? 0:invoicePrintPreview.getAmount());
+            invoice.setDate(invoicePrintPreview.getDateInvoice());
+            invoice.setFullName(invoiceForm.getFullName());
+            invoice.setLicensePlates(invoiceForm.getLicensePlates());
+            invoice.setRepairType(allRepairs.get(invoiceForm.getRepairIndex()).getName());
+            invoice.setCustomerID(invoiceForm.getCustomerID());
+            invoice.setMechanicName(allMechanics.get(invoiceForm.getMechanicIndex()).getName()+allMechanics.get(invoiceForm.getMechanicIndex()).getSurname());
+            invoice.setPhone(invoiceForm.getPhone());
+            //invoice metadata
+            InvoiceMetaData invoiceMetaData=new InvoiceMetaData(invoicePrintPreview.getVat());
+            invoiceMetaData.setVat(invoicePrintPreview.getVat());
+            invoiceMetaData.setDateIn(invoicePrintPreview.getDateIN());
+            invoiceMetaData.setDateOut(invoicePrintPreview.getDateOUT());
+            invoiceMetaData.setMileage(invoicePrintPreview.getMileage());
+            invoiceMetaData.setFirstOil(invoicePrintPreview.getFirstOil());
+            invoiceMetaData.setNextOil(invoicePrintPreview.getNextOil());
+            invoiceMetaData.setNextService(invoicePrintPreview.getNextService());
+            invoiceMetaData.setComments(invoicePrintPreview.getComments());
+            invoiceMetaData.setDiscount(invoicePrintPreview.getDiscount());
+            //execute queries
+            query="INSERT INTO invoicemetadata (InvoiceID,ImportDate,ExportDate,Miles,FirstOil,NextOil,NextService,Comments,Discount, Vat) VALUES (";
+            query=query+"LAST_INSERT_ID()"+", '"+invoiceMetaData.getDateIn()+"', '"+invoiceMetaData.getDateOut()+"', ";
+            query=query+invoiceMetaData.getMileage()+", "+invoiceMetaData.getFirstOil()+", "+invoiceMetaData.getNextOil()+", "+invoiceMetaData.getNextService()+",";
+            query=query+"'"+invoiceMetaData.getComments()+"', "+invoiceMetaData.getDiscount()+", "+invoiceMetaData.getVat()+");";
+            final String queryCommit="COMMIT;";
+            final String queryInvoiceMetaData=query;
+            Statement statement= connection.createStatement();
+            System.out.println(queryBegin);
+            System.out.println(queryInvoice);
+            System.out.println(queryInvoiceMetaData);
+            System.out.println(queryCommit);
+            statement.executeUpdate(queryBegin);
+            statement.executeUpdate(queryInvoice);
+            statement.executeUpdate(queryInvoiceMetaData);
+            statement.executeUpdate(queryCommit);
+            //Find invoiceID
+            ResultSet rs = statement.executeQuery("SELECT LAST_INSERT_ID()");
+            rs.next();
+            int arithmosTimologiou=rs.getInt(1);
+            System.out.println("Arithmos timologiou: "+arithmosTimologiou);
+            //insert to tables
+            invoice.setInvoiceID(arithmosTimologiou);
+            invoiceMetaData.setInvoiceId(arithmosTimologiou);
+            allInvoices.add(invoice);
+            allInvoicesMetaData.add(invoiceMetaData);
+            //insert parts to database
+            ObservableList<Part>parts;
+            parts=invoicePrintPreview.getAllParts();
+            for(Part p : parts){
+                query="INSERT INTO invoiceparts (InvoiceID, PartsId, Description, Quantity, Price) VALUES (";
+                query=query+"LAST_INSERT_ID()"+", '"+p.getPartsID()+"', '"+p.getDescription()+"', "+p.getQuantity()+", "+p.getPrice()+");";
+                final String queryInvoiceParts=query;
+                System.out.println(queryInvoiceParts);
+                PreparedStatement preparedStatement = connection.prepareStatement(queryInvoiceParts);
+                preparedStatement.execute();
+            }
+        }catch (SQLException ex){
+            errorPopUp0.setErrorMessage("Error with adding data to database.");
+            errorPopUp0.showError();
+        }
+    }
+
 }

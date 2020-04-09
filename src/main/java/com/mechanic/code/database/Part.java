@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 public class Part {
 	private int counter,invoiceID,quantity;
 	private String partsID,description;
-	private float price;
+	private double price;
 	private static DecimalFormat decimalFormat=new DecimalFormat("0.00");
 
 	public Part(){
@@ -19,7 +19,7 @@ public class Part {
 		description="";
 	}
 
-	public Part(int count,int arithmosTimologiou,int posotita,String onoma,String kodikos,float timi){
+	public Part(int count,int arithmosTimologiou,int posotita,String onoma,String kodikos,double timi){
 		invoiceID=arithmosTimologiou;
 		quantity=posotita;
 		partsID=kodikos;

@@ -5,8 +5,10 @@ import com.mechanic.code.database.Car;
 import com.mechanic.code.database.Customer;
 import com.mechanic.code.database.Mechanic;
 import com.mechanic.code.database.Repair;
+import com.mechanic.code.main.MainScreen;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -33,21 +35,23 @@ public class InvoiceForm {
 	private Label labelEmpty;
 	private Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
 	private Font fontBold = Font.font("Arial", FontWeight.BOLD, FontPosture.REGULAR, 16);
-	private Connection connection;
 	private Label labelCustomerIDfound, labelNamefound, labelSurnamefound,labelPhonefound, labelBrandfound, labelModelfound, labelVINfound;
 	private ErrorPopUp errorPopUp;
-	private ObservableList<Mechanic>allMechanics=FXCollections.observableArrayList();
-	private ObservableList<Repair>allRepairs= FXCollections.observableArrayList();
+	private ObservableList<Mechanic>allMechanics;
+	private ObservableList<Repair>allRepairs;
+	private ObservableList<Customer>allCustomers;
+	private ObservableList<Car>allCars;
 	private ChoiceBox<String> choiceBoxMechanic;
 	private ChoiceBox<String>choiceBoxRepair;
-	private CheckBox checkBoxCredit;
+	private ChoiceBox<String>choiceBoxCredit;
 
 
-	public InvoiceForm(Stage primaryStage, Connection connectionMain, ObservableList<Mechanic>mechanics,ObservableList<Repair>repairs) {
+	public InvoiceForm(Stage primaryStage, Connection connectionMain, ObservableList<Mechanic>mechanics,ObservableList<Repair>repairs,ObservableList<Customer>customers,ObservableList<Car>cars) {
 		errorPopUp=new ErrorPopUp(0,primaryStage);
 		allMechanics=mechanics;
 		allRepairs=repairs;
-		connection = connectionMain;
+		allCars=cars;
+		allCustomers=customers;
 		GridPane gridFirst = invoiceFormFirst();
 		GridPane gridSecond = invoiceFormSecond();
 		Tab tab1 = new Tab("1st Step", gridFirst);
@@ -66,11 +70,10 @@ public class InvoiceForm {
 		buttonNext.setOnAction(actionEvent -> {
 			System.out.println("Next Pressed");
 			licensePlates = textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
-			if (licensePlates.equals("") || choiceBoxMechanic.getSelectionModel().isEmpty() || choiceBoxRepair.getSelectionModel().isEmpty()) {
+			if (licensePlates.equals("") || choiceBoxMechanic.getSelectionModel().isEmpty() || choiceBoxRepair.getSelectionModel().isEmpty() || choiceBoxCredit.getSelectionModel().isEmpty()) {
 				labelEmpty.setText("Please fill all the details!");
 			} else {
 				try {
-					System.out.println("Mechanic Selected is: " + allMechanics.get(choiceBoxMechanic.getSelectionModel().getSelectedIndex()).getMechanicID());
 					Car car = findCar(licensePlates);
 					Customer customer = findCustomer(car.getCustomerId());
 					labelCustomerIDfound.setText(String.valueOf(customer.getCounter()));
@@ -83,8 +86,8 @@ public class InvoiceForm {
 					tab1.setDisable(true);
 					tab2.setDisable(false);
 					tabPane.getSelectionModel().select(1);
-				}catch (NullPointerException exep){
-					errorPopUp.setErrorMessage("License Plates not found!");
+				}catch (IndexOutOfBoundsException exep){
+					errorPopUp.setErrorMessage("Error with license plates. Customer or Car not found");
 					errorPopUp.showError();
 				}
 			}
@@ -117,13 +120,14 @@ public class InvoiceForm {
 		Label labelRepair=new Label("Repair:");
 		labelRepair.setFont(font);
 		labelRepair.setTextFill(Color.BLACK);
+		Label labelCredit=new Label("Credit/Cash:");
+		labelCredit.setFont(font);
+		labelCredit.setTextFill(Color.BLACK);
 		labelEmpty = new Label("");
 		labelEmpty.setFont(font);
 		labelEmpty.setTextFill(Color.FIREBRICK);
 		//TextFields
 		textFieldLicensePlates = new TextField();
-		//Credit
-		checkBoxCredit=new CheckBox("Credit");
 		//choiceBox
 		choiceBoxMechanic = new ChoiceBox<>();
 		for (Mechanic m :allMechanics){
@@ -133,8 +137,9 @@ public class InvoiceForm {
 		for (Repair r :allRepairs){
 			choiceBoxRepair.getItems().add(r.getName());
 		}
-		//CheckBox
-
+		choiceBoxCredit=new ChoiceBox<>();
+		choiceBoxCredit.getItems().add("Credit");
+		choiceBoxCredit.getItems().add("Cash");
 		//Buttons
 		buttonNext = new Button("Next");
 		buttonCancel = new Button("Cancel");
@@ -147,7 +152,8 @@ public class InvoiceForm {
 		grid.add(choiceBoxMechanic, 1, 2);
 		grid.add(labelRepair, 0, 3);
 		grid.add(choiceBoxRepair, 1, 3);
-		grid.add(checkBoxCredit, 0, 4, 2, 1);
+		grid.add(labelCredit, 0, 4);
+		grid.add(choiceBoxCredit, 1, 4);
 		grid.add(labelEmpty, 0, 5, 2, 1);
 		HBox buttonBox = new HBox(buttonNext, buttonCancel);
 		buttonBox.setSpacing(20);
@@ -234,37 +240,14 @@ public class InvoiceForm {
 
 	}
 
-	private Car findCar(String noumera) {
-		Car carSearched = null;
-		try {
-			final String querySearch = "SELECT * FROM cars WHERE LicensePlates= '" + noumera + "';";
-			System.out.println(querySearch);
-			Statement statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery(querySearch);
-
-			while (rs.next()) {
-				carSearched = new Car(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
-			}
-		} catch (SQLException ex) {
-			System.out.println("Error with searching");
-		}
-		return carSearched;
+	private Car findCar(String noumera) throws IndexOutOfBoundsException {
+		FilteredList<Car>filteredListCars=new FilteredList<>(allCars.filtered(car -> car.getLicencePlates().equals(noumera)));
+		return (filteredListCars.get(0));
 	}
 
-	private Customer findCustomer(Integer kinito) {
-		Customer customerSearched = null;
-		try {
-			final String querySearch = "SELECT * FROM customers WHERE CustomerID=" + kinito + ";";
-			System.out.println(querySearch);
-			Statement statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery(querySearch);
-			while (rs.next()) {
-				customerSearched = new Customer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getString(6), rs.getFloat(7));
-			}
-		} catch (SQLException ex) {
-			System.out.println("Error with searching");
-		}
-		return customerSearched;
+	private Customer findCustomer(Integer arithmosPelati) throws IndexOutOfBoundsException{
+		FilteredList<Customer>filteredListCustomer=new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter()==arithmosPelati));
+		return (filteredListCustomer.get(0));
 	}
 
 
@@ -307,7 +290,7 @@ public class InvoiceForm {
 		return clickedOK;
 	}
 
-	private boolean isCredit(){
-		return (checkBoxCredit.isSelected());
+	public String getCreditCash(){
+		return (choiceBoxCredit.getSelectionModel().getSelectedItem());
 	}
 }

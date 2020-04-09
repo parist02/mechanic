@@ -1,9 +1,10 @@
 package com.mechanic.code.database;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class Invoice {
-	private Date date;
+	private LocalDate date;
 	private String fullName, licencePlates, mechanicName, repairType;
 	private int phone, customerID,invoiceID;
 	private float balance;
@@ -11,7 +12,7 @@ public class Invoice {
 
 	public Invoice() {
 		invoiceID=0;
-		date = new Date(System.currentTimeMillis());
+		date = LocalDate.now();
 		fullName = "";
 		licencePlates = "";
 		mechanicName = "";
@@ -25,10 +26,9 @@ public class Invoice {
 	public void setInvoiceID(int invoiceID) {
 		this.invoiceID = invoiceID;
 	}
-	public void setDate(Date date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
-
 	public void setBalance(float balance) {
 		this.balance = balance;
 	}
@@ -61,7 +61,7 @@ public class Invoice {
 		return licencePlates;
 	}
 
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 

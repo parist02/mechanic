@@ -1,4 +1,5 @@
 package com.mechanic.code.print;
+import com.mechanic.code.database.Invoice;
 import com.mechanic.code.main.ErrorPopUp;
 import com.mechanic.code.database.Part;
 import com.mechanic.code.main.MainScreen;
@@ -22,9 +23,13 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.Flow;
 
 
 public class InvoicePrintPreview {
@@ -34,12 +39,13 @@ public class InvoicePrintPreview {
 	private static double height= Paper.A4.getHeight();
 	private static double width=Paper.A4.getWidth();
 	private LocalDate dateInvoice,dateIN,dateOUT;
-	private Integer mileage,firstOil,nextOil,nextService;
+	private Integer mileage,firstOil,nextOil,nextService,discount=0;
 	private String comments;
 	private ObservableList<Part>allParts= FXCollections.observableArrayList();
 	private ErrorPopUp errorPopUp=new ErrorPopUp(0,stagePrint);
-	private boolean beingPrinted=false;
+	private boolean beingPrinted=false,beingSaved=false;
 	private float amount=0,net=0,vat=0,total=0;
+	DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
 	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates,String brandModel, String vin) {
 		//1st Part, import from database except date
@@ -59,15 +65,13 @@ public class InvoicePrintPreview {
 		Label labelCompany9 = new Label("Date:");
 		//xrisimopoiite gia metatropi imerominies sto format pou theloume
 		StringConverter<LocalDate> stringConverter = new StringConverter<>() {
-			private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
+			private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			@Override
 			public String toString(LocalDate localDate) {
 				if (localDate == null)
 					return "";
 				return dateTimeFormatter.format(localDate);
 			}
-
 			@Override
 			public LocalDate fromString(String dateString) {
 				if (dateString == null || dateString.trim().isEmpty()) {
@@ -174,12 +178,22 @@ public class InvoicePrintPreview {
 		quantityColumn.setMinWidth(100);
 		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
-		TableColumn<Part, Float> priceColumn = new TableColumn<>("Price");
+		TableColumn<Part, Double> priceColumn = new TableColumn<>("Price");
 		priceColumn.setReorderable(false);
 		priceColumn.setResizable(false);
 		priceColumn.setMinWidth(100);
 		priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-
+		priceColumn.setCellFactory(partFloatTableColumn -> new TableCell<>() {
+			@Override
+			protected void updateItem(Double item, boolean empty) {
+				super.updateItem(item, empty);
+				if (empty) {
+					setText(null);
+				} else {
+					setText(decimalFormat.format(item));
+				}
+			}
+		});
 
 		TableView<Part> tableViewParts = new TableView<>();
 		tableViewParts.getColumns().add(counterColumn);
@@ -275,8 +289,10 @@ public class InvoicePrintPreview {
 		Tooltip tooltipSave=new Tooltip("Save Invoice without Printing");
 		buttonSave.setTooltip(tooltipSave);
 
-
-		VBox boxMain = new VBox(grid, buttonPrint);
+		HBox boxButtons =new HBox(buttonPrint,buttonSave);
+		boxButtons.setPadding(padding);
+		boxButtons.setSpacing(10);
+		VBox boxMain = new VBox(grid, boxButtons);
 		Scene scene = new Scene(boxMain);
 		//
 		//scene.getStylesheets().add(getClass().getResource("stylesheets.css").toExternalForm());
@@ -285,26 +301,46 @@ public class InvoicePrintPreview {
 		stagePrint.setResizable(false);
 		stagePrint.setScene(scene);
 		buttonAddPart.setOnAction(actionEvent -> {
+			boolean error=false;
+			int quantity=0;
+			float price=0;
 			String partID = textFieldPartsID.getText().replaceAll("[^a-zA-Z0-9]", "");
-			textFieldPartsID.setText("");
+			if(partID.equals("")){
+				error=true;
+			}
 			String description = textFieldDescription.getText().replaceAll("[^a-zA-Z0-9/.-]\\s", "");
-			textFieldDescription.setText("");
-			int quantity = Integer.parseInt(textFieldQuantity.getText().replaceAll("[^0-9]", ""));
-			textFieldQuantity.setText("");
-			float price = Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
+			if(description.equals("")) {
+				textFieldDescription.setText(description);
+				error = true;
+			}
+			try {
+				quantity = Integer.parseInt(textFieldQuantity.getText().replaceAll("[^0-9]", ""));
+			}catch (Exception ex){
+				error=true;
+			}
+			try {
+				price = Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
+			}catch (Exception ex){
+				error=true;
+			}
 			textFieldPrice.setText("");
-			int counter = allParts.size() + 1;
-			Part partNew = new Part(counter, 0, quantity, description, partID, price);
-			amount=amount + quantity*price;
-			net=amount/*- discount*/ ; //needs to change after discount
-			vat=net*MainScreen.company.getVat();
-			total=net+vat;
-			labelAmount.setText(String.valueOf(amount));
-			labelNet.setText(String.valueOf(net));
-			labelVat.setText(String.valueOf(vat));
-			labelTotal.setText(String.valueOf(total));
-			allParts.add(partNew);
-			tableViewParts.refresh();
+			textFieldQuantity.setText("");
+			if(!error) {
+				textFieldPartsID.setText("");
+				textFieldDescription.setText("");
+				int counter = allParts.size() + 1;
+				Part partNew = new Part(counter, 0, quantity, description, partID, price);
+				amount = amount + quantity * price;
+				net =Float.parseFloat(decimalFormat.format(amount  /*- discount*/  )); //needs to change after discount
+				vat = Float.parseFloat(decimalFormat.format(net * MainScreen.company.getVat()));
+				total = Float.parseFloat(decimalFormat.format(net + vat));
+				labelAmount.setText(String.valueOf(amount));
+				labelNet.setText(String.valueOf(net));
+				labelVat.setText(String.valueOf(vat));
+				labelTotal.setText(String.valueOf(total));
+				allParts.add(partNew);
+				tableViewParts.refresh();
+			}
 		});
 
 		buttonPrint.setOnAction(actionEvent -> {
@@ -331,6 +367,8 @@ public class InvoicePrintPreview {
 				errorPopUp.setErrorMessage("Please fill all the details.");
 				errorPopUp.showError();
 			} else {
+				comments=textAreaComments.getText();
+				beingSaved=true;
 				beingPrinted = true;
 				stagePrint.close();
 			}
@@ -359,6 +397,8 @@ public class InvoicePrintPreview {
 				errorPopUp.setErrorMessage("Please fill all the details.");
 				errorPopUp.showError();
 			} else {
+				comments=textAreaComments.getText();
+				beingSaved=true;
 				beingPrinted = false;
 				stagePrint.close();
 			}
@@ -393,8 +433,55 @@ public class InvoicePrintPreview {
 		return comments;
 	}
 
+	public Integer getMileage(){ return mileage;}
+
+	public Integer getFirstOil() {
+		return firstOil;
+	}
+
+	public Integer getNextOil() {
+		return nextOil;
+	}
+
+	public Integer getNextService() {
+		return nextService;
+	}
+
+	public float getVat() {
+		return MainScreen.company.getVat();
+	}
+
+	public Integer getDiscount() {
+		return discount;
+	}
+
+	public void setVat(float vat) {
+		this.vat = vat;
+	}
+
+
+	public void setNextService(Integer nextService) {
+		this.nextService = nextService;
+	}
+
+	public void setMileage(Integer mileage) {
+		this.mileage = mileage;
+	}
+
+	public void setFirstOil(Integer firstOil) {
+		this.firstOil = firstOil;
+	}
+
+	public void setNextOil(Integer nextOil) {
+		this.nextOil = nextOil;
+	}
+
 	public void setAllParts(ObservableList<Part> allParts) {
 		this.allParts = allParts;
+	}
+
+	public void setDiscount(Integer discount) {
+		this.discount = discount;
 	}
 
 	public void setDateInvoice(LocalDate dateInvoice) {
@@ -415,5 +502,13 @@ public class InvoicePrintPreview {
 
 	public boolean isBeingPrinted() {
 		return beingPrinted;
+	}
+
+	public boolean isBeingSaved() {
+		return beingSaved;
+	}
+
+	public float getAmount(){
+		return amount;
 	}
 }

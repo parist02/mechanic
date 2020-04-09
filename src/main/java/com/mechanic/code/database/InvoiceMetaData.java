@@ -3,7 +3,7 @@ package com.mechanic.code.database;
 import java.time.LocalDate;
 
 public class InvoiceMetaData {
-	private LocalDate dateInvoice,dateIn,dateOut;
+	private LocalDate dateIn,dateOut;
 	private int invoiceId,mileage,firstOil,nextOil,nextService;
 	private String comments;
 	private float vat,discount;
@@ -12,7 +12,6 @@ public class InvoiceMetaData {
 	//den tha dimiourgithei defteros constructor tha ekteleite i entoli set gia efkolia afou einai arketes oi metavlites
 	public InvoiceMetaData(Float fpa){
 		invoiceId=0;
-		dateInvoice=null;
 		dateIn=null;
 		dateOut=null;
 		mileage=0;
@@ -24,9 +23,7 @@ public class InvoiceMetaData {
 		discount=0;
 	}
 
-	public LocalDate getDateInvoice() {
-		return dateInvoice;
-	}
+
 
 	public int getInvoiceId() {
 		return invoiceId;
@@ -68,9 +65,6 @@ public class InvoiceMetaData {
 		return dateOut;
 	}
 
-	public void setDateInvoice(LocalDate dateInvoice) {
-		this.dateInvoice = dateInvoice;
-	}
 
 	public void setComments(String comments) {
 		this.comments = comments;
