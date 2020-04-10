@@ -1,45 +1,42 @@
 package com.mechanic.code.print;
 
 import javafx.print.*;
-import javafx.scene.image.WritableImage;
-import javafx.scene.layout.GridPane;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Window;
+import javafx.scene.Node;
+import javafx.scene.transform.Scale;
 
 public class Print {
+    private Node nodePrint;
 
-    public GridPane nodePrint;
-    public Rectangle rect;
-    public WritableImage writableImage;
-    public double width;
-    public double height;
+    public Print(Node node) {
+        nodePrint=node;
+    }
 
+    public void print(){
+        PrinterJob printerJob = PrinterJob.createPrinterJob();
+        if (printerJob != null) {
+            boolean correctSettings = printerJob.showPrintDialog(null);
+            PageLayout pageLayout= printerJob.getPrinter().createPageLayout(Paper.A4,PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
 
-    public Print(GridPane node,Window window){
-        width=node.getWidth();
-        height=node.getHeight();
-        PrinterJob printerJob=PrinterJob.createPrinterJob();
-        if (printerJob!=null){
-            boolean correctSettings=printerJob.showPrintDialog(window);
-            //PageLayout pageLayout=printerJob.getPrinter().createPageLayout(Paper.A4,)
-            boolean correctPageSettings=printerJob.showPageSetupDialog(window);
-            if (correctPageSettings&&correctSettings){
-                for (int i=1; i<node.getRowCount();i++){
-
-                    printerJob.printPage(node);
+            double scaleX = pageLayout.getPrintableWidth() / nodePrint.getBoundsInParent().getWidth();
+            double scaleY = pageLayout.getPrintableHeight() / nodePrint.getBoundsInParent().getHeight();
+            Scale scale = new Scale(scaleX,scaleY);
+            nodePrint.getTransforms().add(scale);
+            if (correctSettings) {
+                boolean printing = printerJob.printPage(pageLayout,nodePrint);
+                if (printing) {
+                    printerJob.endJob();
+                } else {
+                    System.out.println("Printing failed");
                 }
-                printerJob.endJob();
             }else{
-                System.out.println("Error with settings");
+                System.out.println("Error with printer settings");
             }
-
-        }else{
+            nodePrint.getTransforms().remove(scale);
+        } else {
             System.out.println("Error with creating printer job");
         }
 
-
     }
-
 
 
 }

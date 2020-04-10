@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.print.Paper;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -33,21 +34,21 @@ import java.util.concurrent.Flow;
 
 
 public class InvoicePrintPreview {
-	public Stage stagePrint=new Stage();
+	public Stage stagePrint = new Stage();
 	private static javafx.geometry.Insets padding = new Insets(10, 10, 10, 10);
 	private static javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
-	private static double height= Paper.A4.getHeight();
-	private static double width=Paper.A4.getWidth();
-	private LocalDate dateInvoice,dateIN,dateOUT;
-	private Integer mileage,firstOil,nextOil,nextService,discount=0;
+	private static double height = Paper.A4.getHeight();
+	private static double width = Paper.A4.getWidth();
+	private LocalDate dateInvoice, dateIN, dateOUT;
+	private Integer mileage, firstOil, nextOil, nextService, discount = 0;
 	private String comments;
-	private ObservableList<Part>allParts= FXCollections.observableArrayList();
-	private ErrorPopUp errorPopUp=new ErrorPopUp(0,stagePrint);
-	private boolean beingPrinted=false,beingSaved=false;
-	private float amount=0,net=0,vat=0,total=0;
+	private ObservableList<Part> allParts = FXCollections.observableArrayList();
+	private ErrorPopUp errorPopUp = new ErrorPopUp(0, stagePrint);
+	private boolean beingPrinted = false, beingSaved = false;
+	private float amount = 0, net = 0, vat = 0, total = 0;
 	DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
-	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates,String brandModel, String vin) {
+	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates, String brandModel, String vin) {
 		//1st Part, import from database except date
 		Label labelCompany1 = new Label("M.B.A LTD");
 		Label labelCompany2 = new Label("37 PRODROMOU\nSTR.2062 STROVOLOS");
@@ -66,12 +67,14 @@ public class InvoicePrintPreview {
 		//xrisimopoiite gia metatropi imerominies sto format pou theloume
 		StringConverter<LocalDate> stringConverter = new StringConverter<>() {
 			private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
 			@Override
 			public String toString(LocalDate localDate) {
 				if (localDate == null)
 					return "";
 				return dateTimeFormatter.format(localDate);
 			}
+
 			@Override
 			public LocalDate fromString(String dateString) {
 				if (dateString == null || dateString.trim().isEmpty()) {
@@ -244,7 +247,7 @@ public class InvoicePrintPreview {
 		Label labelTotal3 = new Label("Net:");
 		Label labelNet = new Label("");
 		Label labelTotal4 = new Label("Vat:");
-		Label labelVat= new Label("");
+		Label labelVat = new Label("");
 		Label labelTotal5 = new Label("GTotal:");
 		Label labelTotal = new Label("");
 		Label labelTotal6 = new Label("Received By");
@@ -285,11 +288,11 @@ public class InvoicePrintPreview {
 		Button buttonPrint = new Button("Print");
 		Tooltip tooltipPrint = new Tooltip("Save Invoice and Print");
 		buttonPrint.setTooltip(tooltipPrint);
-		Button buttonSave=new Button("Save");
-		Tooltip tooltipSave=new Tooltip("Save Invoice without Printing");
+		Button buttonSave = new Button("Save");
+		Tooltip tooltipSave = new Tooltip("Save Invoice without Printing");
 		buttonSave.setTooltip(tooltipSave);
 
-		HBox boxButtons =new HBox(buttonPrint,buttonSave);
+		HBox boxButtons = new HBox(buttonPrint, buttonSave);
 		boxButtons.setPadding(padding);
 		boxButtons.setSpacing(10);
 		VBox boxMain = new VBox(grid, boxButtons);
@@ -301,37 +304,38 @@ public class InvoicePrintPreview {
 		stagePrint.setResizable(false);
 		stagePrint.setScene(scene);
 		buttonAddPart.setOnAction(actionEvent -> {
-			boolean error=false;
-			int quantity=0;
-			float price=0;
+			boolean error = false;
+			int quantity = 0;
+			float price = 0;
 			String partID = textFieldPartsID.getText().replaceAll("[^a-zA-Z0-9]", "");
-			if(partID.equals("")){
-				error=true;
+			if (partID.equals("")) {
+				error = true;
 			}
 			String description = textFieldDescription.getText().replaceAll("[^a-zA-Z0-9/.-]\\s", "");
-			if(description.equals("")) {
+			if (description.equals("")) {
 				textFieldDescription.setText(description);
 				error = true;
 			}
 			try {
 				quantity = Integer.parseInt(textFieldQuantity.getText().replaceAll("[^0-9]", ""));
-			}catch (Exception ex){
-				error=true;
+			} catch (Exception ex) {
+				error = true;
 			}
 			try {
 				price = Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
-			}catch (Exception ex){
-				error=true;
+			} catch (Exception ex) {
+				error = true;
 			}
 			textFieldPrice.setText("");
 			textFieldQuantity.setText("");
-			if(!error) {
+			if (!error) {
 				textFieldPartsID.setText("");
 				textFieldDescription.setText("");
 				int counter = allParts.size() + 1;
 				Part partNew = new Part(counter, 0, quantity, description, partID, price);
 				amount = amount + quantity * price;
-				net =Float.parseFloat(decimalFormat.format(amount  /*- discount*/  )); //needs to change after discount
+				amount = Float.parseFloat(decimalFormat.format(amount));
+				net = Float.parseFloat(decimalFormat.format(amount  /*- discount*/)); //needs to change after discount
 				vat = Float.parseFloat(decimalFormat.format(net * MainScreen.company.getVat()));
 				total = Float.parseFloat(decimalFormat.format(net + vat));
 				labelAmount.setText(String.valueOf(amount));
@@ -367,8 +371,8 @@ public class InvoicePrintPreview {
 				errorPopUp.setErrorMessage("Please fill all the details.");
 				errorPopUp.showError();
 			} else {
-				comments=textAreaComments.getText();
-				beingSaved=true;
+				comments = textAreaComments.getText();
+				beingSaved = true;
 				beingPrinted = true;
 				stagePrint.close();
 			}
@@ -397,19 +401,17 @@ public class InvoicePrintPreview {
 				errorPopUp.setErrorMessage("Please fill all the details.");
 				errorPopUp.showError();
 			} else {
-				comments=textAreaComments.getText();
-				beingSaved=true;
+				comments = textAreaComments.getText();
+				beingSaved = true;
 				beingPrinted = false;
 				stagePrint.close();
 			}
 		});
 
 
-
-
 	}
 
-	public void show(){
+	public void show() {
 		stagePrint.showAndWait();
 	}
 
@@ -433,7 +435,9 @@ public class InvoicePrintPreview {
 		return comments;
 	}
 
-	public Integer getMileage(){ return mileage;}
+	public Integer getMileage() {
+		return mileage;
+	}
 
 	public Integer getFirstOil() {
 		return firstOil;
@@ -508,7 +512,8 @@ public class InvoicePrintPreview {
 		return beingSaved;
 	}
 
-	public float getAmount(){
+	public float getAmount() {
 		return amount;
 	}
+
 }

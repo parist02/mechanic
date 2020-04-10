@@ -21,6 +21,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -48,12 +49,16 @@ public class MainScreen extends Application {
     private FilteredList<Mechanic> filteredMechanics;
     private FilteredList<Repair> filteredRepairs;
     private FilteredList<Invoice> filteredInvoices;
+    private FilteredList<Invoice> twiceFilteredInvoices;
     private FilteredList<InvoiceMetaData> filteredInvoicesMetaData;
     private FilteredList<Part> filteredParts;
     private boolean carsFiltered = false;
     private boolean customersFiltered = false;
+    private boolean invoiceFiltered=false;
+    private boolean invoiceFilteredTwice=false;
     public static Company company;
     private SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd/MM/yyyy");
+    DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     @Override
     public void init() throws Exception {
@@ -74,6 +79,16 @@ public class MainScreen extends Application {
 
     @Override
     public void start(Stage stage) {
+        importFromMechanics();
+        importFromRepairs();
+        importCompanyDetails();
+        allCustomers = importFromCustomers();
+        allCars = importFromCars();
+        allInvoices = importFromInvoices();
+        importFromInvoiceMetaData();
+        importFromInvoiceParts();
+
+
 
         TabPane tabPane = new TabPane();
         Form form = new Form();
@@ -141,8 +156,6 @@ public class MainScreen extends Application {
         tableViewCustomers.getColumns().add(addressColumn);
         tableViewCustomers.getColumns().add(balanceColumn);
         tableViewCustomers.setEditable(false);
-        //importing all customers from database
-        allCustomers = importFromCustomers();
         tableViewCustomers.setItems(allCustomers);
 
         tableViewCustomers.setPadding(padding);
@@ -233,8 +246,6 @@ public class MainScreen extends Application {
         tableViewCars.setEditable(false);
         tableViewCars.setMaxHeight(150);
         tableViewCars.setMaxWidth(800);
-        //importing all cars from database
-        allCars = importFromCars();
         tableViewCars.setItems(allCars);
 
         //Clicking table of cars changes customers also
@@ -255,8 +266,6 @@ public class MainScreen extends Application {
         buttonAddCars.setOnAction(add -> addToCars(null));
         Button buttonDeleteCars = new Button("Delete");
         buttonDeleteCars.setPadding(padding);
-
-        //deleting a car, needs a rewrite
         buttonDeleteCars.setOnAction(del -> {
             if (tableViewCars.getSelectionModel().isEmpty()) {
                 errorPopUp0.setErrorMessage("Select a car first.");
@@ -267,6 +276,14 @@ public class MainScreen extends Application {
                 if (errorPopUp2.isAdded()) {
                     deleteFromCars();
                 }
+            }
+        });
+        Button buttonCarRecord=new Button("Show Record");
+        buttonCarRecord.setPadding(padding);
+        buttonCarRecord.setOnAction(actionEvent -> {
+            if(!tableViewCars.getSelectionModel().isEmpty()){
+                filterInvoices(0,tableViewCars.getSelectionModel().getSelectedItem().getLicencePlates(),null);
+                tabPane.getSelectionModel().select(1);
             }
         });
 
@@ -342,13 +359,14 @@ public class MainScreen extends Application {
             tableViewCars.setItems(allCars);
             tableViewCustomers.getSelectionModel().clearSelection();
             tableViewCars.getSelectionModel().clearSelection();
-
+            tableViewCustomers.refresh();
+            tableViewCars.refresh();
         });
 
         HBox boxButtonsCustomers = new HBox(buttonAddCustomer, buttonUpdateCustomers, buttonDeleteCustomers, choiceBoxSearchTab1, textFieldSearchCustomers, buttonSearchCustomers, buttonSearchClearCustomers);
         boxButtonsCustomers.setPadding(padding);
         boxButtonsCustomers.setSpacing(20);
-        HBox boxButtonsCars = new HBox(buttonAddCars, buttonUpdateCars, buttonDeleteCars);
+        HBox boxButtonsCars = new HBox(buttonAddCars, buttonUpdateCars, buttonDeleteCars,buttonCarRecord);
         boxButtonsCars.setPadding(padding);
         boxButtonsCars.setSpacing(20);
         VBox boxCustomers = new VBox(labelCustomerTitle, boxButtonsCustomers, tableViewCustomers, boxButtonsCars, tableViewCars);
@@ -425,6 +443,7 @@ public class MainScreen extends Application {
         tableViewInvoice.getColumns().add(balanceInvoiceColumn);
         tableViewInvoice.setEditable(false);
         tableViewInvoice.setPadding(padding);
+        tableViewInvoice.setItems(allInvoices);
 
         Button buttonNewInvoice = new Button("Create invoice");
         buttonNewInvoice.setPadding(padding);
@@ -436,7 +455,7 @@ public class MainScreen extends Application {
                 InvoicePrintPreview invoicePrintPreview = new InvoicePrintPreview(primaryStage, invoiceForm.getCustomerID(), invoiceForm.getFullName(), invoiceForm.getLicensePlates(), invoiceForm.getBrandModel(), invoiceForm.getVin());
                 invoicePrintPreview.show();
                 if(invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()){
-                    System.out.println("Printing...not implemented yet");
+                    //print needs to be implemented
                     addToInvoice(invoiceForm,invoicePrintPreview);
                 }else if(invoicePrintPreview.isBeingSaved()){
                     System.out.println("Saving");
@@ -444,19 +463,50 @@ public class MainScreen extends Application {
                 }
             }
         });
-        VBox boxTab2 = new VBox(tableViewInvoice, buttonNewInvoice);
+
+        ChoiceBox<String> choiceBoxFilterInvoices=new ChoiceBox<>();
+        choiceBoxFilterInvoices.getItems().add("No filter");
+        for(Repair r : allRepairs){
+            choiceBoxFilterInvoices.getItems().add(r.getName());
+        }
+        choiceBoxFilterInvoices.getSelectionModel().select(0);
+        choiceBoxFilterInvoices.setOnAction(actionEvent -> {
+            if(choiceBoxFilterInvoices.getSelectionModel().getSelectedIndex()!=0) {
+                if (invoiceFiltered && invoiceFilteredTwice) {
+                    filterInvoices(3,null,choiceBoxFilterInvoices.getSelectionModel().getSelectedItem());
+                }else if(invoiceFiltered){
+                    filterInvoices(2,null,choiceBoxFilterInvoices.getSelectionModel().getSelectedItem());
+                } else {
+                    filterInvoices(1,null,choiceBoxFilterInvoices.getSelectionModel().getSelectedItem());
+                }
+            }else{
+                if (!invoiceFiltered && !invoiceFilteredTwice){
+                    tableViewInvoice.setItems(allInvoices);
+                }if(invoiceFilteredTwice){
+                    tableViewInvoice.setItems(twiceFilteredInvoices);
+                }
+                tableViewInvoice.refresh();
+            }
+        });
+        Button buttonClearInvoices=new Button("Clear");
+        buttonClearInvoices.setPadding(padding);
+        buttonClearInvoices.setOnAction(actionEvent -> {
+            invoiceFiltered=false;
+            invoiceFilteredTwice=false;
+            tableViewInvoice.setItems(allInvoices);
+            tableViewInvoice.getSelectionModel().clearSelection();
+            choiceBoxFilterInvoices.getSelectionModel().select(0);
+            tableViewInvoice.refresh();
+        });
+
+
+        HBox boxButtonsInvoices=new HBox(buttonNewInvoice,choiceBoxFilterInvoices,buttonClearInvoices);
+        boxButtonsInvoices.setSpacing(10);
+        VBox boxTab2 = new VBox(boxButtonsInvoices,tableViewInvoice);
         boxTab2.setPadding(padding);
         boxTab2.setSpacing(10);
 
         //
-        importFromMechanics();
-        importFromRepairs();
-        importCompanyDetails();
-        //importing invoice data
-        allInvoices = importFromInvoices();
-        tableViewInvoice.setItems(allInvoices);
-        importFromInvoiceMetaData();
-        importFromInvoiceParts();
         Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Invoice", boxTab2);
         Tab tab3 = new Tab("Unfinished...", boxInvoice);
@@ -505,7 +555,6 @@ public class MainScreen extends Application {
         }
         return importingCustomers;
     }
-
 
     public ObservableList<Car> importFromCars() {
         ObservableList<Car> importingCars = FXCollections.observableArrayList();
@@ -641,7 +690,6 @@ public class MainScreen extends Application {
         }
     }
 
-
     public void deleteFromCustomers() {
         try {
             Customer selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItem();
@@ -678,7 +726,6 @@ public class MainScreen extends Application {
         }
     }
 
-
     public void updateFromCustomers() {
         try {
             final int index2;
@@ -713,7 +760,6 @@ public class MainScreen extends Application {
         }
     }
 
-
     public void updateFromCars() {
         try {
             final int index2;
@@ -747,7 +793,6 @@ public class MainScreen extends Application {
             errorPopUp0.showError();
         }
     }
-
 
     public void addToCustomers(String til) {
         try {
@@ -799,6 +844,7 @@ public class MainScreen extends Application {
             errorPopUp0.showError();
         }
     }
+
     public void addToInvoice(InvoiceForm invoiceForm,InvoicePrintPreview invoicePrintPreview){
         try {
             String queryBegin="BEGIN;";
@@ -863,7 +909,7 @@ public class MainScreen extends Application {
             parts=invoicePrintPreview.getAllParts();
             for(Part p : parts){
                 query="INSERT INTO invoiceparts (InvoiceID, PartsId, Description, Quantity, Price) VALUES (";
-                query=query+"LAST_INSERT_ID()"+", '"+p.getPartsID()+"', '"+p.getDescription()+"', "+p.getQuantity()+", "+p.getPrice()+");";
+                query=query+"LAST_INSERT_ID()"+", '"+p.getPartsID()+"', '"+p.getDescription()+"', "+p.getQuantity()+", "+Float.parseFloat(decimalFormat.format(p.getPrice()))+");";
                 final String queryInvoiceParts=query;
                 System.out.println(queryInvoiceParts);
                 PreparedStatement preparedStatement = connection.prepareStatement(queryInvoiceParts);
@@ -873,6 +919,42 @@ public class MainScreen extends Application {
             errorPopUp0.setErrorMessage("Error with adding data to database.");
             errorPopUp0.showError();
         }
+    }
+
+    /*
+		   0: tha ginei anaziti meso noumera aftokinitou
+		   1: tha gine anazitisi analogos ton episkevon
+
+	   */
+    public void filterInvoices(int type, String noumeraAftokinitou,String eidosEpiskevis){
+        /*
+            0: tha ginei anaziti meso noumera aftokinitou
+            1: tha ginei anazitisi analogos ton episkevon
+            2: tha ginei anazitisi analogos ton episkevon apo tin eidi filtrarismeni lista ton timologion
+
+        */
+        switch (type){
+            case 0:{
+                filteredInvoices = new FilteredList<>(allInvoices.filtered(invoice -> invoice.getLicencePlates().equals(noumeraAftokinitou)));
+                invoiceFiltered=true;
+                break;
+            }
+            case 1:{
+                filteredInvoices = new FilteredList<>(allInvoices.filtered(invoice -> invoice.getRepairType().equals(eidosEpiskevis)));
+                break;
+            }
+            case 2:{
+                invoiceFilteredTwice=true;
+                twiceFilteredInvoices=filteredInvoices;
+                filteredInvoices = new FilteredList<>(filteredInvoices.filtered(invoice -> invoice.getRepairType().equals(eidosEpiskevis)));
+            }
+            case 3:{
+                filteredInvoices = new FilteredList<>(twiceFilteredInvoices.filtered(invoice -> invoice.getRepairType().equals(eidosEpiskevis)));
+                break;
+            }
+        }
+        tableViewInvoice.setItems(filteredInvoices);
+        tableViewInvoice.refresh();
     }
 
 }
