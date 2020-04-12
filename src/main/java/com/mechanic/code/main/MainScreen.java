@@ -881,6 +881,17 @@ public class MainScreen extends Application {
             invoice.setCustomerID(invoiceForm.getCustomerID());
             invoice.setMechanicName(allMechanics.get(invoiceForm.getMechanicIndex()).getName()+allMechanics.get(invoiceForm.getMechanicIndex()).getSurname());
             invoice.setPhone(invoiceForm.getPhone());
+            if(invoiceForm.getCreditCash().equals("Cash")){
+                filteredListCustomers=new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter()==invoice.getCustomerID()));
+                System.out.println(filteredListCustomers.get(0).getCounter());
+                float newAmount=filteredListCustomers.get(0).getBalance()+invoicePrintPreview.getAmount();
+                allCustomers.get(filteredListCustomers.getSourceIndexFor(allCustomers,0)).setBalance(newAmount);
+                tableViewCustomers.refresh();
+                final String queryCustomerAmount="Update customers SET Balance = "+newAmount+" WHERE CustomerID = " + invoice.getCustomerID() + ";";
+                System.out.println(queryCustomerAmount);
+                PreparedStatement preparedStatement = connection.prepareStatement(queryCustomerAmount);
+                preparedStatement.execute();
+            }
             //invoice metadata
             InvoiceMetaData invoiceMetaData=new InvoiceMetaData(invoicePrintPreview.getVat());
             invoiceMetaData.setVat(invoicePrintPreview.getVat());
@@ -901,12 +912,12 @@ public class MainScreen extends Application {
             final String queryInvoiceMetaData=query;
             Statement statement= connection.createStatement();
             System.out.println(queryBegin);
-            System.out.println(queryInvoice);
-            System.out.println(queryInvoiceMetaData);
-            System.out.println(queryCommit);
             statement.executeUpdate(queryBegin);
+            System.out.println(queryInvoice);
             statement.executeUpdate(queryInvoice);
+            System.out.println(queryInvoiceMetaData);
             statement.executeUpdate(queryInvoiceMetaData);
+            System.out.println(queryCommit);
             statement.executeUpdate(queryCommit);
             //Find invoiceID
             ResultSet rs = statement.executeQuery("SELECT LAST_INSERT_ID()");
@@ -921,6 +932,7 @@ public class MainScreen extends Application {
             //insert parts to database
             ObservableList<Part>parts;
             parts=invoicePrintPreview.getAllParts();
+            allParts.addAll(parts);
             for(Part p : parts){
                 query="INSERT INTO invoiceparts (InvoiceID, PartsId, Description, Quantity, Price) VALUES (";
                 query=query+arithmosTimologiou+", '"+p.getPartsID()+"', '"+p.getDescription()+"', "+p.getQuantity()+", "+Float.parseFloat(decimalFormat.format(p.getPrice()))+");";
@@ -928,7 +940,6 @@ public class MainScreen extends Application {
                 System.out.println(queryInvoiceParts);
                 PreparedStatement preparedStatement = connection.prepareStatement(queryInvoiceParts);
                 preparedStatement.execute();
-                allParts.add(p);
             }
         }catch (SQLException ex){
             errorPopUp0.setErrorMessage("Error with adding data to database.");

@@ -17,19 +17,17 @@ public class CustomersForm {
 	private Stage stageForm;
 	private String name, surname, address=null;
 	private Integer phone1=null, phone2=null;
-	private Float balance=null;
+	private float balance=0;
 	private TextField textFieldName;
 	private TextField textFieldSurname;
 	private TextField textFieldPhone1;
 	private TextField textFieldPhone2;
 	private TextField textFieldAddress;
-	private TextField textFieldBalance;
 	private Button buttonOk, buttonCancel;
-	private Label labelEmpty;
+	private Label labelEmpty,labelBalance2;
 	private boolean changed=false;
 	private String nameBefore,surnameBefore,addressBefore;
 	private Integer phone1Before,phone2Before;
-	private Float balanceBefore;
 	private String query="UPDATE customers SET ";
 	private String queryAdd="INSERT INTO customers (CustomerId, Name, Surname, Phone_1, Phone_2, Address, Balance) VALUES (NULL";
 
@@ -37,9 +35,7 @@ public class CustomersForm {
 		customersFormInitializer();
 		stageForm.initModality(Modality.WINDOW_MODAL);
 		stageForm.initOwner(primaryStage);
-		buttonCancel.setOnAction(e -> {
-			stageForm.close();
-		});
+		buttonCancel.setOnAction(e ->stageForm.close());
 		buttonOk.setOnAction(e -> {
 			name=textFieldName.getText();
 			name=name.replaceAll("[^a-zA-Z0-9]", "");
@@ -53,7 +49,6 @@ public class CustomersForm {
 			}
 			address=textFieldAddress.getText();
 			address=address.replaceAll("[^a-zA-Z0-9]\\s", "");
-			balance=Float.parseFloat(textFieldBalance.getText().replaceAll("[^0-9.]", ""));
 			if (name.equals("") || surname.equals("") || phone1 == null) { //elegxos an iparxoun xaraktires sta tilefono
 				labelEmpty.setText("Please fill all the details");
 			} else {
@@ -72,7 +67,6 @@ public class CustomersForm {
 		phone1Before=til1;
 		phone2Before=til2;
 		addressBefore=diefthinsi;
-		balanceBefore=ipolipo;
 		customersFormInitializer();
 		stageForm.initModality(Modality.WINDOW_MODAL);
 		stageForm.initOwner(primaryStage);
@@ -81,18 +75,15 @@ public class CustomersForm {
 		textFieldPhone1.setText(til1.toString());
 		textFieldPhone2.setText(til2.toString());
 		textFieldAddress.setText(diefthinsi);
-		textFieldBalance.setText(ipolipo.toString());
+		labelBalance2.setText(ipolipo.toString());
 		//Event Handler
-		buttonCancel.setOnAction(e->{
-			stageForm.close();
-		});
+		buttonCancel.setOnAction(e->stageForm.close());
 		buttonOk.setOnAction(e->{
 			name=textFieldName.getText().replaceAll("[^a-zA-Z0-9]", "");
 			surname=textFieldSurname.getText().replaceAll("[^a-zA-Z0-9]", "");
 			phone1=Integer.parseInt(textFieldPhone1.getText().replaceAll("[^0-9]", ""));
 			phone2=Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
-			address=textFieldAddress.getText().replaceAll("[^a-zA-Z0-9]\\s", "");;
-			balance=Float.parseFloat(textFieldBalance.getText().replaceAll("[^0-9.]", ""));
+			address=textFieldAddress.getText().replaceAll("[^a-zA-Z0-9]\\s", "");
 			if (name.equals("")||surname.equals("")|| phone1 == null){
 				labelEmpty.setText("Please fill all the details");
 			}else {
@@ -136,14 +127,6 @@ public class CustomersForm {
 						query=query+" Address = '"+address+"'";
 					}
 				}
-				if(!balance.equals(balanceBefore)){
-					if(changed){
-						query=query+", Balance = "+balance.toString();
-					}else{
-						changed=true;
-						query=query+" Balance = "+balance.toString();
-					}
-				}
 				stageForm.close();
 			}
 		});
@@ -173,6 +156,9 @@ public class CustomersForm {
 		Label labelBalance=new Label("Balance");
 		labelBalance.setFont(font);
 		labelBalance.setTextFill(Color.BLACK);
+		labelBalance2=new Label("0");
+		labelBalance2.setFont(font);
+		labelBalance2.setTextFill(Color.BLACK);
 		labelEmpty = new Label("");
 		labelEmpty.setFont(font);
 		labelEmpty.setTextFill(Color.FIREBRICK);
@@ -187,7 +173,6 @@ public class CustomersForm {
 		textFieldPhone1 = new TextField();
 		textFieldPhone2 = new TextField();
 		textFieldAddress = new TextField();
-		textFieldBalance=new TextField();
 		//
 		buttonOk = new Button("Ok");
 		buttonCancel = new Button("Cancel");
@@ -205,7 +190,7 @@ public class CustomersForm {
 		grid.add(labelAddress, 0, 5);
 		grid.add(textFieldAddress, 1, 5);
 		grid.add(labelBalance, 0, 6);
-		grid.add(textFieldBalance, 1, 6);
+		grid.add(labelBalance2, 1, 6);
 		grid.add(labelEmpty, 0, 7, 2, 1);
 		grid.add(buttonOk, 0, 8);
 		grid.add(buttonCancel, 1, 8);
