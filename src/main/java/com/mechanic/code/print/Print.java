@@ -1,28 +1,22 @@
 package com.mechanic.code.print;
-
 import javafx.print.*;
 import javafx.scene.Node;
+import javafx.scene.layout.GridPane;
 import javafx.scene.transform.Scale;
+import javafx.stage.Stage;
 
 public class Print {
-    private Node nodePrint;
-
-    public Print(Node node) {
-        nodePrint=node;
-    }
-
-    public void print(){
+    public Print(GridPane node) {
         PrinterJob printerJob = PrinterJob.createPrinterJob();
         if (printerJob != null) {
             boolean correctSettings = printerJob.showPrintDialog(null);
             PageLayout pageLayout= printerJob.getPrinter().createPageLayout(Paper.A4,PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
-
-            double scaleX = pageLayout.getPrintableWidth() / nodePrint.getBoundsInParent().getWidth();
-            double scaleY = pageLayout.getPrintableHeight() / nodePrint.getBoundsInParent().getHeight();
+            double scaleX = pageLayout.getPrintableWidth() / node.getBoundsInParent().getWidth();
+            double scaleY = pageLayout.getPrintableHeight() / node.getBoundsInParent().getHeight();
             Scale scale = new Scale(scaleX,scaleY);
-            nodePrint.getTransforms().add(scale);
+            node.getTransforms().add(scale);
             if (correctSettings) {
-                boolean printing = printerJob.printPage(pageLayout,nodePrint);
+                boolean printing = printerJob.printPage(pageLayout,node);
                 if (printing) {
                     printerJob.endJob();
                 } else {
@@ -31,12 +25,10 @@ public class Print {
             }else{
                 System.out.println("Error with printer settings");
             }
-            nodePrint.getTransforms().remove(scale);
+            node.getTransforms().remove(scale);
         } else {
             System.out.println("Error with creating printer job");
         }
-
     }
-
 
 }

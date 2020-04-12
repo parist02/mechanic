@@ -1,4 +1,5 @@
 package com.mechanic.code.main;
+import com.mechanic.code.print.Print;
 import com.mechanic.code.temporary.Form;
 import com.mechanic.code.forms.CarsForm;
 import com.mechanic.code.forms.CustomersForm;
@@ -25,6 +26,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 
 public class MainScreen extends Application {
     private TableView<Customer> tableViewCustomers = new TableView<>();
@@ -56,7 +58,7 @@ public class MainScreen extends Application {
     private boolean customersFiltered = false;
     private boolean invoiceFiltered=false;
     private boolean invoiceFilteredTwice=false;
-    public static Company company;
+    private static Float vat;
     private SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd/MM/yyyy");
     DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
@@ -81,7 +83,7 @@ public class MainScreen extends Application {
     public void start(Stage stage) {
         importFromMechanics();
         importFromRepairs();
-        importCompanyDetails();
+        importVat();
         allCustomers = importFromCustomers();
         allCars = importFromCars();
         allInvoices = importFromInvoices();
@@ -456,13 +458,28 @@ public class MainScreen extends Application {
                 invoicePrintPreview.show();
                 if(invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()){
                     //print needs to be implemented
-                    addToInvoice(invoiceForm,invoicePrintPreview);
+                    int invoiceNo;
+                    invoiceNo=addToInvoice(invoiceForm,invoicePrintPreview);
+                    invoicePrintPreview.setInvoiceID(invoiceNo);
+                    Print print=new Print(invoicePrintPreview.getNodeForPrint(false));
                 }else if(invoicePrintPreview.isBeingSaved()){
                     System.out.println("Saving");
                     addToInvoice(invoiceForm,invoicePrintPreview);
                 }
             }
         });
+
+        Button buttonOpenInvoice=new Button("Open");
+        buttonOpenInvoice.setPadding(padding);
+        buttonOpenInvoice.setOnAction(actionEvent -> {
+            if (!tableViewInvoice.getSelectionModel().isEmpty()){
+                openInvoice();
+            }else{
+                errorPopUp0.setErrorMessage("Select an invoice first!");
+                errorPopUp0.showError();
+            }
+        });
+
 
         ChoiceBox<String> choiceBoxFilterInvoices=new ChoiceBox<>();
         choiceBoxFilterInvoices.getItems().add("No filter");
@@ -500,7 +517,7 @@ public class MainScreen extends Application {
         });
 
 
-        HBox boxButtonsInvoices=new HBox(buttonNewInvoice,choiceBoxFilterInvoices,buttonClearInvoices);
+        HBox boxButtonsInvoices=new HBox(buttonNewInvoice,buttonOpenInvoice,choiceBoxFilterInvoices,buttonClearInvoices);
         boxButtonsInvoices.setSpacing(10);
         VBox boxTab2 = new VBox(boxButtonsInvoices,tableViewInvoice);
         boxTab2.setPadding(padding);
@@ -674,17 +691,13 @@ public class MainScreen extends Application {
         }
     }
 
-    public void importCompanyDetails() {
+    public void importVat() {
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from company");
-            company = new Company();
-            while (rs.next()) {
-                company.setPhone(rs.getInt(1));
-                company.setAddress(rs.getString(2));
-                company.setVat(rs.getFloat(3));
-                company.setTaxNumber(rs.getString(4));
-            }
+            rs.next();
+            vat=rs.getFloat(1);
+
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
@@ -845,7 +858,8 @@ public class MainScreen extends Application {
         }
     }
 
-    public void addToInvoice(InvoiceForm invoiceForm,InvoicePrintPreview invoicePrintPreview){
+    public Integer addToInvoice(InvoiceForm invoiceForm,InvoicePrintPreview invoicePrintPreview){
+        int arithmosTimologiou=-1;
         try {
             String queryBegin="BEGIN;";
             String query="INSERT INTO invoice (InvoiceID, Date, CustomerID, LicensePlates, RepairID, MechanicID, Cash, Remaining) VALUES (NULL";
@@ -897,7 +911,7 @@ public class MainScreen extends Application {
             //Find invoiceID
             ResultSet rs = statement.executeQuery("SELECT LAST_INSERT_ID()");
             rs.next();
-            int arithmosTimologiou=rs.getInt(1);
+            arithmosTimologiou=rs.getInt(1);
             System.out.println("Arithmos timologiou: "+arithmosTimologiou);
             //insert to tables
             invoice.setInvoiceID(arithmosTimologiou);
@@ -909,16 +923,18 @@ public class MainScreen extends Application {
             parts=invoicePrintPreview.getAllParts();
             for(Part p : parts){
                 query="INSERT INTO invoiceparts (InvoiceID, PartsId, Description, Quantity, Price) VALUES (";
-                query=query+"LAST_INSERT_ID()"+", '"+p.getPartsID()+"', '"+p.getDescription()+"', "+p.getQuantity()+", "+Float.parseFloat(decimalFormat.format(p.getPrice()))+");";
+                query=query+arithmosTimologiou+", '"+p.getPartsID()+"', '"+p.getDescription()+"', "+p.getQuantity()+", "+Float.parseFloat(decimalFormat.format(p.getPrice()))+");";
                 final String queryInvoiceParts=query;
                 System.out.println(queryInvoiceParts);
                 PreparedStatement preparedStatement = connection.prepareStatement(queryInvoiceParts);
                 preparedStatement.execute();
+                allParts.add(p);
             }
         }catch (SQLException ex){
             errorPopUp0.setErrorMessage("Error with adding data to database.");
             errorPopUp0.showError();
         }
+        return arithmosTimologiou;
     }
 
     /*
@@ -955,6 +971,38 @@ public class MainScreen extends Application {
         }
         tableViewInvoice.setItems(filteredInvoices);
         tableViewInvoice.refresh();
+    }
+
+    public static Float getVat(){
+        return vat;
+    }
+
+    public void openInvoice(){
+        Invoice selectedInvoice=tableViewInvoice.getSelectionModel().getSelectedItem();
+        filteredInvoicesMetaData=new FilteredList<>(allInvoicesMetaData.filtered(invoiceMetaData -> invoiceMetaData.getInvoiceId()==selectedInvoice.getInvoiceID()));
+        InvoiceMetaData selectedInvoiceMetaData=filteredInvoicesMetaData.get(0);
+        filteredParts=new FilteredList<>(allParts.filtered(part -> part.getInvoiceID()==selectedInvoice.getInvoiceID()));
+        ObservableList<Part>selectedParts;
+        selectedParts=filteredParts;
+        Car selectedCar=new FilteredList<>(allCars.filtered(car -> car.getLicencePlates().equals(selectedInvoice.getLicencePlates()))).get(0);
+        InvoicePrintPreview invoicePrintPreview=new InvoicePrintPreview(primaryStage,selectedInvoice.getCustomerID(),selectedInvoice.getFullName(),selectedInvoice.getLicencePlates(),selectedCar.getBrand()+selectedCar.getModel(),selectedCar.getVin());
+        invoicePrintPreview.setMileage(selectedInvoiceMetaData.getMileage());
+        invoicePrintPreview.setDateInvoice(selectedInvoice.getDate());
+        invoicePrintPreview.setInvoiceID(selectedInvoice.getInvoiceID());
+        invoicePrintPreview.setDateOUT(selectedInvoiceMetaData.getDateOut());
+        invoicePrintPreview.setDateIN(selectedInvoiceMetaData.getDateIn());
+        invoicePrintPreview.setAllParts(selectedParts);
+        invoicePrintPreview.setDiscount(selectedInvoiceMetaData.getDiscount());
+        invoicePrintPreview.setFirstOil(selectedInvoiceMetaData.getFirstOil());
+        invoicePrintPreview.setNextOil(selectedInvoiceMetaData.getNextOil());
+        invoicePrintPreview.setComments(selectedInvoiceMetaData.getComments());
+        invoicePrintPreview.setNextService(selectedInvoiceMetaData.getNextService());
+        invoicePrintPreview.setVat(selectedInvoiceMetaData.getVat());
+        invoicePrintPreview.showPreview();
+        if(invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
+            Print print = new Print(invoicePrintPreview.getNodeForPrint(true));
+        }
+
     }
 
 }

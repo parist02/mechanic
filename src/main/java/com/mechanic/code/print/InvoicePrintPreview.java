@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -34,21 +35,33 @@ import java.util.concurrent.Flow;
 
 
 public class InvoicePrintPreview {
-	public Stage stagePrint = new Stage();
-	private static javafx.geometry.Insets padding = new Insets(10, 10, 10, 10);
-	private static javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
+	private Stage stagePrint = new Stage();
+	private static final javafx.geometry.Insets padding = new Insets(10, 10, 10, 10);
+	private static final javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
 	private static double height = Paper.A4.getHeight();
 	private static double width = Paper.A4.getWidth();
 	private LocalDate dateInvoice, dateIN, dateOUT;
-	private Integer mileage, firstOil, nextOil, nextService, discount = 0;
+	private Integer mileage, firstOil, nextOil, nextService,invoiceID;
 	private String comments;
 	private ObservableList<Part> allParts = FXCollections.observableArrayList();
 	private ErrorPopUp errorPopUp = new ErrorPopUp(0, stagePrint);
 	private boolean beingPrinted = false, beingSaved = false;
-	private float amount = 0, net = 0, vat = 0, total = 0;
-	DecimalFormat decimalFormat = new DecimalFormat("0.00");
+	private float amount = 0, net = 0, vat, total = 0, vatTotal,discount=0;
+	private Label labelInvoiceID,labelInvoiceDate, labelInvoiceDateIN,labelInvoiceDateOUT;
+	private Label labelMileage,labelFirstOil,labelNextOil,labelNextService,labelDiscount;
+	private Label labelAmount,labelNet,labelVat,labelTotal;
+	private final DecimalFormat decimalFormat = new DecimalFormat("0.00");
+	private GridPane gridForPrint,gridCompany,gridCustomer2,gridCustomer3,grid,gridTotal;
+	private DatePicker datePickerInvoice,datePickerIN,datePickerOUT;
+	private TextField textFieldMileage,textFieldFirstOil,textFieldNextOil,textFieldNextService,textFieldDiscount;
+	private  VBox vBoxParts;
+	private TableView<Part>tableViewParts;
+	private TextArea textAreaComments;
+	private Button buttonSave;
+	private HBox boxButtons;
 
 	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates, String brandModel, String vin) {
+		vat=MainScreen.getVat();
 		//1st Part, import from database except date
 		Label labelCompany1 = new Label("M.B.A LTD");
 		Label labelCompany2 = new Label("37 PRODROMOU\nSTR.2062 STROVOLOS");
@@ -58,11 +71,12 @@ public class InvoicePrintPreview {
 		Label labelCompany6 = new Label("TAX REG.: 12091591N");
 
 		VBox boxCompany = new VBox(labelCompany1, labelCompany2, labelCompany3, labelCompany4, labelCompany5, labelCompany6);
-		boxCompany.setId("label1");
+		boxCompany.setId("label2");
 		boxCompany.setSpacing(5);
 		Label labelTitle = new Label("Cash Invoice");
+		labelTitle.setId("title");
 		Label labelCompany7 = new Label("Invoice No.:");
-		Label labelCompany8 = new Label("123456");//get from database
+		labelInvoiceID = new Label("");//get from database
 		Label labelCompany9 = new Label("Date:");
 		//xrisimopoiite gia metatropi imerominies sto format pou theloume
 		StringConverter<LocalDate> stringConverter = new StringConverter<>() {
@@ -83,20 +97,20 @@ public class InvoicePrintPreview {
 				return LocalDate.parse(dateString, dateTimeFormatter);
 			}
 		};
-		DatePicker datePickerInvoice = new DatePicker();
+		datePickerInvoice = new DatePicker();
 		datePickerInvoice.setConverter(stringConverter);
 		datePickerInvoice.setValue(LocalDate.now());
 
 		//Label labelCompany10=new Label("D/MMM/YYYY"); //depends if new  or not
-		GridPane gridCompany = new GridPane();
+		gridCompany = new GridPane();
 		gridCompany.add(labelCompany7, 0, 0);
-		gridCompany.add(labelCompany8, 1, 0);
+		gridCompany.add(labelInvoiceID, 1, 0);
 		gridCompany.add(labelCompany9, 0, 1);
 		gridCompany.add(datePickerInvoice, 1, 1);
 		gridCompany.setVgap(5);
 		gridCompany.setHgap(5);
 		gridCompany.setId("grid");
-
+		labelInvoiceDate=new Label("");
 
 		//2nd Part, need to implement search when adding customers
 		Label labelCustomer1 = new Label("Customer Account:");
@@ -124,29 +138,31 @@ public class InvoicePrintPreview {
 		gridCustomer1.setId("grid");
 
 		Label labelCustomer6 = new Label("Date In:");
-		DatePicker datePickerIN = new DatePicker();
+		datePickerIN = new DatePicker();
 		datePickerIN.setConverter(stringConverter);
 		Label labelCustomer7 = new Label("Date Out:");
-		DatePicker datePickerOUT = new DatePicker();
+		datePickerOUT = new DatePicker();
 		datePickerOUT.setConverter(stringConverter);
 
-		GridPane gridCustomer2 = new GridPane();
+		gridCustomer2 = new GridPane();
 		gridCustomer2.add(labelCustomer6, 0, 0);
 		gridCustomer2.add(datePickerIN, 1, 0);
 		gridCustomer2.add(labelCustomer7, 0, 1);
 		gridCustomer2.add(datePickerOUT, 1, 1);
 
+		labelInvoiceDateIN=new Label("");
+		labelInvoiceDateOUT=new Label("");
 
 		Label labelCustomer8 = new Label("Mileage:");
-		TextField textFieldMileage = new TextField();
+		textFieldMileage = new TextField();
 		Label labelCustomer9 = new Label("First Oil:");
-		TextField textFieldFirstOil = new TextField();
+		textFieldFirstOil = new TextField();
 		Label labelCustomer10 = new Label("Next Oil:");
-		TextField textFieldNextOil = new TextField();
+		textFieldNextOil = new TextField();
 		Label labelCustomer11 = new Label("Next Service:");
-		TextField textFieldNextService = new TextField();
+		textFieldNextService = new TextField();
 
-		GridPane gridCustomer3 = new GridPane();
+		gridCustomer3 = new GridPane();
 		gridCustomer3.add(labelCustomer8, 0, 0);
 		gridCustomer3.add(textFieldMileage, 1, 0);
 		gridCustomer3.add(labelCustomer9, 0, 1);
@@ -155,6 +171,12 @@ public class InvoicePrintPreview {
 		gridCustomer3.add(textFieldNextOil, 1, 2);
 		gridCustomer3.add(labelCustomer11, 0, 3);
 		gridCustomer3.add(textFieldNextService, 1, 3);
+
+		labelMileage=new Label("");
+		labelFirstOil=new Label("");
+		labelNextOil=new Label("");
+		labelNextService=new Label("");
+
 
 		//3rd part
 		TableColumn<Part, Integer> counterColumn = new TableColumn<>("No.");
@@ -198,7 +220,7 @@ public class InvoicePrintPreview {
 			}
 		});
 
-		TableView<Part> tableViewParts = new TableView<>();
+		tableViewParts = new TableView<>();
 		tableViewParts.getColumns().add(counterColumn);
 		tableViewParts.getColumns().add(partsIDColumn);
 		tableViewParts.getColumns().add(descriptionColumn);
@@ -206,7 +228,9 @@ public class InvoicePrintPreview {
 		tableViewParts.getColumns().add(priceColumn);
 		tableViewParts.setPadding(padding);
 		tableViewParts.setMaxHeight(400);
+		tableViewParts.setEditable(false);
 		tableViewParts.setItems(allParts);
+		
 
 		TextField textFieldPartsID = new TextField();
 		textFieldPartsID.setPromptText("Parts ID");
@@ -225,13 +249,13 @@ public class InvoicePrintPreview {
 		Button buttonAddPart = new Button("Add");
 		//buttonAddPart.setMinWidth(50);
 		HBox hBoxAddPart = new HBox(labelAddPart, textFieldPartsID, textFieldDescription, textFieldQuantity, textFieldPrice, buttonAddPart);
-		VBox vBoxParts = new VBox(tableViewParts, hBoxAddPart);
+		vBoxParts = new VBox(tableViewParts, hBoxAddPart);
 		vBoxParts.setPadding(padding);
 
 		//4th part
 		Label labelComments = new Label("Comments:");
 		labelComments.setId("label2");
-		TextArea textAreaComments = new TextArea();
+		textAreaComments = new TextArea();
 		textAreaComments.setPrefHeight(70);
 		//textAreaComments.setPrefWidth(220);
 		Label labelSignature = new Label("\tIssued By");
@@ -241,23 +265,24 @@ public class InvoicePrintPreview {
 		boxComments.setSpacing(5);
 
 		Label labelTotal1 = new Label("Amount:");
-		Label labelAmount = new Label("");
+		labelAmount = new Label("");
 		Label labelTotal2 = new Label("Discount:");
-		Label labelDiscount = new Label("");
+		labelDiscount = new Label("");
+		textFieldDiscount=new TextField("0");
 		Label labelTotal3 = new Label("Net:");
-		Label labelNet = new Label("");
+		labelNet = new Label("");
 		Label labelTotal4 = new Label("Vat:");
-		Label labelVat = new Label("");
+		labelVat = new Label("");
 		Label labelTotal5 = new Label("GTotal:");
-		Label labelTotal = new Label("");
+		labelTotal = new Label("");
 		Label labelTotal6 = new Label("Received By");
 		Label labelDots2 = new Label("..........................................");
 
-		GridPane gridTotal = new GridPane();
+		gridTotal = new GridPane();
 		gridTotal.add(labelTotal1, 0, 0);
 		gridTotal.add(labelAmount, 1, 0);
 		gridTotal.add(labelTotal2, 0, 1);
-		gridTotal.add(labelDiscount, 1, 1);
+		gridTotal.add(textFieldDiscount, 1, 1);
 		gridTotal.add(labelTotal3, 0, 2);
 		gridTotal.add(labelNet, 1, 2);
 		gridTotal.add(labelTotal4, 0, 3);
@@ -269,7 +294,7 @@ public class InvoicePrintPreview {
 
 
 		//Scene Control
-		GridPane grid = new GridPane();
+		grid = new GridPane();
 		grid.add(boxCompany, 0, 0);
 		grid.add(labelTitle, 1, 0);
 		grid.add(gridCompany, 2, 0);
@@ -288,17 +313,16 @@ public class InvoicePrintPreview {
 		Button buttonPrint = new Button("Print");
 		Tooltip tooltipPrint = new Tooltip("Save Invoice and Print");
 		buttonPrint.setTooltip(tooltipPrint);
-		Button buttonSave = new Button("Save");
+		buttonSave = new Button("Save");
 		Tooltip tooltipSave = new Tooltip("Save Invoice without Printing");
 		buttonSave.setTooltip(tooltipSave);
 
-		HBox boxButtons = new HBox(buttonPrint, buttonSave);
+		boxButtons = new HBox(buttonPrint, buttonSave);
 		boxButtons.setPadding(padding);
 		boxButtons.setSpacing(10);
 		VBox boxMain = new VBox(grid, boxButtons);
+		boxMain.getStylesheets().add("stylesheets.css");
 		Scene scene = new Scene(boxMain);
-		//
-		//scene.getStylesheets().add(getClass().getResource("stylesheets.css").toExternalForm());
 		stagePrint.initStyle(StageStyle.UTILITY);
 		stagePrint.initOwner(primaryStage);
 		stagePrint.setResizable(false);
@@ -318,16 +342,14 @@ public class InvoicePrintPreview {
 			}
 			try {
 				quantity = Integer.parseInt(textFieldQuantity.getText().replaceAll("[^0-9]", ""));
-			} catch (Exception ex) {
-				error = true;
-			}
-			try {
 				price = Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
+				discount=Float.parseFloat(textFieldDiscount.getText().replaceAll("[^0-9.]", ""));
 			} catch (Exception ex) {
 				error = true;
 			}
 			textFieldPrice.setText("");
 			textFieldQuantity.setText("");
+			textFieldDiscount.setText(String.valueOf(discount));
 			if (!error) {
 				textFieldPartsID.setText("");
 				textFieldDescription.setText("");
@@ -335,18 +357,18 @@ public class InvoicePrintPreview {
 				Part partNew = new Part(counter, 0, quantity, description, partID, price);
 				amount = amount + quantity * price;
 				amount = Float.parseFloat(decimalFormat.format(amount));
-				net = Float.parseFloat(decimalFormat.format(amount  /*- discount*/)); //needs to change after discount
-				vat = Float.parseFloat(decimalFormat.format(net * MainScreen.company.getVat()));
-				total = Float.parseFloat(decimalFormat.format(net + vat));
+				net = Float.parseFloat(decimalFormat.format(amount - discount));
+				vatTotal = Float.parseFloat(decimalFormat.format(net * vat));
+				total = Float.parseFloat(decimalFormat.format(net + vatTotal));
 				labelAmount.setText(String.valueOf(amount));
 				labelNet.setText(String.valueOf(net));
 				labelVat.setText(String.valueOf(vat));
 				labelTotal.setText(String.valueOf(total));
+				labelDiscount.setText(String.valueOf(discount));
 				allParts.add(partNew);
 				tableViewParts.refresh();
 			}
 		});
-
 		buttonPrint.setOnAction(actionEvent -> {
 			dateInvoice = datePickerInvoice.getValue();
 			dateIN = datePickerIN.getValue();
@@ -452,10 +474,10 @@ public class InvoicePrintPreview {
 	}
 
 	public float getVat() {
-		return MainScreen.company.getVat();
+		return vat;
 	}
 
-	public Integer getDiscount() {
+	public Float getDiscount() {
 		return discount;
 	}
 
@@ -463,28 +485,40 @@ public class InvoicePrintPreview {
 		this.vat = vat;
 	}
 
+	public Integer getInvoiceID() {
+		return invoiceID;
+	}
+
+	public void setInvoiceID(Integer invoiceID) {
+		this.invoiceID = invoiceID;
+		labelInvoiceID.setText(String.valueOf(invoiceID));
+	}
 
 	public void setNextService(Integer nextService) {
 		this.nextService = nextService;
+		labelNextService.setText(String.valueOf(nextService));
 	}
 
 	public void setMileage(Integer mileage) {
 		this.mileage = mileage;
+		labelMileage.setText(String.valueOf(mileage));
 	}
 
 	public void setFirstOil(Integer firstOil) {
 		this.firstOil = firstOil;
+		labelFirstOil.setText(String.valueOf(firstOil));
 	}
 
 	public void setNextOil(Integer nextOil) {
 		this.nextOil = nextOil;
+		labelNextOil.setText(String.valueOf(nextOil));
 	}
 
 	public void setAllParts(ObservableList<Part> allParts) {
 		this.allParts = allParts;
 	}
 
-	public void setDiscount(Integer discount) {
+	public void setDiscount(Float discount) {
 		this.discount = discount;
 	}
 
@@ -502,6 +536,7 @@ public class InvoicePrintPreview {
 
 	public void setComments(String comments) {
 		this.comments = comments;
+		textAreaComments.setText(comments);
 	}
 
 	public boolean isBeingPrinted() {
@@ -514,6 +549,69 @@ public class InvoicePrintPreview {
 
 	public float getAmount() {
 		return amount;
+	}
+
+
+	private void readyForPrint(){
+		labelInvoiceDate.setText(String.valueOf(dateInvoice));
+		labelInvoiceDateIN.setText(String.valueOf(dateIN));
+		labelInvoiceDateOUT.setText(String.valueOf(dateOUT));
+		labelMileage.setText(String.valueOf(mileage));
+		labelFirstOil.setText(String.valueOf(firstOil));
+		labelNextOil.setText(String.valueOf(nextOil));
+		labelNextService.setText(String.valueOf(nextService));
+		gridCompany.getChildren().remove(datePickerInvoice);
+		gridCompany.add(labelInvoiceDate,1,1);
+		gridCustomer2.getChildren().remove(datePickerIN);
+		gridCustomer2.getChildren().remove(datePickerOUT);
+		gridCustomer2.add(labelInvoiceDateIN, 1, 0);
+		gridCustomer2.add(labelInvoiceDateOUT, 1, 1);
+		gridCustomer3.getChildren().remove(textFieldMileage);
+		gridCustomer3.getChildren().remove(textFieldFirstOil);
+		gridCustomer3.getChildren().remove(textFieldNextOil);
+		gridCustomer3.getChildren().remove(textFieldNextService);
+		gridCustomer3.add(labelMileage, 1, 0);
+		gridCustomer3.add(labelFirstOil, 1, 1);
+		gridCustomer3.add(labelNextOil, 1, 2);
+		gridCustomer3.add(labelNextService, 1, 3);
+		gridTotal.getChildren().remove(textFieldDiscount);
+		gridTotal.add(labelDiscount, 1, 1);
+		grid.getChildren().remove(vBoxParts);
+		grid.add(tableViewParts, 0, 2, 3, 1);
+	}
+
+	public GridPane getNodeForPrint(boolean isOpen){
+		if(!isOpen){
+			readyForPrint();
+		}else{
+			textAreaComments.setDisable(false);
+		}
+		return (grid);
+	}
+
+	private void calculateAmount(){
+		for(Part p : allParts) {
+			amount = Float.parseFloat(String.valueOf(amount + p.getQuantity() * p.getPrice()));
+			amount = Float.parseFloat(decimalFormat.format(amount));
+			net = Float.parseFloat(decimalFormat.format(amount - discount));
+			vatTotal = Float.parseFloat(decimalFormat.format(net * vat));
+			total = Float.parseFloat(decimalFormat.format(net + vatTotal));
+		}
+		labelAmount.setText(String.valueOf(amount));
+		labelNet.setText(String.valueOf(net));
+		labelVat.setText(String.valueOf(vat));
+		labelTotal.setText(String.valueOf(total));
+		labelDiscount.setText(String.valueOf(discount));
+		tableViewParts.setItems(allParts);
+		tableViewParts.refresh();
+	}
+
+	public void showPreview(){
+		calculateAmount();
+		readyForPrint();
+		textAreaComments.setDisable(true);
+		boxButtons.getChildren().remove(buttonSave);
+		stagePrint.showAndWait();
 	}
 
 }
