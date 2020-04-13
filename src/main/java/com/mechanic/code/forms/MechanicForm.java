@@ -131,4 +131,32 @@ public class MechanicForm {
 		buttonOk.getStyleClass().add("button2");
 	}
 
+	public Integer getMechanicID() {
+		return mechanicID;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getSurname() {
+		return surname;
+	}
+
+	public boolean isChanged() {
+		return changed;
+	}
+
+	public String getQuery() {
+		return query;
+	}
+
+	public String getQueryAdd() {
+		return queryAdd;
+	}
+
+	public void showForm(){
+		stageForm.showAndWait();
+	}
 }
+

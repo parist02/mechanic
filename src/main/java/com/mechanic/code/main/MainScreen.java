@@ -1,9 +1,6 @@
 package com.mechanic.code.main;
-import com.mechanic.code.forms.BalanceForm;
+import com.mechanic.code.forms.*;
 import com.mechanic.code.print.Print;
-import com.mechanic.code.forms.CarsForm;
-import com.mechanic.code.forms.CustomersForm;
-import com.mechanic.code.forms.InvoiceForm;
 import com.mechanic.code.database.*;
 import com.mechanic.code.print.InvoicePrintPreview;
 import javafx.application.Application;
@@ -32,6 +29,7 @@ public class MainScreen extends Application {
     private TableView<Customer> tableViewCustomers = new TableView<>();
     private TableView<Car> tableViewCars = new TableView<>();
     private TableView<Invoice> tableViewInvoice = new TableView<>();
+    private TableView<Mechanic>tableViewMechanic=new TableView<>();
     private static final Insets padding = new Insets(10, 10, 10, 10);
     private static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     private Connection connection;
@@ -534,7 +532,7 @@ public class MainScreen extends Application {
 
             }
         });
-        //
+
 
         HBox boxButtonsInvoices = new HBox(buttonNewInvoice, buttonOpenInvoice,buttonEditBalance, choiceBoxFilterInvoices, buttonClearInvoices);
         boxButtonsInvoices.setSpacing(10);
@@ -542,10 +540,80 @@ public class MainScreen extends Application {
         boxTab2.setPadding(padding);
         boxTab2.setSpacing(10);
 
+        //Tab 3
+        TableColumn<Mechanic, Integer> mechanicIDColumn = new TableColumn<>("Mechanic ID");
+        mechanicIDColumn.setReorderable(false);
+        mechanicIDColumn.setResizable(false);
+        mechanicIDColumn.setMinWidth(50);
+        mechanicIDColumn.setCellValueFactory(new PropertyValueFactory<>("mechanicID"));
+
+        TableColumn<Mechanic, Integer> mechanicNameColumn2 = new TableColumn<>("Name");
+        mechanicNameColumn2.setReorderable(false);
+        mechanicNameColumn2.setResizable(false);
+        mechanicNameColumn2.setMinWidth(150);
+        mechanicNameColumn2.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<Mechanic, Integer> mechanicSurname = new TableColumn<>("Surname");
+        mechanicSurname.setReorderable(false);
+        mechanicSurname.setResizable(false);
+        mechanicSurname.setMinWidth(150);
+        mechanicSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
+
+        tableViewMechanic.getColumns().add(mechanicIDColumn);
+        tableViewMechanic.getColumns().add(mechanicNameColumn2);
+        tableViewMechanic.getColumns().add(mechanicSurname);
+        tableViewMechanic.setEditable(false);
+        tableViewMechanic.setItems(allMechanics);
+        tableViewMechanic.setPadding(padding);
+
+
+        Button buttonUpdateMechanics = new Button("Edit");
+        buttonUpdateMechanics.setPadding(padding);
+        buttonUpdateMechanics.setOnAction(upd -> updateFromMechanics());
+        Button buttonAddMechanic = new Button("Add");
+        buttonAddMechanic.setPadding(padding);
+        buttonAddMechanic.setOnAction(add -> addToMechanics());
+        Button buttonDeleteMechanic=new Button("Delete");
+        buttonDeleteMechanic.setPadding(padding);
+        buttonDeleteMechanic.setOnAction(actionEvent -> {
+            if (tableViewMechanic.getSelectionModel().isEmpty()) {
+                errorPopUp0.setErrorMessage("Select a customer first.");
+                errorPopUp0.showError();
+            } else {
+                errorPopUp2.setErrorMessage("Are you sure you want to delete the mechanic?");
+                errorPopUp2.showError();
+                if (errorPopUp2.isAdded()) {
+                    deleteFromMechanics();
+                }
+            }
+        });
+
+        Label labelVAT=new Label("Current VAT: "+vat);
+        labelVAT.setFont(font);
+        Button buttonEditVat=new Button("Edit VAT");
+        buttonEditVat.setOnAction(actionEvent -> {
+            VatForm vatForm=new VatForm(primaryStage,vat);
+            vatForm.showForm();
+            if(vatForm.isChanged()){
+                updateVat(vatForm.getVat());
+                vat=vatForm.getVat();
+                labelVAT.setText("Current VAT: "+(vatForm.getVat()));
+            }
+        });
+        buttonEditVat.setPadding(padding);
+        HBox boxVat=new HBox(labelVAT,buttonEditVat);
+        boxVat.setSpacing(20);
+        HBox boxButtonsMechanics=new HBox(buttonAddMechanic,buttonUpdateMechanics,buttonDeleteMechanic);
+        boxButtonsMechanics.setSpacing(20);
+        VBox boxTab3=new VBox(boxButtonsMechanics,tableViewMechanic,boxVat);
+        boxTab3.setPadding(padding);
+        boxTab3.setSpacing(20);
+
+
         //
         Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Invoice", boxTab2);
-        Tab tab3 = new Tab("Unfinished...", null);
+        Tab tab3 = new Tab("Details", boxTab3);
 
         tabPane.getTabs().add(tab1);
         tabPane.getTabs().add(tab2);
@@ -716,7 +784,7 @@ public class MainScreen extends Application {
         return importingParts;
     }
 
-    public float importVat() {
+    private float importVat() {
         float fpa=-1;
         try {
             Statement stmt = connection.createStatement();
@@ -729,6 +797,19 @@ public class MainScreen extends Application {
         }
         return fpa;
     }
+
+    private void updateVat(float fpa){
+        try{
+            final String query = "UPDATE company SET Vat ="+fpa+ ";";
+            System.out.println(query);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.execute();
+        }catch (SQLException ex){
+            errorPopUp0.setErrorMessage("Error with updating VAT");
+            errorPopUp0.showError();
+        }
+    }
+
 
     private void deleteFromCustomers() {
         try {
@@ -976,6 +1057,76 @@ public class MainScreen extends Application {
         }
         return invoice;
     }
+
+    private void deleteFromMechanics() {
+        try {
+            Mechanic selectedMechanic = tableViewMechanic.getSelectionModel().getSelectedItem();
+            final int index = selectedMechanic.getMechanicID();
+            filteredMechanics = new FilteredList<>(allMechanics.filtered(mechanic -> mechanic.getMechanicID().equals(selectedMechanic.getMechanicID())));
+            allMechanics.remove(selectedMechanic);
+            tableViewMechanic.refresh();
+            final String query = "DELETE FROM mechanics WHERE MechanicID = " + index;
+            System.out.println(query);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.execute();
+        } catch (Exception ex) {
+            System.out.println("Error with removing from database");
+        }
+    }
+
+    private void updateFromMechanics() {
+        try {
+            Mechanic selectedMechanic = tableViewMechanic.getSelectionModel().getSelectedItem();
+            final int index2 = tableViewCustomers.getSelectionModel().getFocusedIndex();
+            final int index = selectedMechanic.getMechanicID();
+            MechanicForm mechanicForm = new MechanicForm(primaryStage, selectedMechanic.getName(), selectedMechanic.getSurname());
+            mechanicForm.showForm();
+            if (mechanicForm.isChanged()) {
+                final String query = mechanicForm.getQuery() + " WHERE MechanicID = " + index + ";";
+                System.out.println(query);
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.execute();
+                allMechanics.get(index2).setName(mechanicForm.getName());
+                allMechanics.get(index2).setSurname(mechanicForm.getSurname());
+                tableViewMechanic.refresh();
+            } else {
+                System.out.println("Not saving changes");
+            }
+        } catch (Exception ex) {
+            System.out.println("Error with updating from database");
+            errorPopUp0.setErrorMessage("Select a customer!");
+            errorPopUp0.showError();
+        }
+    }
+
+    private void addToMechanics() {
+        try {
+            MechanicForm mechanicForm = new MechanicForm(primaryStage);
+            mechanicForm.showForm();
+            if (mechanicForm.isChanged()) {
+                final String query = mechanicForm.getQueryAdd();
+                System.out.println(query);
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.execute();
+                //to deftero query ginete gia na piasoume to customerID tou customer to opio exei topothetithei sto database gia ton logo oti den mporoume na gnorizoume sigoura to epomeno
+                final String querySearch = "SELECT LAST_INSERT_ID();";
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery(querySearch);
+                rs.next();
+                Mechanic mechanicNew = new Mechanic(rs.getInt(1), mechanicForm.getName(), mechanicForm.getSurname());
+                allMechanics.add(mechanicNew);
+                tableViewMechanic.refresh();
+            } else {
+                System.out.println("Data not added");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error with adding data to database");
+            errorPopUp0.setErrorMessage("Error with adding data to database.");
+            errorPopUp0.showError();
+        }
+    }
+
+
 
 
     private void filterInvoices(int type, String strSearch, String eidosEpiskevis) {
