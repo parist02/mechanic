@@ -1,7 +1,6 @@
 package com.mechanic.code.main;
 import com.mechanic.code.forms.BalanceForm;
 import com.mechanic.code.print.Print;
-import com.mechanic.code.temporary.Form;
 import com.mechanic.code.forms.CarsForm;
 import com.mechanic.code.forms.CustomersForm;
 import com.mechanic.code.forms.InvoiceForm;
@@ -47,6 +46,7 @@ public class MainScreen extends Application {
     private ErrorPopUp errorPopUp0;
     private ErrorPopUp errorPopUp1;
     private ErrorPopUp errorPopUp2;
+    private Print print;
     private FilteredList<Customer> filteredListCustomers;
     private FilteredList<Car> filteredListCars;
     private FilteredList<Mechanic> filteredMechanics;
@@ -82,30 +82,17 @@ public class MainScreen extends Application {
 
     @Override
     public void start(Stage stage) {
-        importFromMechanics();
-        importFromRepairs();
-        importVat();
+        allMechanics=importFromMechanics();
+        allRepairs=importFromRepairs();
+        vat = importVat();
         allCustomers = importFromCustomers();
         allCars = importFromCars();
         allInvoices = importFromInvoices();
-        importFromInvoiceMetaData();
-        importFromInvoiceParts();
+        allInvoicesMetaData = importFromInvoiceMetaData();
+        allParts = importFromInvoiceParts();
 
 
         TabPane tabPane = new TabPane();
-        Form form = new Form();
-
-
-        Button buttonForm = new Button("Show form");
-        buttonForm.setPadding(padding);
-        buttonForm.setFont(font);
-
-        Label labelInvoice = new Label("Press the button to show the print form");
-        labelInvoice.setPadding(padding);
-        labelInvoice.setFont(font);
-        VBox boxInvoice = new VBox(buttonForm, labelInvoice);
-        boxInvoice.setPadding(padding);
-        buttonForm.setOnAction(e -> form.showForm());
 
         //Tab 1
         TableColumn<Customer, Integer> counterColumn = new TableColumn<>("No.");
@@ -463,10 +450,11 @@ public class MainScreen extends Application {
                 invoicePrintPreview.show();
                 if (invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
                     //print needs to be implemented
-                    int invoiceNo;
-                    invoiceNo = addToInvoice(invoiceForm, invoicePrintPreview);
-                    invoicePrintPreview.setInvoiceID(invoiceNo);
-                    Print print = new Print(invoicePrintPreview.getNodeForPrint(false));
+                    Invoice invoice = addToInvoice(invoiceForm, invoicePrintPreview);
+                    invoicePrintPreview.setInvoiceID(invoice.getInvoiceID());
+//                    print.setNode(invoicePrintPreview.getNodeForPrint(false));
+//                    print.print();
+                    openInvoice(true,invoice);
                 } else if (invoicePrintPreview.isBeingSaved()) {
                     System.out.println("Saving");
                     addToInvoice(invoiceForm, invoicePrintPreview);
@@ -478,7 +466,7 @@ public class MainScreen extends Application {
         buttonOpenInvoice.setPadding(padding);
         buttonOpenInvoice.setOnAction(actionEvent -> {
             if (!tableViewInvoice.getSelectionModel().isEmpty()) {
-                openInvoice();
+                openInvoice(false,tableViewInvoice.getSelectionModel().getSelectedItem());
             } else {
                 errorPopUp0.setErrorMessage("Select an invoice first!");
                 errorPopUp0.showError();
@@ -557,7 +545,7 @@ public class MainScreen extends Application {
         //
         Tab tab1 = new Tab("Customers", boxCustomers);
         Tab tab2 = new Tab("Invoice", boxTab2);
-        Tab tab3 = new Tab("Unfinished...", boxInvoice);
+        Tab tab3 = new Tab("Unfinished...", null);
 
         tabPane.getTabs().add(tab1);
         tabPane.getTabs().add(tab2);
@@ -575,6 +563,7 @@ public class MainScreen extends Application {
         errorPopUp0 = new ErrorPopUp(0, primaryStage);
         errorPopUp1 = new ErrorPopUp(1, primaryStage);
         errorPopUp2 = new ErrorPopUp(2, primaryStage);
+        print=new Print(primaryStage);
         primaryStage.show();
 
     }
@@ -588,7 +577,7 @@ public class MainScreen extends Application {
     }
 
 
-    public ObservableList<Customer> importFromCustomers() {
+    private ObservableList<Customer> importFromCustomers() {
         ObservableList<Customer> importingCustomers = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
@@ -604,7 +593,7 @@ public class MainScreen extends Application {
         return importingCustomers;
     }
 
-    public ObservableList<Car> importFromCars() {
+    private ObservableList<Car> importFromCars() {
         ObservableList<Car> importingCars = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
@@ -621,39 +610,40 @@ public class MainScreen extends Application {
         return importingCars;
     }
 
-    //class needs to be changed to import data to a table
-    //temporary void just to get mechanics
-    public void importFromMechanics() {
+    private ObservableList<Mechanic> importFromMechanics() {
+        ObservableList<Mechanic>importingMechanics=FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from mechanics");
             Mechanic mechanic;
             while (rs.next()) {
                 mechanic = new Mechanic(rs.getInt(1), rs.getString(2), rs.getString(3));
-                allMechanics.add(mechanic);
+                importingMechanics.add(mechanic);
             }
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
+        return importingMechanics;
     }
 
-    //class needs to be changed to import data to a table
-    //temporary void just to get repairs
-    public void importFromRepairs() {
+
+    private ObservableList<Repair> importFromRepairs() {
+        ObservableList<Repair>importingRepairs=FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from repairs");
             Repair repair;
             while (rs.next()) {
                 repair = new Repair(rs.getInt(1), rs.getString(2));
-                allRepairs.add(repair);
+                importingRepairs.add(repair);
             }
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
+        return importingRepairs;
     }
 
-    public ObservableList<Invoice> importFromInvoices() {
+    private ObservableList<Invoice> importFromInvoices() {
         ObservableList<Invoice> importingInvoices = FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
@@ -684,7 +674,8 @@ public class MainScreen extends Application {
         return importingInvoices;
     }
 
-    public void importFromInvoiceMetaData() {
+    private ObservableList<InvoiceMetaData> importFromInvoiceMetaData() {
+        ObservableList<InvoiceMetaData>importingInvoiceMetaData=FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from invoicemetadata");
@@ -700,41 +691,46 @@ public class MainScreen extends Application {
                 invoiceMetaData.setNextService(rs.getInt(7));
                 invoiceMetaData.setComments(rs.getString(8));
                 invoiceMetaData.setDiscount(rs.getFloat(9));
-                allInvoicesMetaData.add(invoiceMetaData);
+                importingInvoiceMetaData.add(invoiceMetaData);
 
             }
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
+        return importingInvoiceMetaData;
     }
 
-    public void importFromInvoiceParts() {
+    private ObservableList<Part> importFromInvoiceParts() {
+        ObservableList<Part>importingParts=FXCollections.observableArrayList();
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from invoiceparts");
             Part part;
             while (rs.next()) {
                 part = new Part(allParts.size(), rs.getInt(1), rs.getInt(4), rs.getString(3), rs.getString(2), rs.getInt(5));
-                allParts.add(part);
+                importingParts.add(part);
             }
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
+        return importingParts;
     }
 
-    public void importVat() {
+    public float importVat() {
+        float fpa=-1;
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from company");
             rs.next();
-            vat = rs.getFloat(1);
+            fpa = rs.getFloat(1);
 
         } catch (SQLException e) {
             System.out.println("Error with getting data");
         }
+        return fpa;
     }
 
-    public void deleteFromCustomers() {
+    private void deleteFromCustomers() {
         try {
             Customer selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItem();
             final int index = selectedCustomer.getCounter();
@@ -754,7 +750,7 @@ public class MainScreen extends Application {
         }
     }
 
-    public void deleteFromCars() {
+    private void deleteFromCars() {
         try {
             Car selectedCar = tableViewCars.getSelectionModel().getSelectedItem();
             final String index = selectedCar.getLicencePlates();
@@ -770,7 +766,7 @@ public class MainScreen extends Application {
         }
     }
 
-    public void updateFromCustomers() {
+    private void updateFromCustomers() {
         try {
             final int index2;
             Customer selectedCustomer = tableViewCustomers.getSelectionModel().getSelectedItem();
@@ -804,7 +800,7 @@ public class MainScreen extends Application {
         }
     }
 
-    public void updateFromCars() {
+    private void updateFromCars() {
         try {
             final int index2;
             Car selectedCar = tableViewCars.getSelectionModel().getSelectedItem();
@@ -838,7 +834,7 @@ public class MainScreen extends Application {
         }
     }
 
-    public void addToCustomers(String til) {
+    private void addToCustomers(String til) {
         try {
             CustomersForm customersForm = new CustomersForm(primaryStage);
             customersForm.setTextFieldPhone1(til);
@@ -866,7 +862,7 @@ public class MainScreen extends Application {
         }
     }
 
-    public void addToCars(String noumera) {
+    private void addToCars(String noumera) {
         try {
             CarsForm carsForm = new CarsForm(primaryStage);
             carsForm.setTextFieldLicensePlates(noumera);
@@ -889,8 +885,9 @@ public class MainScreen extends Application {
         }
     }
 
-    public Integer addToInvoice(InvoiceForm invoiceForm, InvoicePrintPreview invoicePrintPreview) {
-        int arithmosTimologiou = -1;
+    private Invoice addToInvoice(InvoiceForm invoiceForm, InvoicePrintPreview invoicePrintPreview) {
+        int arithmosTimologiou;
+        Invoice invoice = null;
         try {
             String queryBegin = "BEGIN;";
             String query = "INSERT INTO invoice (InvoiceID, Date, CustomerID, LicensePlates, RepairID, MechanicID, Cash, Remaining) VALUES (NULL";
@@ -903,7 +900,7 @@ public class MainScreen extends Application {
             query = query + (invoiceForm.getCreditCash().equals("Credit") ? 0 : invoicePrintPreview.getAmount()) + ");";
             final String queryInvoice = query;
             //invoice
-            Invoice invoice = new Invoice();
+            invoice = new Invoice();
             invoice.setBalance(invoiceForm.getCreditCash().equals("Credit") ? 0 : invoicePrintPreview.getAmount());
             invoice.setDate(invoicePrintPreview.getDateInvoice());
             invoice.setFullName(invoiceForm.getFullName());
@@ -913,7 +910,8 @@ public class MainScreen extends Application {
             invoice.setMechanicName(allMechanics.get(invoiceForm.getMechanicIndex()).getName() + allMechanics.get(invoiceForm.getMechanicIndex()).getSurname());
             invoice.setPhone(invoiceForm.getPhone());
             if (invoiceForm.getCreditCash().equals("Cash")) {
-                filteredListCustomers = new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter() == invoice.getCustomerID()));
+                Invoice finalInvoice = invoice;
+                filteredListCustomers = new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter() == finalInvoice.getCustomerID()));
                 System.out.println(filteredListCustomers.get(0).getCounter());
                 float newAmount = filteredListCustomers.get(0).getBalance() + invoicePrintPreview.getAmount();
                 allCustomers.get(filteredListCustomers.getSourceIndexFor(allCustomers, 0)).setBalance(newAmount);
@@ -963,8 +961,8 @@ public class MainScreen extends Application {
             //insert parts to database
             ObservableList<Part> parts;
             parts = invoicePrintPreview.getAllParts();
-            allParts.addAll(parts);
             for (Part p : parts) {
+                allParts.add(p);
                 query = "INSERT INTO invoiceparts (InvoiceID, PartsId, Description, Quantity, Price) VALUES (";
                 query = query + arithmosTimologiou + ", '" + p.getPartsID() + "', '" + p.getDescription() + "', " + p.getQuantity() + ", " + Float.parseFloat(decimalFormat.format(p.getPrice())) + ");";
                 final String queryInvoiceParts = query;
@@ -976,15 +974,11 @@ public class MainScreen extends Application {
             errorPopUp0.setErrorMessage("Error with adding data to database.");
             errorPopUp0.showError();
         }
-        return arithmosTimologiou;
+        return invoice;
     }
 
-    /*
-		   0: tha ginei anaziti meso noumera aftokinitou
-		   1: tha gine anazitisi analogos ton episkevon
 
-	   */
-    public void filterInvoices(int type, String strSearch, String eidosEpiskevis) {
+    private void filterInvoices(int type, String strSearch, String eidosEpiskevis) {
         /*
             0: tha ginei anazitisi meso noumera aftokinitou
             1: tha ginei anazitisi analogos ton episkevon
@@ -1025,18 +1019,17 @@ public class MainScreen extends Application {
         return vat;
     }
 
-    public void openInvoice() {
-        Invoice selectedInvoice = tableViewInvoice.getSelectionModel().getSelectedItem();
-        filteredInvoicesMetaData = new FilteredList<>(allInvoicesMetaData.filtered(invoiceMetaData -> invoiceMetaData.getInvoiceId() == selectedInvoice.getInvoiceID()));
+    private void openInvoice(boolean isNew,Invoice invoice) {
+        filteredInvoicesMetaData = new FilteredList<>(allInvoicesMetaData.filtered(invoiceMetaData -> invoiceMetaData.getInvoiceId() == invoice.getInvoiceID()));
         InvoiceMetaData selectedInvoiceMetaData = filteredInvoicesMetaData.get(0);
-        filteredParts = new FilteredList<>(allParts.filtered(part -> part.getInvoiceID() == selectedInvoice.getInvoiceID()));
+        filteredParts = new FilteredList<>(allParts.filtered(part -> part.getInvoiceID() == invoice.getInvoiceID()));
         ObservableList<Part> selectedParts;
         selectedParts = filteredParts;
-        Car selectedCar = new FilteredList<>(allCars.filtered(car -> car.getLicencePlates().equals(selectedInvoice.getLicencePlates()))).get(0);
-        InvoicePrintPreview invoicePrintPreview = new InvoicePrintPreview(primaryStage, selectedInvoice.getCustomerID(), selectedInvoice.getFullName(), selectedInvoice.getLicencePlates(), selectedCar.getBrand() + selectedCar.getModel(), selectedCar.getVin());
+        Car selectedCar = new FilteredList<>(allCars.filtered(car -> car.getLicencePlates().equals(invoice.getLicencePlates()))).get(0);
+        InvoicePrintPreview invoicePrintPreview = new InvoicePrintPreview(primaryStage, invoice.getCustomerID(), invoice.getFullName(), invoice.getLicencePlates(), selectedCar.getBrand() + selectedCar.getModel(), selectedCar.getVin());
         invoicePrintPreview.setMileage(selectedInvoiceMetaData.getMileage());
-        invoicePrintPreview.setDateInvoice(selectedInvoice.getDate());
-        invoicePrintPreview.setInvoiceID(selectedInvoice.getInvoiceID());
+        invoicePrintPreview.setDateInvoice(invoice.getDate());
+        invoicePrintPreview.setInvoiceID(invoice.getInvoiceID());
         invoicePrintPreview.setDateOUT(selectedInvoiceMetaData.getDateOut());
         invoicePrintPreview.setDateIN(selectedInvoiceMetaData.getDateIn());
         invoicePrintPreview.setAllParts(selectedParts);
@@ -1046,14 +1039,20 @@ public class MainScreen extends Application {
         invoicePrintPreview.setComments(selectedInvoiceMetaData.getComments());
         invoicePrintPreview.setNextService(selectedInvoiceMetaData.getNextService());
         invoicePrintPreview.setVat(selectedInvoiceMetaData.getVat());
-        invoicePrintPreview.showPreview();
-        if (invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
-            Print print = new Print(invoicePrintPreview.getNodeForPrint(true));
+        if(!isNew) {
+            invoicePrintPreview.showPreview();
+            if (invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
+                print.setNode(invoicePrintPreview.getNodeForPrint(true));
+                print.print();
+            }
+        }else{
+            print.setNode(invoicePrintPreview.getNodeForPrint(true));
+            print.print();
         }
 
     }
 
-    public void editBalance(){
+    private void editBalance(){
         Invoice selectedInvoice=tableViewInvoice.getSelectionModel().getSelectedItem();
         if(selectedInvoice.getBalance()!=0){
             try {

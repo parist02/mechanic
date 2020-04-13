@@ -516,6 +516,9 @@ public class InvoicePrintPreview {
 
 	public void setAllParts(ObservableList<Part> allParts) {
 		this.allParts = allParts;
+		for (int i=0;i<allParts.size();i++){
+			this.allParts.get(i).setCounter(i+1);
+		}
 	}
 
 	public void setDiscount(Float discount) {
@@ -583,9 +586,8 @@ public class InvoicePrintPreview {
 	public GridPane getNodeForPrint(boolean isOpen){
 		if(!isOpen){
 			readyForPrint();
-		}else{
-			textAreaComments.setDisable(false);
 		}
+		textAreaComments.setDisable(false);
 		return (grid);
 	}
 
