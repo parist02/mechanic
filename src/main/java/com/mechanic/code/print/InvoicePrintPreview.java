@@ -32,6 +32,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Flow;
+import java.util.concurrent.TimeUnit;
 
 
 public class InvoicePrintPreview {
@@ -57,7 +58,7 @@ public class InvoicePrintPreview {
 	private  VBox vBoxParts;
 	private TableView<Part>tableViewParts;
 	private TextArea textAreaComments;
-	private Button buttonSave;
+	private Button buttonSave,buttonPrint;
 	private HBox boxButtons;
 
 	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates, String brandModel, String vin) {
@@ -310,10 +311,10 @@ public class InvoicePrintPreview {
 		grid.setVgap(20);
 		grid.setAlignment(Pos.TOP_CENTER);
 
-		Button buttonPrint = new Button("Print");
+		buttonPrint = new Button("Save and Show Print Preview");
 		Tooltip tooltipPrint = new Tooltip("Save Invoice and Print");
 		buttonPrint.setTooltip(tooltipPrint);
-		buttonSave = new Button("Save");
+		buttonSave = new Button("Save and Close");
 		Tooltip tooltipSave = new Tooltip("Save Invoice without Printing");
 		buttonSave.setTooltip(tooltipSave);
 
@@ -362,7 +363,7 @@ public class InvoicePrintPreview {
 				total = Float.parseFloat(decimalFormat.format(net + vatTotal));
 				labelAmount.setText(String.valueOf(amount));
 				labelNet.setText(String.valueOf(net));
-				labelVat.setText(String.valueOf(vat));
+				labelVat.setText(String.valueOf(vatTotal));
 				labelTotal.setText(String.valueOf(total));
 				labelDiscount.setText(String.valueOf(discount));
 				allParts.add(partNew);
@@ -608,12 +609,20 @@ public class InvoicePrintPreview {
 		tableViewParts.refresh();
 	}
 
-	public void showPreview(){
+	public void initializePreview(){
 		calculateAmount();
 		readyForPrint();
 		textAreaComments.setDisable(true);
 		boxButtons.getChildren().remove(buttonSave);
+	}
+
+	public void showPreview(){
+		initializePreview();
+		buttonPrint.setText("Print");
 		stagePrint.showAndWait();
 	}
+
+
+
 
 }

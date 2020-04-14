@@ -449,10 +449,7 @@ public class MainScreen extends Application {
                 if (invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
                     //print needs to be implemented
                     Invoice invoice = addToInvoice(invoiceForm, invoicePrintPreview);
-                    invoicePrintPreview.setInvoiceID(invoice.getInvoiceID());
-//                    print.setNode(invoicePrintPreview.getNodeForPrint(false));
-//                    print.print();
-                    openInvoice(true,invoice);
+                    openInvoice(invoice);
                 } else if (invoicePrintPreview.isBeingSaved()) {
                     System.out.println("Saving");
                     addToInvoice(invoiceForm, invoicePrintPreview);
@@ -464,7 +461,7 @@ public class MainScreen extends Application {
         buttonOpenInvoice.setPadding(padding);
         buttonOpenInvoice.setOnAction(actionEvent -> {
             if (!tableViewInvoice.getSelectionModel().isEmpty()) {
-                openInvoice(false,tableViewInvoice.getSelectionModel().getSelectedItem());
+                openInvoice(tableViewInvoice.getSelectionModel().getSelectedItem());
             } else {
                 errorPopUp0.setErrorMessage("Select an invoice first!");
                 errorPopUp0.showError();
@@ -1042,8 +1039,10 @@ public class MainScreen extends Application {
             //insert parts to database
             ObservableList<Part> parts;
             parts = invoicePrintPreview.getAllParts();
+            Part newPart;
             for (Part p : parts) {
-                allParts.add(p);
+                newPart=new Part(0,arithmosTimologiou,p.getQuantity(),p.getDescription(),p.getPartsID(),p.getPrice());
+                allParts.add(newPart);
                 query = "INSERT INTO invoiceparts (InvoiceID, PartsId, Description, Quantity, Price) VALUES (";
                 query = query + arithmosTimologiou + ", '" + p.getPartsID() + "', '" + p.getDescription() + "', " + p.getQuantity() + ", " + Float.parseFloat(decimalFormat.format(p.getPrice())) + ");";
                 final String queryInvoiceParts = query;
@@ -1170,7 +1169,7 @@ public class MainScreen extends Application {
         return vat;
     }
 
-    private void openInvoice(boolean isNew,Invoice invoice) {
+    private void openInvoice(Invoice invoice) {
         filteredInvoicesMetaData = new FilteredList<>(allInvoicesMetaData.filtered(invoiceMetaData -> invoiceMetaData.getInvoiceId() == invoice.getInvoiceID()));
         InvoiceMetaData selectedInvoiceMetaData = filteredInvoicesMetaData.get(0);
         filteredParts = new FilteredList<>(allParts.filtered(part -> part.getInvoiceID() == invoice.getInvoiceID()));
@@ -1190,17 +1189,11 @@ public class MainScreen extends Application {
         invoicePrintPreview.setComments(selectedInvoiceMetaData.getComments());
         invoicePrintPreview.setNextService(selectedInvoiceMetaData.getNextService());
         invoicePrintPreview.setVat(selectedInvoiceMetaData.getVat());
-        if(!isNew) {
-            invoicePrintPreview.showPreview();
-            if (invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
-                print.setNode(invoicePrintPreview.getNodeForPrint(true));
-                print.print();
-            }
-        }else{
+        invoicePrintPreview.showPreview();
+        if (invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
             print.setNode(invoicePrintPreview.getNodeForPrint(true));
             print.print();
         }
-
     }
 
     private void editBalance(){

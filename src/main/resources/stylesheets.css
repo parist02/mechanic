@@ -14,17 +14,17 @@
     -fx-grid-lines-visible: false;
 }
 
-/*,.table-view.root,.table-view.indexed-cell*/
-.table-view .cell{
-    -fx-border-style: solid;
-    -fx-border-color: gray;
-    -fx-alignment: center-left;
-    -fx-border-width: 0.1;
+/*!*,.table-view.root,.table-view.indexed-cell*!*/
+/*.table-view .cell{*/
+/*    -fx-border-style: solid;*/
+/*    -fx-border-color: gray;*/
+/*    -fx-alignment: center-left;*/
+/*    -fx-border-width: 0.1;*/
 
-}
-.table-view .column-header{
-    -fx-background-color: lightgray;
-}
+/*}*/
+/*.table-view .column-header{*/
+/*    -fx-background-color: lightgray;*/
+/*}*/
 
 
 #label1 {
