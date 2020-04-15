@@ -5,19 +5,12 @@ import com.mechanic.code.database.Car;
 import com.mechanic.code.database.Customer;
 import com.mechanic.code.database.Mechanic;
 import com.mechanic.code.database.Repair;
-import com.mechanic.code.main.MainScreen;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -30,11 +23,9 @@ public class InvoiceForm {
 	private Stage stageForm;
 	private String licensePlates = null;
 	private TextField textFieldLicensePlates;
-	private Button buttonOK, buttonCancel, buttonNext, buttonBack;
+	private Button buttonOK, buttonCancel,buttonCancel2, buttonNext, buttonBack;
 	private boolean clickedOK = false;
 	private Label labelEmpty;
-	private Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
-	private Font fontBold = Font.font("Arial", FontWeight.BOLD, FontPosture.REGULAR, 16);
 	private Label labelCustomerIDfound, labelNamefound, labelSurnamefound,labelPhonefound, labelBrandfound, labelModelfound, labelVINfound;
 	private ErrorPopUp errorPopUp;
 	private ObservableList<Mechanic>allMechanics;
@@ -63,6 +54,7 @@ public class InvoiceForm {
 		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
 		stageForm = new Stage();
 		Scene scene = new Scene(tabPane);
+		scene.getStylesheets().add("stylesheets.css");
 		stageForm.setScene(scene);
 		stageForm.initModality(Modality.WINDOW_MODAL);
 		stageForm.initOwner(primaryStage);
@@ -109,23 +101,17 @@ public class InvoiceForm {
 	private GridPane invoiceFormFirst() {
 		//Labels
 		Label labelTitle = new Label("Invoice details");
-		labelTitle.setFont(fontBold);
-		labelTitle.setTextFill(Color.BLACK);
+		labelTitle.getStyleClass().add("formTitle");
 		Label labelLicensePlates = new Label("License Plates:");
-		labelLicensePlates.setFont(font);
-		labelLicensePlates.setTextFill(Color.BLACK);
+		labelLicensePlates.getStyleClass().add("formLabel");
 		Label labelMechanic=new Label("Mechanic:");
-		labelMechanic.setFont(font);
-		labelMechanic.setTextFill(Color.BLACK);
+		labelMechanic.getStyleClass().add("formLabel");
 		Label labelRepair=new Label("Repair:");
-		labelRepair.setFont(font);
-		labelRepair.setTextFill(Color.BLACK);
+		labelRepair.getStyleClass().add("formLabel");
 		Label labelCredit=new Label("Credit/Cash:");
-		labelCredit.setFont(font);
-		labelCredit.setTextFill(Color.BLACK);
+		labelCredit.getStyleClass().add("formLabel");
 		labelEmpty = new Label("");
-		labelEmpty.setFont(font);
-		labelEmpty.setTextFill(Color.FIREBRICK);
+		labelEmpty.getStyleClass().add("errorLabel");
 		//TextFields
 		textFieldLicensePlates = new TextField();
 		//choiceBox
@@ -142,7 +128,9 @@ public class InvoiceForm {
 		choiceBoxCredit.getItems().add("Cash");
 		//Buttons
 		buttonNext = new Button("Next");
+		buttonNext.getStyleClass().add("buttonMain");
 		buttonCancel = new Button("Cancel");
+		buttonCancel.getStyleClass().add("buttonCancel");
 		//Grid control
 		GridPane grid = new GridPane();
 		grid.add(labelTitle, 0, 0, 2, 1);
@@ -155,65 +143,53 @@ public class InvoiceForm {
 		grid.add(labelCredit, 0, 4);
 		grid.add(choiceBoxCredit, 1, 4);
 		grid.add(labelEmpty, 0, 5, 2, 1);
-		HBox buttonBox = new HBox(buttonNext, buttonCancel);
-		buttonBox.setSpacing(20);
+		HBox buttonBox = new HBox(buttonCancel,buttonNext);
+		buttonBox.getStyleClass().add("buttonForm");
 		grid.add(buttonBox, 0, 6,2,1);
-		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.setHgap(20);
-		grid.setVgap(15);
+		grid.getStyleClass().add("formGrid");
 		//
 		return (grid);
 	}
 
 	private GridPane invoiceFormSecond() {
 		Label labelTitle = new Label("Data found");
-		labelTitle.setFont(fontBold);
-		labelTitle.setTextFill(Color.BLACK);
+		labelTitle.getStyleClass().add("formTitle");
 		Label labelCustomerID = new Label("Customer ID:");
-		labelCustomerID.setFont(font);
-		labelCustomerID.setTextFill(Color.BLACK);
+		labelCustomerID.getStyleClass().add("formLabel");
 		Label labelName = new Label("Name:");
-		labelName.setFont(font);
-		labelName.setTextFill(Color.BLACK);
+		labelName.getStyleClass().add("formLabel");
 		Label labelSurname = new Label("Surname:");
-		labelSurname.setFont(font);
-		labelSurname.setTextFill(Color.BLACK);
+		labelSurname.getStyleClass().add("formLabel");
 		Label labelPhone=new Label("Phone:");
-		labelPhone.setFont(font);
-		labelPhone.setTextFill(Color.BLACK);
+		labelPhone.getStyleClass().add("formLabel");
 		Label labelBrand = new Label("Brand:");
-		labelBrand.setFont(font);
-		labelBrand.setTextFill(Color.BLACK);
-		Label labelModel = new Label("Model:");
-		labelModel.setFont(font);
-		labelModel.setTextFill(Color.BLACK);
+		labelBrand.getStyleClass().add("formLabel");
+		Label labelModel = new Label("Model:");//////
+		labelModel.getStyleClass().add("formLabel");
 		Label labelVIN = new Label("VIN:");
-		labelVIN.setFont(font);
-		labelVIN.setTextFill(Color.BLACK);
+		labelVIN.getStyleClass().add("formLabel");
 		labelCustomerIDfound = new Label("");
-		labelCustomerIDfound.setFont(font);
-		labelCustomerIDfound.setTextFill(Color.BLACK);
+		labelCustomerIDfound.getStyleClass().add("formLabel2");
 		labelNamefound = new Label("");
-		labelNamefound.setFont(font);
-		labelNamefound.setTextFill(Color.BLACK);
+		labelNamefound.getStyleClass().add("formLabel2");
 		labelSurnamefound = new Label("");
-		labelSurnamefound.setFont(font);
-		labelSurnamefound.setTextFill(Color.BLACK);
+		labelSurnamefound.getStyleClass().add("formLabel2");
 		labelPhonefound = new Label("");
-		labelPhonefound.setFont(font);
-		labelPhonefound.setTextFill(Color.BLACK);
+		labelPhonefound.getStyleClass().add("formLabel2");
 		labelBrandfound = new Label("");
-		labelBrandfound.setFont(font);
-		labelBrandfound.setTextFill(Color.BLACK);
+		labelBrandfound.getStyleClass().add("formLabel2");
 		labelModelfound = new Label("");
-		labelModelfound.setFont(font);
-		labelModelfound.setTextFill(Color.BLACK);
+		labelModelfound.getStyleClass().add("formLabel2");
 		labelVINfound = new Label("");
-		labelVINfound.setFont(font);
-		labelVINfound.setTextFill(Color.BLACK);
+		labelVINfound.getStyleClass().add("formLabel2");
 		Label labelfound = new Label("Do you want to continue with the creation of the invoice?");
+		labelfound.getStyleClass().add("formLabel2");
 		buttonOK = new Button("Confirm");
+		buttonOK.getStyleClass().add("buttonMain");
 		buttonBack = new Button("Back");
+		buttonBack.getStyleClass().add("buttonCancel");
+		buttonCancel2=new Button("Cancel");
+		buttonCancel2.getStyleClass().add("buttonCancel");
 		GridPane grid = new GridPane();
 		grid.add(labelTitle, 0, 0, 2, 1);
 		grid.add(labelName, 0, 1);
@@ -229,12 +205,10 @@ public class InvoiceForm {
 		grid.add(labelVIN, 0, 6);
 		grid.add(labelVINfound, 1, 6);
 		grid.add(labelfound, 0, 8, 2, 1);
-		HBox buttonBox2 = new HBox(buttonBack, buttonOK, buttonCancel);
-		buttonBox2.setSpacing(20);
+		HBox buttonBox2 = new HBox(buttonBack, buttonCancel2,buttonOK);
+		buttonBox2.getStyleClass().add("buttonForm");
 		grid.add(buttonBox2, 0, 9, 2, 1);
-		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.setHgap(20);
-		grid.setVgap(15);
+		grid.getStyleClass().add("formGrid");
 		//
 		return (grid);
 

@@ -1,49 +1,102 @@
 .root {
-    -fx-padding: 5, 5, 5, 5;
-    
-    
+    -fx-padding: 20;
 }
 
-#grid{
-    -fx-font-family: Arial;
-    -fx-font-size: 12;
-    -fx-padding: 5,5,5,5;
+.buttonForm {
+    -fx-alignment : baseline-right;
+    -fx-spacing: 8;
+}
+
+.formTitle{
+    -fx-font-size: 25;
     -fx-font-weight: bold;
-    -fx-vgap: 5;
-    -fx-hgap: 5;
-    -fx-grid-lines-visible: false;
+    -fx-padding: 10 0 20 0;
+    -fx-text-fill: gray;
 }
 
-/*!*,.table-view.root,.table-view.indexed-cell*!*/
-/*.table-view .cell{*/
-/*    -fx-border-style: solid;*/
-/*    -fx-border-color: gray;*/
-/*    -fx-alignment: center-left;*/
-/*    -fx-border-width: 0.1;*/
 
-/*}*/
-/*.table-view .column-header{*/
-/*    -fx-background-color: lightgray;*/
-/*}*/
+.formLabel {
+    -fx-font-weight: bold;
+    -fx-text-alignment: left;
+    -fx-font-size: 13;
+}
 
-
-#label1 {
-    -fx-font-family: Arial;
+.formLabel2 {
+    -fx-font-weight: normal;
+    -fx-text-alignment: left;
     -fx-font-size: 12;
-    -fx-padding: 5,5,5,5;
-}
-#label2{
-    -fx-font-family: Arial;
-    -fx-font-size: 12;
-    -fx-padding: 5,5,5,5;
-    -fx-fontweight: bold;
 }
 
-#title{
-    -fx-font-family: Arial;
-    -fx-font-size: 22;
-    -fx-padding: 5,5,5,5;
-    -fx-fontweight: bold;
+
+.errorLabel{
+    -fx-text-fill: firebrick;
+    -fx-font-size: 13;
+    -fx-alignment: center;
+    -fx-font-style: italic;
+    -fx-padding: 10 0;
 }
+
+.formGrid{
+    -fx-hgap: 20;
+    -fx-vgap: 10;
+}
+
+.buttonMain{
+    -fx-background-color: cornflowerblue;
+    -fx-text-fill: white;
+}
+.buttonMain:hover{
+    -fx-background-color: royalblue;
+}
+
+.buttonCancel{
+    -fx-background-color: #dddddd;
+}
+.buttonCancel:hover{
+    -fx-background-color: #cccccc;
+}
+
+/*#grid{*/
+/*    -fx-font-family: Arial;*/
+/*    -fx-font-size: 12;*/
+/*    -fx-padding: 5,5,5,5;*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-vgap: 5;*/
+/*    -fx-hgap: 5;*/
+/*    -fx-grid-lines-visible: false;*/
+/*}*/
+
+/*!*!*,.table-view.root,.table-view.indexed-cell*!*!*/
+/*!*.table-view .cell{*!*/
+/*!*    -fx-border-style: solid;*!*/
+/*!*    -fx-border-color: gray;*!*/
+/*!*    -fx-alignment: center-left;*!*/
+/*!*    -fx-border-width: 0.1;*!*/
+
+/*!*}*!*/
+/*!*.table-view .column-header{*!*/
+/*!*    -fx-background-color: lightgray;*!*/
+/*!*}*!*/
+
+
+/*#label1 {*/
+/*    -fx-font-family: Arial;*/
+/*    -fx-font-size: 12;*/
+/*    -fx-padding: 5,5,5,5;*/
+/*}*/
+/*#label2{*/
+/*    -fx-font-family: Arial;*/
+/*    -fx-font-size: 12;*/
+/*    -fx-padding: 5,5,5,5;*/
+/*    -fx-fontweight: bold;*/
+/*}*/
+
+/*#title{*/
+/*    -fx-font-family: Arial;*/
+/*    -fx-font-size: 22;*/
+/*    -fx-padding: 5,5,5,5;*/
+/*    -fx-fontweight: bold;*/
+/*}*/
+
 
 

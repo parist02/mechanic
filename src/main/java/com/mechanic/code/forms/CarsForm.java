@@ -1,13 +1,10 @@
 package com.mechanic.code.forms;
-
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
@@ -15,7 +12,7 @@ import javafx.stage.Stage;
 
 public class CarsForm {
 	private Stage stageForm;
-	private String licensePlates, brand, model,date,vin;
+	private String licensePlates="", brand="", model="",date="",vin="";
 	private Integer customerID;
 	private TextField textFieldLicensePlates;
 	private TextField textFieldBrand;
@@ -37,20 +34,37 @@ public class CarsForm {
 		stageForm.initOwner(primaryStage);
 		buttonCancel.setOnAction(e ->stageForm.close());
 		buttonOk.setOnAction(e -> {
-			licensePlates=textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
-			brand=textFieldBrand.getText().replaceAll("[^a-zA-Z0-9]", "");
-			model=textFieldModel.getText().replaceAll("[^a-zA-Z0-9]", "");
-			vin=textFieldVin.getText().replaceAll("[^a-zA-Z0-9]", "");
-			date=textFieldDate.getText().replaceAll("[^a-zA-Z0-9/-]\\s", "");
-			if (!textFieldCustomerID.getText().equals("")){
-				customerID=Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
+			boolean error=false;
+			try {
+				licensePlates = textFieldLicensePlates.getText();
+				licensePlates = licensePlates.replaceAll("[^a-zA-Z0-9]", "");
+				brand = textFieldBrand.getText();
+				brand = brand.replaceAll("[^a-zA-Z0-9]", "");
+				model = textFieldModel.getText();
+				model = model.replaceAll("[^a-zA-Z0-9]", "");
+				vin = textFieldVin.getText().replaceAll("[^a-zA-Z0-9]", "");
+				vin = textFieldVin.getText();
+				vin = vin.replaceAll("[^a-zA-Z0-9]", "");
+				date = textFieldDate.getText();
+				date = date.replaceAll("[^a-zA-Z0-9/-]\\s", "");
+			}catch (Exception ex){
+				error=true;
 			}
-			if (licensePlates.equals("") || brand.equals("") || model.equals("") || vin.equals("") || date.equals("")) {
+			try {
+				customerID = Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
+			}catch (Exception ex){
+				textFieldCustomerID.setText("");
+			}
+			try {
+				if (licensePlates.isBlank() || brand.isBlank() || model.isBlank() || vin.isBlank() || date.isBlank() || error) {
+					labelEmpty.setText("Please fill all the details");
+				} else {
+					changed = true;
+					queryAdd = queryAdd + "'" + licensePlates + "' , '" + brand + "', '" + model + "', '" + vin + "', '" + date + "', " + customerID + ");";
+					stageForm.close();
+				}
+			}catch (Exception exception){
 				labelEmpty.setText("Please fill all the details");
-			} else {
-				changed=true;
-				queryAdd = queryAdd + "'" + licensePlates + "' , '" + brand + "', '" + model + "', '" + vin + "', '" + date+"', "+customerID + ");";
-				stageForm.close();
 			}
 		});
 	}
@@ -76,13 +90,21 @@ public class CarsForm {
 		//Event Handler
 		buttonCancel.setOnAction(e->stageForm.close());
 		buttonOk.setOnAction(e->{
-			licensePlates=textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
-			brand=textFieldBrand.getText().replaceAll("[^a-zA-Z0-9]", "");
-			model=textFieldModel.getText().replaceAll("[^a-zA-Z0-9]", "");
+			licensePlates=textFieldLicensePlates.getText();
+			licensePlates=licensePlates.replaceAll("[^a-zA-Z0-9]", "");
+			brand=textFieldBrand.getText();
+			brand=brand.replaceAll("[^a-zA-Z0-9]", "");
+			model=textFieldModel.getText();
+			model=model.replaceAll("[^a-zA-Z0-9]", "");
 			vin=textFieldVin.getText().replaceAll("[^a-zA-Z0-9]", "");
-			date=textFieldDate.getText().replaceAll("[^a-zA-Z0-9/-]\\s", "");
-			if (!textFieldCustomerID.getText().equals("")){
-				customerID=Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
+			vin=textFieldVin.getText();
+			vin=vin.replaceAll("[^a-zA-Z0-9]", "");
+			date=textFieldDate.getText();
+			date=date.replaceAll("[^a-zA-Z0-9/-]\\s", "");
+			try {
+				customerID = Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
+			}catch (Exception ex){
+				textFieldCustomerID.setText("");
 			}
 			if (licensePlates.equals("") || brand.equals("") || model.equals("") || vin.equals("") || date.equals("")) {
 				labelEmpty.setText("Please fill all the details");
@@ -144,44 +166,35 @@ public class CarsForm {
 	private void carsFormInitializer() {
 		stageForm = new Stage();
 		stageForm.setTitle("Form");
-		Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
 		//Labels
 		Label labelLicensePlates = new Label("License Plates:");
-		labelLicensePlates.setFont(font);
-		labelLicensePlates.setTextFill(Color.BLACK);
+		labelLicensePlates.getStyleClass().add("formLabel");
 		Label labelBrand = new Label("Brand:");
-		labelBrand.setFont(font);
-		labelBrand.setTextFill(Color.BLACK);
+		labelBrand.getStyleClass().add("formLabel");
 		Label labelModel = new Label("Model:");
-		labelModel.setFont(font);
-		labelModel.setTextFill(Color.BLACK);
+		labelModel.getStyleClass().add("formLabel");
 		Label labelVIN = new Label("VIN:");
-		labelVIN.setFont(font);
-		labelVIN.setTextFill(Color.BLACK);
+		labelVIN.getStyleClass().add("formLabel");
 		Label labelDate = new Label("Date of Manufacture:");
-		labelDate.setFont(font);
-		labelDate.setTextFill(Color.BLACK);
+		labelDate.getStyleClass().add("formLabel");
 		Label labelCustomerID = new Label("Customer ID:");
-		labelCustomerID.setFont(font);
-		labelCustomerID.setTextFill(Color.BLACK);
-		labelEmpty = new Label("");
-		labelEmpty.setFont(font);
-		labelEmpty.setTextFill(Color.FIREBRICK);
-		labelEmpty.setPadding(new Insets(10, 10, 10, 10));
+		labelCustomerID.getStyleClass().add("formLabel");
 		Label labelTitle = new Label("Car details");
-		labelTitle.setTextFill(Color.BLACK);
-		labelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-		labelTitle.setPadding(new Insets(10, 10, 10, 10));
+		labelTitle.getStyleClass().add("formTitle");
+		labelEmpty=new Label("");
+		labelEmpty.getStyleClass().add("errorLabel");
 		//Text fields
-		textFieldLicensePlates = new TextField();
-		textFieldBrand = new TextField();
-		textFieldModel = new TextField();
-		textFieldVin = new TextField();
-		textFieldDate = new TextField();
-		textFieldCustomerID=new TextField();
+		textFieldLicensePlates = new TextField("");
+		textFieldBrand = new TextField("");
+		textFieldModel = new TextField("");
+		textFieldVin = new TextField("");
+		textFieldDate = new TextField("");
+		textFieldCustomerID=new TextField("");
 		//
 		buttonOk = new Button("Ok");
+		buttonOk.getStyleClass().add("buttonMain");
 		buttonCancel = new Button("Cancel");
+		buttonCancel.getStyleClass().add("buttonCancel");
 		//Grid control
 		GridPane grid = new GridPane();
 		grid.add(labelTitle, 0, 0, 2, 1);
@@ -198,14 +211,13 @@ public class CarsForm {
 		grid.add(labelCustomerID,0,6);
 		grid.add(textFieldCustomerID,1,6);
 		grid.add(labelEmpty, 0, 7, 2, 1);
-		grid.add(buttonOk, 0, 8);
-		grid.add(buttonCancel, 1, 8);
-		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.setHgap(20);
-		grid.setVgap(15);
+		HBox boxButtons=new HBox(buttonCancel,buttonOk);
+		boxButtons.getStyleClass().add("buttonForm");
+		grid.add(boxButtons, 0, 8,2,1);
+		grid.getStyleClass().add("formGrid");
 		//Scene control
 		Scene sceneForm = new Scene(grid);
-		//sceneForm.getStylesheets().add("style.css");
+		sceneForm.getStylesheets().add("stylesheets.css");
 		stageForm.setScene(sceneForm);
 		buttonOk.getStyleClass().add("button2");
 	}

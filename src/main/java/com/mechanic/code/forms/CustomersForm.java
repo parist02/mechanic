@@ -1,15 +1,12 @@
 package com.mechanic.code.forms;
 
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -37,19 +34,25 @@ public class CustomersForm {
 		stageForm.initOwner(primaryStage);
 		buttonCancel.setOnAction(e ->stageForm.close());
 		buttonOk.setOnAction(e -> {
+			boolean error=false;
 			name=textFieldName.getText();
 			name=name.replaceAll("[^a-zA-Z0-9]", "");
 			surname=textFieldSurname.getText();
 			surname=surname.replaceAll("[^a-zA-Z0-9]", "");
-			if (!textFieldPhone1.getText().equals("")){
-				phone1=Integer.parseInt(textFieldPhone1.getText().replaceAll("[^0-9]", ""));
+			try {
+				phone1 = Integer.parseInt(textFieldPhone1.getText().replaceAll("[^0-9]", ""));
+			}catch (Exception ex){
+				textFieldPhone1.setText("");
+				error=true;
 			}
-			if (!textFieldPhone2.getText().equals("")){
-				phone2=Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
+			try {
+				phone2 = Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
+			}catch (Exception ex){
+				textFieldPhone2.setText("");
 			}
 			address=textFieldAddress.getText();
 			address=address.replaceAll("[^a-zA-Z0-9]\\s", "");
-			if (name.equals("") || surname.equals("") || phone1 == null) { //elegxos an iparxoun xaraktires sta tilefono
+			if (name.equals("") || surname.equals("") || phone1 == null || error) { //elegxos an iparxoun xaraktires sta tilefono
 				labelEmpty.setText("Please fill all the details");
 			} else {
 				changed=true;
@@ -79,12 +82,22 @@ public class CustomersForm {
 		//Event Handler
 		buttonCancel.setOnAction(e->stageForm.close());
 		buttonOk.setOnAction(e->{
+			boolean error=false;
 			name=textFieldName.getText().replaceAll("[^a-zA-Z0-9]", "");
 			surname=textFieldSurname.getText().replaceAll("[^a-zA-Z0-9]", "");
-			phone1=Integer.parseInt(textFieldPhone1.getText().replaceAll("[^0-9]", ""));
-			phone2=Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
+			try {
+				phone1 = Integer.parseInt(textFieldPhone1.getText().replaceAll("[^0-9]", ""));
+			}catch (Exception ex){
+				textFieldPhone1.setText("");
+				error=true;
+			}
+			try {
+				phone2 = Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
+			}catch (Exception ex){
+				textFieldPhone2.setText("");
+			}
 			address=textFieldAddress.getText().replaceAll("[^a-zA-Z0-9]\\s", "");
-			if (name.equals("")||surname.equals("")|| phone1 == null){
+			if (name.equals("")||surname.equals("")|| phone1 == null || error){
 				labelEmpty.setText("Please fill all the details");
 			}else {
 				if (!name.equals(nameBefore)){
@@ -127,6 +140,7 @@ public class CustomersForm {
 						query=query+" Address = '"+address+"'";
 					}
 				}
+
 				stageForm.close();
 			}
 		});
@@ -136,37 +150,24 @@ public class CustomersForm {
 	private void customersFormInitializer() {
 		stageForm = new Stage();
 		stageForm.setTitle("Form");
-		Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
 		//Labels
 		Label labelName = new Label("Name:");
-		labelName.setFont(font);
-		labelName.setTextFill(Color.BLACK);
-		Label labelSurname = new Label("Surname:");
-		labelSurname.setFont(font);
-		labelSurname.setTextFill(Color.BLACK);
+		labelName.getStyleClass().add("formLabel");
+		Label  labelSurname= new Label("Surname:");
+		labelSurname.getStyleClass().add("formLabel");
 		Label labelPhone1 = new Label("Phone1:");
-		labelPhone1.setFont(font);
-		labelPhone1.setTextFill(Color.BLACK);
+		labelPhone1.getStyleClass().add("formLabel");
 		Label labelPhone2 = new Label("Phone2:");
-		labelPhone2.setFont(font);
-		labelPhone2.setTextFill(Color.BLACK);
+		labelPhone2.getStyleClass().add("formLabel");
 		Label labelAddress = new Label("Address:");
-		labelAddress.setFont(font);
-		labelAddress.setTextFill(Color.BLACK);
+		labelAddress.getStyleClass().add("formLabel");
 		Label labelBalance=new Label("Balance");
-		labelBalance.setFont(font);
-		labelBalance.setTextFill(Color.BLACK);
+		labelBalance.getStyleClass().add("formLabel");
 		labelBalance2=new Label("0");
-		labelBalance2.setFont(font);
-		labelBalance2.setTextFill(Color.BLACK);
 		labelEmpty = new Label("");
-		labelEmpty.setFont(font);
-		labelEmpty.setTextFill(Color.FIREBRICK);
-		labelEmpty.setPadding(new Insets(10, 10, 10, 10));
+		labelEmpty.getStyleClass().add("errorLabel");
 		Label labelTitle = new Label("Customer details");
-		labelTitle.setTextFill(Color.BLACK);
-		labelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-		labelTitle.setPadding(new Insets(10, 10, 10, 10));
+		labelTitle.getStyleClass().add("formTitle");
 		//Text fields
 		textFieldName = new TextField();
 		textFieldSurname = new TextField();
@@ -174,8 +175,10 @@ public class CustomersForm {
 		textFieldPhone2 = new TextField();
 		textFieldAddress = new TextField();
 		//
-		buttonOk = new Button("Ok");
+		buttonOk = new Button("OK");
+		buttonOk.getStyleClass().add("buttonMain");
 		buttonCancel = new Button("Cancel");
+		buttonCancel.getStyleClass().add("buttonCancel");
 		//Grid control
 		GridPane grid = new GridPane();
 		grid.add(labelTitle, 0, 0, 2, 1);
@@ -192,16 +195,14 @@ public class CustomersForm {
 		grid.add(labelBalance, 0, 6);
 		grid.add(labelBalance2, 1, 6);
 		grid.add(labelEmpty, 0, 7, 2, 1);
-		grid.add(buttonOk, 0, 8);
-		grid.add(buttonCancel, 1, 8);
-		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.setHgap(20);
-		grid.setVgap(15);
+		HBox boxButtons=new HBox(buttonCancel,buttonOk);
+		boxButtons.getStyleClass().add("buttonForm");
+		grid.add(boxButtons, 0, 8,2,1);
+		grid.getStyleClass().add("formGrid");
 		//Scene control
 		Scene sceneForm = new Scene(grid);
-		//sceneForm.getStylesheets().add("style.css");
+		sceneForm.getStylesheets().add("stylesheets.css");
 		stageForm.setScene(sceneForm);
-		buttonOk.getStyleClass().add("button2");
 	}
 
 	public String getQuery() {

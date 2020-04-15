@@ -1,22 +1,17 @@
 package com.mechanic.code.forms;
 
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class MechanicForm {
 	private Stage stageForm;
 	private String name, surname;
-	private Integer mechanicID;
 	private TextField textFieldName;
 	private TextField textFieldSurname;
 	private Button buttonOk, buttonCancel;
@@ -89,28 +84,23 @@ public class MechanicForm {
 	private void mechanicFormInitializer() {
 		stageForm = new Stage();
 		stageForm.setTitle("Form");
-		Font font = Font.font("Arial", FontWeight.MEDIUM, FontPosture.REGULAR, 15);
 		//Labels
 		Label labelName = new Label("Name:");
-		labelName.setFont(font);
-		labelName.setTextFill(Color.BLACK);
+		labelName.getStyleClass().add("formLabel");
 		Label labelSurname = new Label("Surname:");
-		labelSurname.setFont(font);
-		labelSurname.setTextFill(Color.BLACK);
+		labelSurname.getStyleClass().add("formLabel");
 		labelEmpty = new Label("");
-		labelEmpty.setFont(font);
-		labelEmpty.setTextFill(Color.FIREBRICK);
-		labelEmpty.setPadding(new Insets(10, 10, 10, 10));
+		labelEmpty.getStyleClass().add("errorLabel");
 		Label labelTitle = new Label("Mechanic details");
-		labelTitle.setTextFill(Color.BLACK);
-		labelTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-		labelTitle.setPadding(new Insets(10, 10, 10, 10));
+		labelTitle.getStyleClass().add("formTitle");
 		//Text fields
 		textFieldName = new TextField();
 		textFieldSurname = new TextField();
 		//
 		buttonOk = new Button("Ok");
+		buttonOk.getStyleClass().add("buttonMain");
 		buttonCancel = new Button("Cancel");
+		buttonCancel.getStyleClass().add("buttonCancel");
 		//Grid control
 		GridPane grid = new GridPane();
 		grid.add(labelTitle, 0, 0, 2, 1);
@@ -119,20 +109,15 @@ public class MechanicForm {
 		grid.add(labelSurname, 0, 2);
 		grid.add(textFieldSurname, 1, 2);
 		grid.add(labelEmpty, 0, 3, 2, 1);
-		grid.add(buttonOk, 0, 4);
-		grid.add(buttonCancel, 1, 4);
-		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.setHgap(20);
-		grid.setVgap(15);
+		HBox buttonBox = new HBox(buttonCancel,buttonOk);
+		buttonBox.getStyleClass().add("buttonForm");
+		grid.add(buttonBox, 0, 4,2,1);
+		grid.getStyleClass().add("formGrid");
 		//Scene control
 		Scene sceneForm = new Scene(grid);
-		//sceneForm.getStylesheets().add("style.css");
+		sceneForm.getStylesheets().add("stylesheets.css");
 		stageForm.setScene(sceneForm);
 		buttonOk.getStyleClass().add("button2");
-	}
-
-	public Integer getMechanicID() {
-		return mechanicID;
 	}
 
 	public String getName() {

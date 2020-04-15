@@ -189,7 +189,7 @@ public class MainScreen extends Application {
         buttonAddCustomer.setOnAction(add -> addToCustomers(null));
         TextField textFieldSearchCustomers = new TextField();
         textFieldSearchCustomers.setPadding(padding);
-        Button buttonSearchCustomers = new Button("Search");
+        Button buttonSearchCustomers = new Button("\uD83D\uDD0D Search");
         Button buttonSearchClearCustomers = new Button("Clear");
 
         TableColumn<Car, String> licencePlatesColumn = new TableColumn<>("License Plates");
@@ -458,7 +458,7 @@ public class MainScreen extends Application {
         });
 
         Button buttonOpenInvoice = new Button("Open");
-        buttonOpenInvoice.setPadding(padding);
+        buttonOpenInvoice.setPadding(padding);  
         buttonOpenInvoice.setOnAction(actionEvent -> {
             if (!tableViewInvoice.getSelectionModel().isEmpty()) {
                 openInvoice(tableViewInvoice.getSelectionModel().getSelectedItem());
