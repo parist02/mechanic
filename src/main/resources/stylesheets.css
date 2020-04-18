@@ -7,6 +7,15 @@
     -fx-spacing: 8;
 }
 
+.buttonForm2{
+    -fx-alignment : baseline-left;
+    -fx-spacing: 8;
+}
+
+.boxTabs{
+    -fx-text-alignment: center
+}
+
 .formTitle{
     -fx-font-size: 25;
     -fx-font-weight: bold;
@@ -42,11 +51,15 @@
 }
 
 .buttonMain{
-    -fx-background-color: cornflowerblue;
+    -fx-background-color: #6d8ce8 ;
     -fx-text-fill: white;
 }
 .buttonMain:hover{
     -fx-background-color: royalblue;
+}
+
+.buttonMain:armed{
+    -fx-background-color: #214cce;
 }
 
 .buttonCancel{
@@ -56,47 +69,39 @@
     -fx-background-color: #cccccc;
 }
 
-/*#grid{*/
-/*    -fx-font-family: Arial;*/
-/*    -fx-font-size: 12;*/
-/*    -fx-padding: 5,5,5,5;*/
-/*    -fx-font-weight: bold;*/
-/*    -fx-vgap: 5;*/
-/*    -fx-hgap: 5;*/
-/*    -fx-grid-lines-visible: false;*/
-/*}*/
+.buttonCancel:armed{
+    -fx-background-color: #bbbbbb;
+}
 
-/*!*!*,.table-view.root,.table-view.indexed-cell*!*!*/
-/*!*.table-view .cell{*!*/
-/*!*    -fx-border-style: solid;*!*/
-/*!*    -fx-border-color: gray;*!*/
-/*!*    -fx-alignment: center-left;*!*/
-/*!*    -fx-border-width: 0.1;*!*/
+.choice-box{
+    -fx-background-color: #dddddd;
+}
+.choice-box:hover{
+    -fx-background-color: #cccccc;
+}
 
-/*!*}*!*/
-/*!*.table-view .column-header{*!*/
-/*!*    -fx-background-color: lightgray;*!*/
-/*!*}*!*/
+.tableViewCustomers{
+    -fx-min-height: 300;
+    /*-fx-alignment: center;*/
+}
 
+.tableViewCars{
+    -fx-min-height: 100;
+    -fx-max-height: 300;
+    /*-fx-tile-alignment: center;*/
+}
 
-/*#label1 {*/
-/*    -fx-font-family: Arial;*/
-/*    -fx-font-size: 12;*/
-/*    -fx-padding: 5,5,5,5;*/
-/*}*/
-/*#label2{*/
-/*    -fx-font-family: Arial;*/
-/*    -fx-font-size: 12;*/
-/*    -fx-padding: 5,5,5,5;*/
-/*    -fx-fontweight: bold;*/
-/*}*/
+.tabs{
+    -fx-background-color: #dddddd;
+}
 
-/*#title{*/
-/*    -fx-font-family: Arial;*/
-/*    -fx-font-size: 22;*/
-/*    -fx-padding: 5,5,5,5;*/
-/*    -fx-fontweight: bold;*/
-/*}*/
+.tabs:hover{
+    -fx-background-color: #cccccc;
+}
+
+.tabs:selected{
+    -fx-background-color: #bbbbbb;
+}
 
 
 

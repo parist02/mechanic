@@ -7,31 +7,24 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.sql.*;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.concurrent.TimeUnit;
 
 public class MainScreen extends Application {
     private TableView<Customer> tableViewCustomers = new TableView<>();
     private TableView<Car> tableViewCars = new TableView<>();
     private TableView<Invoice> tableViewInvoice = new TableView<>();
     private TableView<Mechanic>tableViewMechanic=new TableView<>();
-    private static final Insets padding = new Insets(10, 10, 10, 10);
-    private static Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
     private Connection connection;
     private Stage primaryStage;
     private ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
@@ -95,44 +88,30 @@ public class MainScreen extends Application {
         //Tab 1
         TableColumn<Customer, Integer> counterColumn = new TableColumn<>("No.");
         counterColumn.setReorderable(false);
-        counterColumn.setResizable(false);
-        counterColumn.setMinWidth(50);
         counterColumn.setCellValueFactory(new PropertyValueFactory<>("counter"));
 
         TableColumn<Customer, Integer> nameColumn = new TableColumn<>("Name");
         nameColumn.setReorderable(false);
-        nameColumn.setResizable(false);
-        nameColumn.setMinWidth(100);
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         TableColumn<Customer, Integer> surnameColumn = new TableColumn<>("Surname");
         surnameColumn.setReorderable(false);
-        surnameColumn.setResizable(false);
-        surnameColumn.setMinWidth(100);
         surnameColumn.setCellValueFactory(new PropertyValueFactory<>("surname"));
 
         TableColumn<Customer, Integer> phone1Column = new TableColumn<>("Phone1");
         phone1Column.setReorderable(false);
-        phone1Column.setResizable(false);
-        phone1Column.setMinWidth(100);
         phone1Column.setCellValueFactory(new PropertyValueFactory<>("phone1"));
 
         TableColumn<Customer, Integer> phone2Column = new TableColumn<>("Phone2");
         phone2Column.setReorderable(false);
-        phone2Column.setResizable(false);
-        phone2Column.setMinWidth(100);
         phone2Column.setCellValueFactory(new PropertyValueFactory<>("phone2"));
 
         TableColumn<Customer, Integer> addressColumn = new TableColumn<>("Address");
         addressColumn.setReorderable(false);
-        addressColumn.setResizable(false);
-        addressColumn.setMinWidth(200);
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
 
         TableColumn<Customer, Float> balanceColumn = new TableColumn<>("Balance");
         balanceColumn.setReorderable(false);
-        balanceColumn.setResizable(false);
-        balanceColumn.setMinWidth(100);
         balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
         tableViewCustomers.getColumns().add(counterColumn);
@@ -142,12 +121,10 @@ public class MainScreen extends Application {
         tableViewCustomers.getColumns().add(phone2Column);
         tableViewCustomers.getColumns().add(addressColumn);
         tableViewCustomers.getColumns().add(balanceColumn);
+        tableViewCustomers.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableViewCustomers.setEditable(false);
         tableViewCustomers.setItems(allCustomers);
-
-        tableViewCustomers.setPadding(padding);
-        tableViewCustomers.setMaxHeight(500);
-        tableViewCustomers.setMaxWidth(800);
+        tableViewCustomers.getStyleClass().add("tableViewCustomers");
 
         //Clicking table of customers changes cars also
         tableViewCustomers.setOnMouseClicked(mouseEvent -> {
@@ -158,10 +135,10 @@ public class MainScreen extends Application {
             }
         });
 
-        Label labelCustomerTitle = new Label("Showing all customers");
+        Label labelCustomerTitle = new Label("Customers");
+        labelCustomerTitle.getStyleClass().add("formTitle");
         Button buttonDeleteCustomers = new Button("Delete");
-        buttonDeleteCustomers.setPadding(padding);
-
+        buttonDeleteCustomers.getStyleClass().add("buttonCancel");
         //deleting a customer
         buttonDeleteCustomers.setOnAction(del -> {
             if (tableViewCustomers.getSelectionModel().isEmpty()) {
@@ -177,55 +154,55 @@ public class MainScreen extends Application {
         });
 
         Button buttonBalanceInvoices = new Button("Change Balance");
-        buttonBalanceInvoices.setPadding(padding);
-       //buttonBalance moved down
+        buttonBalanceInvoices.getStyleClass().add("buttonCancel");
+        //buttonBalance moved down
+        Button buttonCustomerRecord = new Button("Show Record");
+        buttonCustomerRecord.getStyleClass().add("buttonCancel");
+        buttonCustomerRecord.setOnAction(actionEvent -> {
+            if (!tableViewCustomers.getSelectionModel().isEmpty()) {
+                filterInvoices(5, String.valueOf(tableViewCustomers.getSelectionModel().getSelectedItem().getCounter()), null);
+                tabPane.getSelectionModel().select(1);
+            }
+        });
+
+
+
 
 
         Button buttonUpdateCustomers = new Button("Edit");
-        buttonUpdateCustomers.setPadding(padding);
+        buttonUpdateCustomers.getStyleClass().add("buttonCancel");
         buttonUpdateCustomers.setOnAction(upd -> updateFromCustomers());
         Button buttonAddCustomer = new Button("Add");
-        buttonAddCustomer.setPadding(padding);
+        buttonAddCustomer.getStyleClass().add("buttonCancel");
         buttonAddCustomer.setOnAction(add -> addToCustomers(null));
         TextField textFieldSearchCustomers = new TextField();
-        textFieldSearchCustomers.setPadding(padding);
         Button buttonSearchCustomers = new Button("\uD83D\uDD0D Search");
+        buttonSearchCustomers.getStyleClass().add("buttonCancel");
         Button buttonSearchClearCustomers = new Button("Clear");
+        buttonSearchClearCustomers.getStyleClass().add("buttonCancel");
 
         TableColumn<Car, String> licencePlatesColumn = new TableColumn<>("License Plates");
         licencePlatesColumn.setReorderable(false);
-        licencePlatesColumn.setResizable(false);
-        licencePlatesColumn.setMinWidth(100);
         licencePlatesColumn.setCellValueFactory(new PropertyValueFactory<>("licencePlates"));
 
         TableColumn<Car, String> brandColumn = new TableColumn<>("Brand");
         brandColumn.setReorderable(false);
-        brandColumn.setResizable(false);
-        brandColumn.setMinWidth(150);
         brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
         TableColumn<Car, String> modelColumn = new TableColumn<>("Model");
         modelColumn.setReorderable(false);
-        modelColumn.setResizable(false);
-        modelColumn.setMinWidth(150);
         modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
 
         TableColumn<Car, String> vinColumn = new TableColumn<>("VIN");
         vinColumn.setReorderable(false);
-        vinColumn.setResizable(false);
-        vinColumn.setMinWidth(200);
         vinColumn.setCellValueFactory(new PropertyValueFactory<>("vin"));
 
         TableColumn<Car, Date> dateCarColumn = new TableColumn<>("Date");
         dateCarColumn.setReorderable(false);
-        dateCarColumn.setResizable(false);
-        dateCarColumn.setMinWidth(100);
         dateCarColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         TableColumn<Car, Integer> customerIdColumn = new TableColumn<>("CustomerID");
         customerIdColumn.setReorderable(false);
-        customerIdColumn.setResizable(false);
-        customerIdColumn.setMinWidth(50);
         customerIdColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
 
 
@@ -236,12 +213,11 @@ public class MainScreen extends Application {
         tableViewCars.getColumns().add(dateCarColumn);
         tableViewCars.getColumns().add(customerIdColumn);
         tableViewCars.setEditable(false);
-        tableViewCars.setMaxHeight(150);
-        tableViewCars.setMaxWidth(800);
+        tableViewCars.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableViewCars.setItems(allCars);
+        tableViewCars.getStyleClass().add("tableViewCars");
 
         //Clicking table of cars changes customers also
-        tableViewCars.setPadding(padding);
         tableViewCars.setOnMouseClicked(mouseEvent -> {
             if (!tableViewCars.getSelectionModel().isEmpty()) {
                 filteredListCustomers = new FilteredList<>(allCustomers.filtered(customers -> customers.getCounter() == tableViewCars.getSelectionModel().getSelectedItem().getCustomerId()));
@@ -251,13 +227,13 @@ public class MainScreen extends Application {
         });
 
         Button buttonUpdateCars = new Button("Edit");
-        buttonUpdateCars.setPadding(padding);
+        buttonUpdateCars.getStyleClass().add("buttonCancel");
         buttonUpdateCars.setOnAction(upd -> updateFromCars());
         Button buttonAddCars = new Button("Add");
-        buttonAddCars.setPadding(padding);
+        buttonAddCars.getStyleClass().add("buttonCancel");
         buttonAddCars.setOnAction(add -> addToCars(null));
         Button buttonDeleteCars = new Button("Delete");
-        buttonDeleteCars.setPadding(padding);
+        buttonDeleteCars.getStyleClass().add("buttonCancel");
         buttonDeleteCars.setOnAction(del -> {
             if (tableViewCars.getSelectionModel().isEmpty()) {
                 errorPopUp0.setErrorMessage("Select a car first.");
@@ -271,7 +247,7 @@ public class MainScreen extends Application {
             }
         });
         Button buttonCarRecord = new Button("Show Record");
-        buttonCarRecord.setPadding(padding);
+        buttonCarRecord.getStyleClass().add("buttonCancel");
         buttonCarRecord.setOnAction(actionEvent -> {
             if (!tableViewCars.getSelectionModel().isEmpty()) {
                 filterInvoices(0, tableViewCars.getSelectionModel().getSelectedItem().getLicencePlates(), null);
@@ -283,8 +259,6 @@ public class MainScreen extends Application {
         choiceBoxSearchTab1.getItems().add("Phone");
         choiceBoxSearchTab1.getItems().add("License Plates");
         choiceBoxSearchTab1.getSelectionModel().selectFirst();
-        choiceBoxSearchTab1.setPadding(padding);
-        buttonSearchCustomers.setPadding(padding);
         //searching tables
         buttonSearchCustomers.setOnAction(ser -> {
             if (!textFieldSearchCustomers.getText().equals("")) {
@@ -342,7 +316,6 @@ public class MainScreen extends Application {
         });
 
         //Clearing selection and searches
-        buttonSearchClearCustomers.setPadding(padding);
         buttonSearchClearCustomers.setOnAction(cle -> {
             customersFiltered = false;
             carsFiltered = false;
@@ -355,73 +328,64 @@ public class MainScreen extends Application {
             tableViewCars.refresh();
         });
 
-        HBox boxButtonsCustomers = new HBox(buttonAddCustomer, buttonUpdateCustomers, buttonDeleteCustomers,buttonBalanceInvoices, choiceBoxSearchTab1, textFieldSearchCustomers, buttonSearchCustomers, buttonSearchClearCustomers);
-        boxButtonsCustomers.setPadding(padding);
-        boxButtonsCustomers.setSpacing(20);
+        Label labelCarsTitle=new Label("Cars");
+        labelCarsTitle.getStyleClass().add("formTitle");
+        HBox boxButtonsCustomersTop=new HBox(labelCustomerTitle,choiceBoxSearchTab1, textFieldSearchCustomers, buttonSearchCustomers, buttonSearchClearCustomers);
+        boxButtonsCustomersTop.getStyleClass().add("buttonForm");
+        HBox boxButtonsCustomersBottom = new HBox(buttonAddCustomer, buttonUpdateCustomers, buttonDeleteCustomers,buttonCustomerRecord,buttonBalanceInvoices);
+        boxButtonsCustomersBottom.getStyleClass().add("buttonForm");
         HBox boxButtonsCars = new HBox(buttonAddCars, buttonUpdateCars, buttonDeleteCars, buttonCarRecord);
-        boxButtonsCars.setPadding(padding);
-        boxButtonsCars.setSpacing(20);
-        VBox boxCustomers = new VBox(labelCustomerTitle, boxButtonsCustomers, tableViewCustomers, boxButtonsCars, tableViewCars);
-        boxCustomers.setPadding(padding);
-        boxCustomers.setSpacing(20);
-
+        boxButtonsCars.getStyleClass().add("buttonForm");
+        VBox boxCustomers = new VBox(boxButtonsCustomersTop,labelCustomerTitle, tableViewCustomers, boxButtonsCustomersBottom,labelCarsTitle, tableViewCars,boxButtonsCars);
+        boxCustomers.getStyleClass().add("boxTabs");
 
         //Tab2
 
         TableColumn<Invoice, Integer> invoiceIDColumn = new TableColumn<>("Invoice No.");
         invoiceIDColumn.setReorderable(false);
         invoiceIDColumn.setResizable(false);
-        invoiceIDColumn.setMinWidth(50);
         invoiceIDColumn.setCellValueFactory(new PropertyValueFactory<>("invoiceID"));
 
         TableColumn<Invoice, Date> dateInvoiceColumn = new TableColumn<>("Date");
         dateInvoiceColumn.setReorderable(false);
         dateInvoiceColumn.setResizable(false);
-        dateInvoiceColumn.setMinWidth(100);
         dateInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         TableColumn<Invoice, Integer> customerIDInvoiceColumn = new TableColumn<>("CustomerID");
         customerIDInvoiceColumn.setReorderable(false);
         customerIDInvoiceColumn.setResizable(false);
-        customerIDInvoiceColumn.setMinWidth(50);
         customerIDInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
 
 
         TableColumn<Invoice, String> fullNameColumn = new TableColumn<>("Full Name");
         fullNameColumn.setReorderable(false);
         fullNameColumn.setResizable(false);
-        fullNameColumn.setMinWidth(200);
         fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
 
         TableColumn<Invoice, Integer> phoneInvoiceColumn = new TableColumn<>("Phone");
         phoneInvoiceColumn.setReorderable(false);
         phoneInvoiceColumn.setResizable(false);
-        phoneInvoiceColumn.setMinWidth(50);
         phoneInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
 
 
         TableColumn<Invoice, String> licencePlatesInvoiceColumn = new TableColumn<>("License Plates");
         licencePlatesInvoiceColumn.setReorderable(false);
         licencePlatesInvoiceColumn.setResizable(false);
-        licencePlatesInvoiceColumn.setMinWidth(100);
         licencePlatesInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("licencePlates"));
 
         TableColumn<Invoice, String> mechanicNameColumn = new TableColumn<>("Mechanic");
         mechanicNameColumn.setReorderable(false);
         mechanicNameColumn.setResizable(false);
-        mechanicNameColumn.setMinWidth(100);
         mechanicNameColumn.setCellValueFactory(new PropertyValueFactory<>("mechanicName"));
 
         TableColumn<Invoice, String> repairTypeColumn = new TableColumn<>("Repair");
         repairTypeColumn.setReorderable(false);
         repairTypeColumn.setResizable(false);
-        repairTypeColumn.setMinWidth(100);
         repairTypeColumn.setCellValueFactory(new PropertyValueFactory<>("repairType"));
 
         TableColumn<Invoice, Float> balanceInvoiceColumn = new TableColumn<>("Balance");
         balanceInvoiceColumn.setReorderable(false);
         balanceInvoiceColumn.setResizable(false);
-        balanceInvoiceColumn.setMinWidth(50);
         balanceInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
         tableViewInvoice.getColumns().add(invoiceIDColumn);
@@ -434,11 +398,10 @@ public class MainScreen extends Application {
         tableViewInvoice.getColumns().add(repairTypeColumn);
         tableViewInvoice.getColumns().add(balanceInvoiceColumn);
         tableViewInvoice.setEditable(false);
-        tableViewInvoice.setPadding(padding);
         tableViewInvoice.setItems(allInvoices);
 
+
         Button buttonNewInvoice = new Button("Create invoice");
-        buttonNewInvoice.setPadding(padding);
         buttonNewInvoice.setOnAction(actionEvent -> {
             InvoiceForm invoiceForm = new InvoiceForm(primaryStage, connection, allMechanics, allRepairs, allCustomers, allCars);
             invoiceForm.showForm();
@@ -458,7 +421,6 @@ public class MainScreen extends Application {
         });
 
         Button buttonOpenInvoice = new Button("Open");
-        buttonOpenInvoice.setPadding(padding);  
         buttonOpenInvoice.setOnAction(actionEvent -> {
             if (!tableViewInvoice.getSelectionModel().isEmpty()) {
                 openInvoice(tableViewInvoice.getSelectionModel().getSelectedItem());
@@ -469,7 +431,6 @@ public class MainScreen extends Application {
         });
 
         Button buttonEditBalance = new Button("Edit Balance");
-        buttonEditBalance.setPadding(padding);
         buttonEditBalance.setOnAction(actionEvent -> {
             if (!tableViewInvoice.getSelectionModel().isEmpty()) {
                 editBalance();
@@ -506,7 +467,6 @@ public class MainScreen extends Application {
             }
         });
         Button buttonClearInvoices = new Button("Clear");
-        buttonClearInvoices.setPadding(padding);
         buttonClearInvoices.setOnAction(actionEvent -> {
             invoiceFiltered = false;
             invoiceFilteredTwice = false;
@@ -532,28 +492,22 @@ public class MainScreen extends Application {
 
 
         HBox boxButtonsInvoices = new HBox(buttonNewInvoice, buttonOpenInvoice,buttonEditBalance, choiceBoxFilterInvoices, buttonClearInvoices);
-        boxButtonsInvoices.setSpacing(10);
         VBox boxTab2 = new VBox(boxButtonsInvoices, tableViewInvoice);
-        boxTab2.setPadding(padding);
-        boxTab2.setSpacing(10);
 
         //Tab 3
         TableColumn<Mechanic, Integer> mechanicIDColumn = new TableColumn<>("Mechanic ID");
         mechanicIDColumn.setReorderable(false);
         mechanicIDColumn.setResizable(false);
-        mechanicIDColumn.setMinWidth(50);
         mechanicIDColumn.setCellValueFactory(new PropertyValueFactory<>("mechanicID"));
 
         TableColumn<Mechanic, Integer> mechanicNameColumn2 = new TableColumn<>("Name");
         mechanicNameColumn2.setReorderable(false);
         mechanicNameColumn2.setResizable(false);
-        mechanicNameColumn2.setMinWidth(150);
         mechanicNameColumn2.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         TableColumn<Mechanic, Integer> mechanicSurname = new TableColumn<>("Surname");
         mechanicSurname.setReorderable(false);
         mechanicSurname.setResizable(false);
-        mechanicSurname.setMinWidth(150);
         mechanicSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
 
         tableViewMechanic.getColumns().add(mechanicIDColumn);
@@ -561,17 +515,13 @@ public class MainScreen extends Application {
         tableViewMechanic.getColumns().add(mechanicSurname);
         tableViewMechanic.setEditable(false);
         tableViewMechanic.setItems(allMechanics);
-        tableViewMechanic.setPadding(padding);
 
 
         Button buttonUpdateMechanics = new Button("Edit");
-        buttonUpdateMechanics.setPadding(padding);
         buttonUpdateMechanics.setOnAction(upd -> updateFromMechanics());
         Button buttonAddMechanic = new Button("Add");
-        buttonAddMechanic.setPadding(padding);
         buttonAddMechanic.setOnAction(add -> addToMechanics());
         Button buttonDeleteMechanic=new Button("Delete");
-        buttonDeleteMechanic.setPadding(padding);
         buttonDeleteMechanic.setOnAction(actionEvent -> {
             if (tableViewMechanic.getSelectionModel().isEmpty()) {
                 errorPopUp0.setErrorMessage("Select a customer first.");
@@ -586,7 +536,6 @@ public class MainScreen extends Application {
         });
 
         Label labelVAT=new Label("Current VAT: "+vat);
-        labelVAT.setFont(font);
         Button buttonEditVat=new Button("Edit VAT");
         buttonEditVat.setOnAction(actionEvent -> {
             VatForm vatForm=new VatForm(primaryStage,vat);
@@ -597,20 +546,18 @@ public class MainScreen extends Application {
                 labelVAT.setText("Current VAT: "+(vatForm.getVat()));
             }
         });
-        buttonEditVat.setPadding(padding);
         HBox boxVat=new HBox(labelVAT,buttonEditVat);
-        boxVat.setSpacing(20);
         HBox boxButtonsMechanics=new HBox(buttonAddMechanic,buttonUpdateMechanics,buttonDeleteMechanic);
-        boxButtonsMechanics.setSpacing(20);
         VBox boxTab3=new VBox(boxButtonsMechanics,tableViewMechanic,boxVat);
-        boxTab3.setPadding(padding);
-        boxTab3.setSpacing(20);
 
 
         //
         Tab tab1 = new Tab("Customers", boxCustomers);
+        tab1.getStyleClass().add("tabs");
         Tab tab2 = new Tab("Invoice", boxTab2);
+        tab2.getStyleClass().add("tabs");
         Tab tab3 = new Tab("Details", boxTab3);
+        tab3.getStyleClass().add("tabs");
 
         tabPane.getTabs().add(tab1);
         tabPane.getTabs().add(tab2);
@@ -620,6 +567,7 @@ public class MainScreen extends Application {
 
 
         Scene scene = new Scene(tabPane);
+        scene.getStylesheets().add("stylesheets.css");
         primaryStage = new Stage();
         primaryStage = stage;
         primaryStage.setMaximized(false);
@@ -1133,7 +1081,9 @@ public class MainScreen extends Application {
             0: tha ginei anazitisi meso noumera aftokinitou
             1: tha ginei anazitisi analogos ton episkevon
             2: tha ginei anazitisi analogos ton episkevon apo tin eidi filtrarismeni lista ton timologion
-            3: tha ginei anazitisi analogos tou arithmou tou pelati
+            3: tha ginei anazitisi analogos ton episkevon apo tin dipla filtrarismeni lista ton timologion
+            4: tha ginei anazitisi analogos tou arithmou tou pelati kai an to balance einai aniso tou miden
+            5: tha ginei anazitisi analogos tou arithmou tou pelati
 
         */
         switch (type) {
@@ -1157,6 +1107,11 @@ public class MainScreen extends Application {
             }
             case 4:{
                 filteredInvoices = new FilteredList<>(allInvoices.filtered(invoice -> (invoice.getCustomerID()==Integer.parseInt(strSearch) && invoice.getBalance()!=0)));
+                invoiceFiltered = true;
+                break;
+            }
+            case 5:{
+                filteredInvoices = new FilteredList<>(allInvoices.filtered(invoice -> (invoice.getCustomerID()==Integer.parseInt(strSearch))));
                 invoiceFiltered = true;
                 break;
             }
