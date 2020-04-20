@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -51,21 +50,14 @@ public class MainScreen extends Application {
     private boolean invoiceFiltered = false;
     private boolean invoiceFilteredTwice = false;
     private static Float vat;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
     DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     @Override
     public void init() throws Exception {
         super.init();
-        System.out.println("The application is starting");
-        System.out.println("Trying to create connection to database...");
         try {
-
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mechanic", "root", "");
-            System.out.println("Established connection...");
-
         } catch (Exception e) {
-            System.out.println("Connection with database has failed...");
             System.exit(0);
 
         }
@@ -330,7 +322,7 @@ public class MainScreen extends Application {
 
         Label labelCarsTitle=new Label("Cars");
         labelCarsTitle.getStyleClass().add("formTitle");
-        HBox boxButtonsCustomersTop=new HBox(labelCustomerTitle,choiceBoxSearchTab1, textFieldSearchCustomers, buttonSearchCustomers, buttonSearchClearCustomers);
+        HBox boxButtonsCustomersTop=new HBox(choiceBoxSearchTab1, textFieldSearchCustomers, buttonSearchCustomers, buttonSearchClearCustomers);
         boxButtonsCustomersTop.getStyleClass().add("buttonForm");
         HBox boxButtonsCustomersBottom = new HBox(buttonAddCustomer, buttonUpdateCustomers, buttonDeleteCustomers,buttonCustomerRecord,buttonBalanceInvoices);
         boxButtonsCustomersBottom.getStyleClass().add("buttonForm");
@@ -343,49 +335,40 @@ public class MainScreen extends Application {
 
         TableColumn<Invoice, Integer> invoiceIDColumn = new TableColumn<>("Invoice No.");
         invoiceIDColumn.setReorderable(false);
-        invoiceIDColumn.setResizable(false);
         invoiceIDColumn.setCellValueFactory(new PropertyValueFactory<>("invoiceID"));
 
         TableColumn<Invoice, Date> dateInvoiceColumn = new TableColumn<>("Date");
         dateInvoiceColumn.setReorderable(false);
-        dateInvoiceColumn.setResizable(false);
         dateInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         TableColumn<Invoice, Integer> customerIDInvoiceColumn = new TableColumn<>("CustomerID");
         customerIDInvoiceColumn.setReorderable(false);
-        customerIDInvoiceColumn.setResizable(false);
         customerIDInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("customerID"));
 
 
         TableColumn<Invoice, String> fullNameColumn = new TableColumn<>("Full Name");
         fullNameColumn.setReorderable(false);
-        fullNameColumn.setResizable(false);
         fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
 
         TableColumn<Invoice, Integer> phoneInvoiceColumn = new TableColumn<>("Phone");
         phoneInvoiceColumn.setReorderable(false);
-        phoneInvoiceColumn.setResizable(false);
         phoneInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
 
 
         TableColumn<Invoice, String> licencePlatesInvoiceColumn = new TableColumn<>("License Plates");
         licencePlatesInvoiceColumn.setReorderable(false);
-        licencePlatesInvoiceColumn.setResizable(false);
         licencePlatesInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("licencePlates"));
 
         TableColumn<Invoice, String> mechanicNameColumn = new TableColumn<>("Mechanic");
         mechanicNameColumn.setReorderable(false);
-        mechanicNameColumn.setResizable(false);
         mechanicNameColumn.setCellValueFactory(new PropertyValueFactory<>("mechanicName"));
 
         TableColumn<Invoice, String> repairTypeColumn = new TableColumn<>("Repair");
         repairTypeColumn.setReorderable(false);
-        repairTypeColumn.setResizable(false);
         repairTypeColumn.setCellValueFactory(new PropertyValueFactory<>("repairType"));
 
         TableColumn<Invoice, Float> balanceInvoiceColumn = new TableColumn<>("Balance");
         balanceInvoiceColumn.setReorderable(false);
-        balanceInvoiceColumn.setResizable(false);
         balanceInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
         tableViewInvoice.getColumns().add(invoiceIDColumn);
@@ -397,16 +380,18 @@ public class MainScreen extends Application {
         tableViewInvoice.getColumns().add(mechanicNameColumn);
         tableViewInvoice.getColumns().add(repairTypeColumn);
         tableViewInvoice.getColumns().add(balanceInvoiceColumn);
-        tableViewInvoice.setEditable(false);
         tableViewInvoice.setItems(allInvoices);
+        tableViewInvoice.setEditable(false);
+        tableViewInvoice.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableViewInvoice.getStyleClass().add("tableViewInvoice");
 
 
         Button buttonNewInvoice = new Button("Create invoice");
+        buttonNewInvoice.getStyleClass().add("buttonCancel");
         buttonNewInvoice.setOnAction(actionEvent -> {
             InvoiceForm invoiceForm = new InvoiceForm(primaryStage, connection, allMechanics, allRepairs, allCustomers, allCars);
             invoiceForm.showForm();
             if (invoiceForm.isClickedOK()) {
-                System.out.println("Clicked Okay creating invoice");
                 InvoicePrintPreview invoicePrintPreview = new InvoicePrintPreview(primaryStage, invoiceForm.getCustomerID(), invoiceForm.getFullName(), invoiceForm.getLicensePlates(), invoiceForm.getBrandModel(), invoiceForm.getVin());
                 invoicePrintPreview.show();
                 if (invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
@@ -414,13 +399,13 @@ public class MainScreen extends Application {
                     Invoice invoice = addToInvoice(invoiceForm, invoicePrintPreview);
                     openInvoice(invoice);
                 } else if (invoicePrintPreview.isBeingSaved()) {
-                    System.out.println("Saving");
                     addToInvoice(invoiceForm, invoicePrintPreview);
                 }
             }
         });
 
         Button buttonOpenInvoice = new Button("Open");
+        buttonOpenInvoice.getStyleClass().add("buttonCancel");
         buttonOpenInvoice.setOnAction(actionEvent -> {
             if (!tableViewInvoice.getSelectionModel().isEmpty()) {
                 openInvoice(tableViewInvoice.getSelectionModel().getSelectedItem());
@@ -431,6 +416,7 @@ public class MainScreen extends Application {
         });
 
         Button buttonEditBalance = new Button("Edit Balance");
+        buttonEditBalance.getStyleClass().add("buttonCancel");
         buttonEditBalance.setOnAction(actionEvent -> {
             if (!tableViewInvoice.getSelectionModel().isEmpty()) {
                 editBalance();
@@ -467,6 +453,7 @@ public class MainScreen extends Application {
             }
         });
         Button buttonClearInvoices = new Button("Clear");
+        buttonClearInvoices.getStyleClass().add("buttonCancel");
         buttonClearInvoices.setOnAction(actionEvent -> {
             invoiceFiltered = false;
             invoiceFilteredTwice = false;
@@ -490,38 +477,45 @@ public class MainScreen extends Application {
             }
         });
 
-
-        HBox boxButtonsInvoices = new HBox(buttonNewInvoice, buttonOpenInvoice,buttonEditBalance, choiceBoxFilterInvoices, buttonClearInvoices);
-        VBox boxTab2 = new VBox(boxButtonsInvoices, tableViewInvoice);
+        Label labelTitleInvoice=new Label("Invoices");
+        labelTitleInvoice.getStyleClass().add("formTitle");
+        HBox boxButtonsInvoices = new HBox(choiceBoxFilterInvoices, buttonClearInvoices);
+        boxButtonsInvoices.getStyleClass().add("buttonForm");
+        HBox boxButtonInvoicesBottom=new HBox(buttonNewInvoice,buttonOpenInvoice,buttonEditBalance);
+        boxButtonInvoicesBottom.getStyleClass().add("buttonForm");
+        VBox boxTab2 = new VBox(boxButtonsInvoices, labelTitleInvoice,tableViewInvoice,boxButtonInvoicesBottom);
+        boxTab2.getStyleClass().add("boxTabs");
 
         //Tab 3
         TableColumn<Mechanic, Integer> mechanicIDColumn = new TableColumn<>("Mechanic ID");
         mechanicIDColumn.setReorderable(false);
-        mechanicIDColumn.setResizable(false);
         mechanicIDColumn.setCellValueFactory(new PropertyValueFactory<>("mechanicID"));
 
         TableColumn<Mechanic, Integer> mechanicNameColumn2 = new TableColumn<>("Name");
         mechanicNameColumn2.setReorderable(false);
-        mechanicNameColumn2.setResizable(false);
         mechanicNameColumn2.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         TableColumn<Mechanic, Integer> mechanicSurname = new TableColumn<>("Surname");
         mechanicSurname.setReorderable(false);
-        mechanicSurname.setResizable(false);
         mechanicSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
 
         tableViewMechanic.getColumns().add(mechanicIDColumn);
         tableViewMechanic.getColumns().add(mechanicNameColumn2);
         tableViewMechanic.getColumns().add(mechanicSurname);
         tableViewMechanic.setEditable(false);
+        tableViewMechanic.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableViewMechanic.setItems(allMechanics);
+        tableViewMechanic.getStyleClass().add("tableViewMechanics");
 
 
         Button buttonUpdateMechanics = new Button("Edit");
+        buttonUpdateMechanics.getStyleClass().add("buttonCancel");
         buttonUpdateMechanics.setOnAction(upd -> updateFromMechanics());
         Button buttonAddMechanic = new Button("Add");
+        buttonAddMechanic.getStyleClass().add("buttonCancel");
         buttonAddMechanic.setOnAction(add -> addToMechanics());
         Button buttonDeleteMechanic=new Button("Delete");
+        buttonDeleteMechanic.getStyleClass().add("buttonCancel");
         buttonDeleteMechanic.setOnAction(actionEvent -> {
             if (tableViewMechanic.getSelectionModel().isEmpty()) {
                 errorPopUp0.setErrorMessage("Select a customer first.");
@@ -536,7 +530,9 @@ public class MainScreen extends Application {
         });
 
         Label labelVAT=new Label("Current VAT: "+vat);
+        labelVAT.getStyleClass().add("formLabel");
         Button buttonEditVat=new Button("Edit VAT");
+        buttonEditVat.getStyleClass().add("buttonMain");
         buttonEditVat.setOnAction(actionEvent -> {
             VatForm vatForm=new VatForm(primaryStage,vat);
             vatForm.showForm();
@@ -546,9 +542,13 @@ public class MainScreen extends Application {
                 labelVAT.setText("Current VAT: "+(vatForm.getVat()));
             }
         });
+        Label labelTitleMechanic=new Label("Mechanics");
+        labelTitleMechanic.getStyleClass().add("formTitle");
         HBox boxVat=new HBox(labelVAT,buttonEditVat);
+        boxVat.getStyleClass().add("buttonForm2");
         HBox boxButtonsMechanics=new HBox(buttonAddMechanic,buttonUpdateMechanics,buttonDeleteMechanic);
-        VBox boxTab3=new VBox(boxButtonsMechanics,tableViewMechanic,boxVat);
+        boxButtonsMechanics.getStyleClass().add("buttonForm");
+        VBox boxTab3=new VBox(labelTitleMechanic,tableViewMechanic,boxButtonsMechanics,boxVat);
 
 
         //
@@ -583,9 +583,7 @@ public class MainScreen extends Application {
 
     @Override
     public void stop() throws Exception {
-        System.out.println("Closing connection...");
         connection.close();
-        System.out.println("Connection closed...");
 
     }
 
@@ -601,7 +599,8 @@ public class MainScreen extends Application {
                 importingCustomers.add(customer);
             }
         } catch (SQLException e) {
-            System.out.println("Error with getting data");
+            errorPopUp0.setErrorMessage("Error with getting data from Customers");
+            errorPopUp0.showError();
         }
         return importingCustomers;
     }
@@ -618,7 +617,8 @@ public class MainScreen extends Application {
 
             }
         } catch (SQLException e) {
-            System.out.println("Error with getting data");
+            errorPopUp0.setErrorMessage("Error with getting data from Cars");
+            errorPopUp0.showError();
         }
         return importingCars;
     }
@@ -634,7 +634,8 @@ public class MainScreen extends Application {
                 importingMechanics.add(mechanic);
             }
         } catch (SQLException e) {
-            System.out.println("Error with getting data");
+            errorPopUp0.setErrorMessage("Error with getting data from Mechanics");
+            errorPopUp0.showError();
         }
         return importingMechanics;
     }
@@ -651,7 +652,8 @@ public class MainScreen extends Application {
                 importingRepairs.add(repair);
             }
         } catch (SQLException e) {
-            System.out.println("Error with getting data");
+            errorPopUp0.setErrorMessage("Error with getting data from Database");
+            errorPopUp0.showError();
         }
         return importingRepairs;
     }
@@ -682,7 +684,8 @@ public class MainScreen extends Application {
                 importingInvoices.add(invoice);
             }
         } catch (SQLException e) {
-            System.out.println("Error with getting data");
+            errorPopUp0.setErrorMessage("Error with getting data from Invoices");
+            errorPopUp0.showError();
         }
         return importingInvoices;
     }
@@ -708,7 +711,8 @@ public class MainScreen extends Application {
 
             }
         } catch (SQLException e) {
-            System.out.println("Error with getting data");
+            errorPopUp0.setErrorMessage("Error with getting data from InvoiceMetaData");
+            errorPopUp0.showError();
         }
         return importingInvoiceMetaData;
     }
@@ -724,7 +728,8 @@ public class MainScreen extends Application {
                 importingParts.add(part);
             }
         } catch (SQLException e) {
-            System.out.println("Error with getting data");
+            errorPopUp0.setErrorMessage("Error with getting data from Parts");
+            errorPopUp0.showError();
         }
         return importingParts;
     }
@@ -738,7 +743,8 @@ public class MainScreen extends Application {
             fpa = rs.getFloat(1);
 
         } catch (SQLException e) {
-            System.out.println("Error with getting data");
+            errorPopUp0.setErrorMessage("Error with getting Vat");
+            errorPopUp0.showError();
         }
         return fpa;
     }
@@ -746,7 +752,6 @@ public class MainScreen extends Application {
     private void updateVat(float fpa){
         try{
             final String query = "UPDATE company SET Vat ="+fpa+ ";";
-            System.out.println(query);
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.execute();
         }catch (SQLException ex){
@@ -768,11 +773,11 @@ public class MainScreen extends Application {
             allCustomers.remove(selectedCustomer);
             tableViewCustomers.refresh();
             final String query = "DELETE FROM customers WHERE CustomerID = " + index;
-            System.out.println(query);
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.execute();
         } catch (Exception ex) {
-            System.out.println("Error with removing from database");
+            errorPopUp0.setErrorMessage("Error with deleting Customer");
+            errorPopUp0.showError();
         }
     }
 
@@ -783,11 +788,11 @@ public class MainScreen extends Application {
             allCars.remove(selectedCar);
             tableViewCars.refresh();
             final String query = "DELETE FROM cars WHERE LicensePlates = '" + index + "'";
-            System.out.println(query);
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.execute();
         } catch (Exception ex) {
-            System.out.println("Error with removing from database");
+            errorPopUp0.setErrorMessage("Error with deleting Car");
+            errorPopUp0.showError();
 
         }
     }
@@ -806,7 +811,6 @@ public class MainScreen extends Application {
             customersForm.showForm();
             if (customersForm.isChanged()) {
                 final String query = customersForm.getQuery() + " WHERE CustomerID = " + index + ";";
-                System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
                 allCustomers.get(index2).setName(customersForm.getName());
@@ -816,11 +820,8 @@ public class MainScreen extends Application {
                 allCustomers.get(index2).setAddress(customersForm.getAddress());
                 allCustomers.get(index2).setBalance(customersForm.getBalance());
                 tableViewCustomers.refresh();
-            } else {
-                System.out.println("Not saving changes");
             }
         } catch (Exception ex) {
-            System.out.println("Error with updating from database");
             errorPopUp0.setErrorMessage("Select a customer!");
             errorPopUp0.showError();
         }
@@ -840,7 +841,6 @@ public class MainScreen extends Application {
             carsForm.showForm();
             if (carsForm.isChanged()) {
                 final String query = carsForm.getQuery() + " WHERE LicensePlates = '" + index + "';";
-                System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
                 allCars.get(index2).setBrand(carsForm.getBrand());
@@ -850,11 +850,8 @@ public class MainScreen extends Application {
                 allCars.get(index2).setDate(carsForm.getDate());
                 allCars.get(index2).setCustomerId(carsForm.getCustomerID());
                 tableViewCars.refresh();
-            } else {
-                System.out.println("Not saving changes");
             }
         } catch (Exception ex) {
-            System.out.println("Error with updating from database");
             errorPopUp0.setErrorMessage("Select a car!");
             errorPopUp0.showError();
         }
@@ -867,7 +864,6 @@ public class MainScreen extends Application {
             customersForm.showForm();
             if (customersForm.isChanged()) {
                 final String query = customersForm.getQueryAdd();
-                System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
                 //to deftero query ginete gia na piasoume to customerID tou customer to opio exei topothetithei sto database gia ton logo oti den mporoume na gnorizoume sigoura to epomeno
@@ -878,11 +874,8 @@ public class MainScreen extends Application {
                 Customer customerNew = new Customer(rs.getInt(1), customersForm.getName(), customersForm.getSurname(), customersForm.getPhone1(), ((customersForm.getPhone2() == null) ? 0 : customersForm.getPhone2()), customersForm.getAddress(), customersForm.getBalance());
                 allCustomers.add(customerNew);
                 tableViewCustomers.refresh();
-            } else {
-                System.out.println("Data not added");
             }
         } catch (SQLException e) {
-            System.out.println("Error with adding data to database");
             errorPopUp0.setErrorMessage("Error with adding data to database.");
             errorPopUp0.showError();
         }
@@ -895,17 +888,13 @@ public class MainScreen extends Application {
             carsForm.showForm();
             if (carsForm.isChanged()) {
                 final String query = carsForm.getQueryAdd();
-                System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
                 Car carNew = new Car(carsForm.getLicensePlates(), carsForm.getBrand(), carsForm.getModel(), carsForm.getVin(), carsForm.getDate(), carsForm.getCustomerID());
                 allCars.add(carNew);
                 tableViewCars.refresh();
-            } else {
-                System.out.println("Data not added");
             }
         } catch (SQLException e) {
-            System.out.println("Error with adding data to database");
             errorPopUp0.setErrorMessage("Error with adding data to database.");
             errorPopUp0.showError();
         }
@@ -938,12 +927,10 @@ public class MainScreen extends Application {
             if (invoiceForm.getCreditCash().equals("Cash")) {
                 Invoice finalInvoice = invoice;
                 filteredListCustomers = new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter() == finalInvoice.getCustomerID()));
-                System.out.println(filteredListCustomers.get(0).getCounter());
                 float newAmount = filteredListCustomers.get(0).getBalance() + invoicePrintPreview.getAmount();
                 allCustomers.get(filteredListCustomers.getSourceIndexFor(allCustomers, 0)).setBalance(newAmount);
                 tableViewCustomers.refresh();
                 final String queryCustomerAmount = "Update customers SET Balance = " + newAmount + " WHERE CustomerID = " + invoice.getCustomerID() + ";";
-                System.out.println(queryCustomerAmount);
                 PreparedStatement preparedStatement = connection.prepareStatement(queryCustomerAmount);
                 preparedStatement.execute();
             }
@@ -966,19 +953,14 @@ public class MainScreen extends Application {
             final String queryCommit = "COMMIT;";
             final String queryInvoiceMetaData = query;
             Statement statement = connection.createStatement();
-            System.out.println(queryBegin);
             statement.executeUpdate(queryBegin);
-            System.out.println(queryInvoice);
             statement.executeUpdate(queryInvoice);
-            System.out.println(queryInvoiceMetaData);
             statement.executeUpdate(queryInvoiceMetaData);
-            System.out.println(queryCommit);
             statement.executeUpdate(queryCommit);
             //Find invoiceID
             ResultSet rs = statement.executeQuery("SELECT LAST_INSERT_ID()");
             rs.next();
             arithmosTimologiou = rs.getInt(1);
-            System.out.println("Arithmos timologiou: " + arithmosTimologiou);
             //insert to tables
             invoice.setInvoiceID(arithmosTimologiou);
             invoiceMetaData.setInvoiceId(arithmosTimologiou);
@@ -994,7 +976,6 @@ public class MainScreen extends Application {
                 query = "INSERT INTO invoiceparts (InvoiceID, PartsId, Description, Quantity, Price) VALUES (";
                 query = query + arithmosTimologiou + ", '" + p.getPartsID() + "', '" + p.getDescription() + "', " + p.getQuantity() + ", " + Float.parseFloat(decimalFormat.format(p.getPrice())) + ");";
                 final String queryInvoiceParts = query;
-                System.out.println(queryInvoiceParts);
                 PreparedStatement preparedStatement = connection.prepareStatement(queryInvoiceParts);
                 preparedStatement.execute();
             }
@@ -1013,11 +994,11 @@ public class MainScreen extends Application {
             allMechanics.remove(selectedMechanic);
             tableViewMechanic.refresh();
             final String query = "DELETE FROM mechanics WHERE MechanicID = " + index;
-            System.out.println(query);
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.execute();
         } catch (Exception ex) {
-            System.out.println("Error with removing from database");
+            errorPopUp0.setErrorMessage("Error with deleting Mechanic");
+            errorPopUp0.showError();
         }
     }
 
@@ -1030,17 +1011,13 @@ public class MainScreen extends Application {
             mechanicForm.showForm();
             if (mechanicForm.isChanged()) {
                 final String query = mechanicForm.getQuery() + " WHERE MechanicID = " + index + ";";
-                System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
                 allMechanics.get(index2).setName(mechanicForm.getName());
                 allMechanics.get(index2).setSurname(mechanicForm.getSurname());
                 tableViewMechanic.refresh();
-            } else {
-                System.out.println("Not saving changes");
             }
         } catch (Exception ex) {
-            System.out.println("Error with updating from database");
             errorPopUp0.setErrorMessage("Select a customer!");
             errorPopUp0.showError();
         }
@@ -1052,7 +1029,6 @@ public class MainScreen extends Application {
             mechanicForm.showForm();
             if (mechanicForm.isChanged()) {
                 final String query = mechanicForm.getQueryAdd();
-                System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
                 //to deftero query ginete gia na piasoume to customerID tou customer to opio exei topothetithei sto database gia ton logo oti den mporoume na gnorizoume sigoura to epomeno
@@ -1063,12 +1039,9 @@ public class MainScreen extends Application {
                 Mechanic mechanicNew = new Mechanic(rs.getInt(1), mechanicForm.getName(), mechanicForm.getSurname());
                 allMechanics.add(mechanicNew);
                 tableViewMechanic.refresh();
-            } else {
-                System.out.println("Data not added");
             }
         } catch (SQLException e) {
-            System.out.println("Error with adding data to database");
-            errorPopUp0.setErrorMessage("Error with adding data to database.");
+            errorPopUp0.setErrorMessage("Error with adding mechanic to database.");
             errorPopUp0.showError();
         }
     }
@@ -1164,11 +1137,9 @@ public class MainScreen extends Application {
                     float oldBalance = filteredListCustomers.get(0).getBalance();
                     float newBalance = oldBalance - balanceForm.getDifferenceInBalance();
                     final String queryCustomer = "Update customers SET Balance = " + newBalance + " WHERE CustomerID = " + filteredListCustomers.get(0).getCounter() + ";";
-                    System.out.println(queryCustomer);
                     PreparedStatement preparedStatement = connection.prepareStatement(queryCustomer);
                     preparedStatement.execute();
                     final String queryInvoice = "Update invoice SET Remaining = " + balanceForm.getBalance() + " WHERE InvoiceID = " + selectedInvoice.getInvoiceID() + ";";
-                    System.out.println(queryInvoice);
                     preparedStatement = connection.prepareStatement(queryInvoice);
                     preparedStatement.execute();
                     allCustomers.get(filteredListCustomers.getSourceIndexFor(allCustomers,0)).setBalance(newBalance);

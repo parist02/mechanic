@@ -60,7 +60,6 @@ public class InvoiceForm {
 		stageForm.initOwner(primaryStage);
 		buttonCancel.setOnAction(actionEvent -> stageForm.close());
 		buttonNext.setOnAction(actionEvent -> {
-			System.out.println("Next Pressed");
 			licensePlates = textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
 			if (licensePlates.equals("") || choiceBoxMechanic.getSelectionModel().isEmpty() || choiceBoxRepair.getSelectionModel().isEmpty() || choiceBoxCredit.getSelectionModel().isEmpty()) {
 				labelEmpty.setText("Please fill all the details!");
@@ -91,7 +90,6 @@ public class InvoiceForm {
 		});
 		buttonOK.setOnAction(actionEvent -> {
 			clickedOK = true;
-			System.out.println("Create Invoice");
 			stageForm.close();
 		});
 		stageForm.setOnCloseRequest(windowEvent -> clickedOK = false);

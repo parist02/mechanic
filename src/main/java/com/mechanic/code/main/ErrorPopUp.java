@@ -1,5 +1,4 @@
 package com.mechanic.code.main;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,10 +9,9 @@ import javafx.stage.Stage;
 
 
 public class ErrorPopUp {
-	private static Insets padding = new Insets(10, 10, 10, 10);
 	private Stage stage;
 	private boolean added=false;
-	private Label labelErrorMsg = new Label();
+	private Label labelErrorMsg;
 
 	/*
 	Types:
@@ -25,26 +23,25 @@ public class ErrorPopUp {
 
 	public ErrorPopUp(int type, Stage primaryStage) {
 		stage = new Stage();
+		labelErrorMsg=new Label("");
+		labelErrorMsg.getStyleClass().add("errorLabel2");
 		stage.setTitle("Error");
 		stage.initModality(Modality.WINDOW_MODAL);
 		stage.initOwner(primaryStage);
-		labelErrorMsg.setStyle("-fx-font-size: 14;" +
-				"-fx-font-weight: bold;" +
-				"-fx-font-family: Arial");
 		Button buttonOk = new Button("Exit");
-		buttonOk.setStyle("-fx-font-size: 12;" +
-				"-fx-font-family: Arial;");
+		buttonOk.getStyleClass().add("buttonCancel");
 		buttonOk.setOnAction(e -> {
 			added = false;
 			stage.close();
 		});
 		Button buttonAdd = new Button("Add");
-		buttonAdd.setStyle("-fx-font-size: 12;" +
-				"-fx-font-family: Arial;");
+		buttonAdd.getStyleClass().add("buttonMain");
 		VBox box;
 		switch (type){
 			case 0:{
-				box = new VBox(labelErrorMsg, buttonOk);
+				HBox boxButtons = new HBox( buttonOk);
+				boxButtons.getStyleClass().add("buttonForm");
+				box = new VBox(labelErrorMsg, boxButtons);
 				break;
 			}
 			case 1:{
@@ -52,8 +49,8 @@ public class ErrorPopUp {
 					added = true;
 					stage.close();
 				});
-				HBox boxButtons = new HBox(buttonAdd, buttonOk);
-				boxButtons.setSpacing(50);
+				HBox boxButtons = new HBox( buttonOk, buttonAdd);
+				boxButtons.getStyleClass().add("buttonForm");
 				box = new VBox(labelErrorMsg, boxButtons);
 				break;
 			}
@@ -63,19 +60,17 @@ public class ErrorPopUp {
 					added = true;
 					stage.close();
 				});
-				HBox boxButtons = new HBox(buttonAdd, buttonOk);
-				boxButtons.setSpacing(50);
+				HBox boxButtons = new HBox( buttonOk,buttonAdd);
+				boxButtons.getStyleClass().add("buttonForm");
 				box = new VBox(labelErrorMsg, boxButtons);
 				break;
 			}
 			default:
 				throw new IllegalStateException("Unexpected value: " + type);
 		}
-		box.setPadding(padding);
-		box.setMinHeight(50);
-		box.setMinWidth(200);
-		box.setSpacing(20);
+		box.setMinWidth(250);
 		Scene scene = new Scene(box);
+		scene.getStylesheets().add("stylesheets.css");
 		stage.setScene(scene);
 		stage.setOnCloseRequest(e->added=false);
 	}

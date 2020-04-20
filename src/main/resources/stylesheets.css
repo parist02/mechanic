@@ -45,6 +45,15 @@
     -fx-padding: 10 0;
 }
 
+.errorLabel2{
+    -fx-text-fill: firebrick;
+    -fx-font-size: 14;
+    -fx-alignment: center;
+    -fx-font-style: normal;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0;
+}
+
 .formGrid{
     -fx-hgap: 20;
     -fx-vgap: 10;
@@ -82,13 +91,21 @@
 
 .tableViewCustomers{
     -fx-min-height: 300;
-    /*-fx-alignment: center;*/
+
 }
 
 .tableViewCars{
     -fx-min-height: 100;
     -fx-max-height: 300;
-    /*-fx-tile-alignment: center;*/
+}
+
+.tableViewInvoice{
+    -fx-min-height: 700;
+    -fx-min-width: 800;
+}
+
+.tableViewMechanics{
+    -fx-min-height: 300;
 }
 
 .tabs{
