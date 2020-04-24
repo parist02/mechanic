@@ -1119,7 +1119,7 @@ public class MainScreen extends Application {
         invoicePrintPreview.setVat(selectedInvoiceMetaData.getVat());
         invoicePrintPreview.showPreview();
         if (invoicePrintPreview.isBeingPrinted() && invoicePrintPreview.isBeingSaved()) {
-            print.setNode(invoicePrintPreview.getNodeForPrint(true));
+            print.setNode(invoicePrintPreview.getNodeForPrint());
             print.print();
         }
     }

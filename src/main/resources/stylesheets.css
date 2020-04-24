@@ -17,7 +17,7 @@
 }
 
 .formTitle{
-    -fx-font-size: 25;
+    -fx-font-size: 22;
     -fx-font-weight: bold;
     -fx-padding: 10 0 20 0;
     -fx-text-fill: gray;
@@ -27,7 +27,7 @@
 .formLabel {
     -fx-font-weight: bold;
     -fx-text-alignment: left;
-    -fx-font-size: 13;
+    -fx-font-size: 12;
 }
 
 .formLabel2 {
@@ -36,6 +36,44 @@
     -fx-font-size: 12;
 }
 
+.printLabel {
+    -fx-font-weight: normal;
+    -fx-text-alignment: left;
+    -fx-font-size: 12;
+}
+
+.printLabelBold {
+    -fx-font-weight: bold;
+    -fx-text-alignment: left;
+    -fx-font-size: 12;
+}
+
+.printLabel2 {
+    -fx-font-weight: normal;
+    -fx-text-alignment: left;
+    -fx-font-size: 12;
+}
+
+.printLabel2Bold {
+    -fx-font-weight: bold;
+    -fx-text-alignment: left;
+    -fx-font-size: 12;
+}
+
+.printGrid{
+    -fx-hgap: 5;
+    -fx-vgap: 1;
+}
+
+.printVBox{
+    -fx-spacing: 2;
+}
+
+.printTitle{
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-font-size: 25;
+}
 
 .errorLabel{
     -fx-text-fill: firebrick;

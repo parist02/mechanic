@@ -1,44 +1,26 @@
 package com.mechanic.code.print;
-import com.mechanic.code.database.Invoice;
 import com.mechanic.code.main.ErrorPopUp;
 import com.mechanic.code.database.Part;
 import com.mechanic.code.main.MainScreen;
-import javafx.beans.binding.Binding;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.print.Paper;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.Flow;
-import java.util.concurrent.TimeUnit;
 
 
 public class InvoicePrintPreview {
 	private Stage stagePrint = new Stage();
-	private static final javafx.geometry.Insets padding = new Insets(10, 10, 10, 10);
-	private static final javafx.scene.text.Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, 18);
 	private static double height = Paper.A4.getHeight();
 	private static double width = Paper.A4.getWidth();
 	private LocalDate dateInvoice, dateIN, dateOUT;
@@ -65,31 +47,37 @@ public class InvoicePrintPreview {
 		vat=MainScreen.getVat();
 		//1st Part, import from database except date
 		Label labelCompany1 = new Label("M.B.A LTD");
-		Label labelCompany2 = new Label("37 PRODROMOU\nSTR.2062 STROVOLOS");
+		labelCompany1.getStyleClass().add("printLabelBold");
+		Label labelCompany2 = new Label("37 PRODROMOU STR.2062 STROVOLOS");
+		labelCompany2.getStyleClass().add("printLabelBold");
 		Label labelCompany3 = new Label("Phone: 22424062");
+		labelCompany3.getStyleClass().add("printLabelBold");
 		Label labelCompany4 = new Label("Fax: 22317441");
+		labelCompany4.getStyleClass().add("printLabelBold");
 		Label labelCompany5 = new Label("VAT Reg.: 10091591L");
+		labelCompany5.getStyleClass().add("printLabelBold");
 		Label labelCompany6 = new Label("TAX REG.: 12091591N");
+		labelCompany6.getStyleClass().add("printLabelBold");
 
 		VBox boxCompany = new VBox(labelCompany1, labelCompany2, labelCompany3, labelCompany4, labelCompany5, labelCompany6);
-		boxCompany.setId("label2");
-		boxCompany.setSpacing(5);
+		boxCompany.getStyleClass().add("printVBox");
 		Label labelTitle = new Label("Cash Invoice");
-		labelTitle.setId("title");
+		labelTitle.getStyleClass().add("printTitle");
 		Label labelCompany7 = new Label("Invoice No.:");
+		labelCompany7.getStyleClass().add("printLabelBold");
 		labelInvoiceID = new Label("");//get from database
+		labelInvoiceID.getStyleClass().add("printLabel2");
 		Label labelCompany9 = new Label("Date:");
+		labelCompany9.getStyleClass().add("printLabelBold");
 		//xrisimopoiite gia metatropi imerominies sto format pou theloume
 		StringConverter<LocalDate> stringConverter = new StringConverter<>() {
 			private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
 			@Override
 			public String toString(LocalDate localDate) {
 				if (localDate == null)
 					return "";
 				return dateTimeFormatter.format(localDate);
 			}
-
 			@Override
 			public LocalDate fromString(String dateString) {
 				if (dateString == null || dateString.trim().isEmpty()) {
@@ -101,29 +89,35 @@ public class InvoicePrintPreview {
 		datePickerInvoice = new DatePicker();
 		datePickerInvoice.setConverter(stringConverter);
 		datePickerInvoice.setValue(LocalDate.now());
-
-		//Label labelCompany10=new Label("D/MMM/YYYY"); //depends if new  or not
 		gridCompany = new GridPane();
 		gridCompany.add(labelCompany7, 0, 0);
 		gridCompany.add(labelInvoiceID, 1, 0);
 		gridCompany.add(labelCompany9, 0, 1);
 		gridCompany.add(datePickerInvoice, 1, 1);
-		gridCompany.setVgap(5);
-		gridCompany.setHgap(5);
-		gridCompany.setId("grid");
+		gridCompany.getStyleClass().add("printGrid");
 		labelInvoiceDate=new Label("");
-
-		//2nd Part, need to implement search when adding customers
+		labelInvoiceDate.getStyleClass().add("printLabel2");
+		//2nd Part
 		Label labelCustomer1 = new Label("Customer Account:");
+		labelCustomer1.getStyleClass().add("printLabelBold");
 		Label labelCustomerCustomerID = new Label(String.valueOf(customerID));
+		labelCustomerCustomerID.getStyleClass().add("printLabel");
 		Label labelCustomer2 = new Label("Full Name:");
+		labelCustomer2.getStyleClass().add("printLabelBold");
 		Label labelCustomerFullName = new Label(fullName);
+		labelCustomerFullName.getStyleClass().add("printLabel");
 		Label labelCustomer3 = new Label("Auto No.:");
+		labelCustomer3.getStyleClass().add("printLabelBold");
 		Label labelCustomerLicencePlates = new Label(licensePlates);
+		labelCustomerLicencePlates.getStyleClass().add("printLabel");
 		Label labelCustomer4 = new Label("Auto Make.:");
+		labelCustomer4.getStyleClass().add("printLabelBold");
 		Label labelCustomerBrandModel = new Label(brandModel);
+		labelCustomerBrandModel.getStyleClass().add("printLabel");
 		Label labelCustomer5 = new Label("Chassis No.");
+		labelCustomer5.getStyleClass().add("printLabelBold");
 		Label labelCustomerVin = new Label(vin);
+		labelCustomerVin.getStyleClass().add("printLabel");
 
 		GridPane gridCustomer1 = new GridPane();
 		gridCustomer1.add(labelCustomer1, 0, 0);
@@ -136,12 +130,14 @@ public class InvoicePrintPreview {
 		gridCustomer1.add(labelCustomerBrandModel, 1, 3);
 		gridCustomer1.add(labelCustomer5, 0, 4);
 		gridCustomer1.add(labelCustomerVin, 1, 4);
-		gridCustomer1.setId("grid");
+		gridCustomer1.getStyleClass().add("printGrid");
 
 		Label labelCustomer6 = new Label("Date In:");
+		labelCustomer6.getStyleClass().add("printLabelBold");
 		datePickerIN = new DatePicker();
 		datePickerIN.setConverter(stringConverter);
 		Label labelCustomer7 = new Label("Date Out:");
+		labelCustomer7.getStyleClass().add("printLabelBold");
 		datePickerOUT = new DatePicker();
 		datePickerOUT.setConverter(stringConverter);
 
@@ -150,17 +146,24 @@ public class InvoicePrintPreview {
 		gridCustomer2.add(datePickerIN, 1, 0);
 		gridCustomer2.add(labelCustomer7, 0, 1);
 		gridCustomer2.add(datePickerOUT, 1, 1);
+		gridCustomer2.getStyleClass().add("printGrid");
 
 		labelInvoiceDateIN=new Label("");
+		labelInvoiceDateIN.getStyleClass().add("printLabel2");
 		labelInvoiceDateOUT=new Label("");
+		labelInvoiceDateOUT.getStyleClass().add("printLabel2");
 
 		Label labelCustomer8 = new Label("Mileage:");
+		labelCustomer8.getStyleClass().add("printLabelBold");
 		textFieldMileage = new TextField();
 		Label labelCustomer9 = new Label("First Oil:");
+		labelCustomer9.getStyleClass().add("printLabelBold");
 		textFieldFirstOil = new TextField();
 		Label labelCustomer10 = new Label("Next Oil:");
+		labelCustomer10.getStyleClass().add("printLabelBold");
 		textFieldNextOil = new TextField();
 		Label labelCustomer11 = new Label("Next Service:");
+		labelCustomer11.getStyleClass().add("printLabelBold");
 		textFieldNextService = new TextField();
 
 		gridCustomer3 = new GridPane();
@@ -172,42 +175,47 @@ public class InvoicePrintPreview {
 		gridCustomer3.add(textFieldNextOil, 1, 2);
 		gridCustomer3.add(labelCustomer11, 0, 3);
 		gridCustomer3.add(textFieldNextService, 1, 3);
+		gridCustomer3.getStyleClass().add("printGrid");
 
 		labelMileage=new Label("");
+		labelMileage.getStyleClass().add("printLabel2");
 		labelFirstOil=new Label("");
+		labelFirstOil.getStyleClass().add("printLabel2");
 		labelNextOil=new Label("");
+		labelNextOil.getStyleClass().add("printLabel2");
 		labelNextService=new Label("");
+		labelNextService.getStyleClass().add("printLabel2");
 
 
 		//3rd part
 		TableColumn<Part, Integer> counterColumn = new TableColumn<>("No.");
 		counterColumn.setReorderable(false);
-		counterColumn.setResizable(false);
-		counterColumn.setMinWidth(100);
+		//counterColumn.setResizable(false);
+//		counterColumn.setMinWidth(100);
 		counterColumn.setCellValueFactory(new PropertyValueFactory<>("counter"));
 
 		TableColumn<Part, String> partsIDColumn = new TableColumn<>("Parts ID");
 		partsIDColumn.setReorderable(false);
-		partsIDColumn.setResizable(false);
-		partsIDColumn.setMinWidth(100);
+//		partsIDColumn.setResizable(false);
+//		partsIDColumn.setMinWidth(100);
 		partsIDColumn.setCellValueFactory(new PropertyValueFactory<>("partsID"));
 
 		TableColumn<Part, String> descriptionColumn = new TableColumn<>("Description");
 		descriptionColumn.setReorderable(false);
-		descriptionColumn.setResizable(false);
-		descriptionColumn.setMinWidth(300);
+//		descriptionColumn.setResizable(false);
+//		descriptionColumn.setMinWidth(300);
 		descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
 		TableColumn<Part, Integer> quantityColumn = new TableColumn<>("Quantity");
 		quantityColumn.setReorderable(false);
-		quantityColumn.setResizable(false);
-		quantityColumn.setMinWidth(100);
+//		quantityColumn.setResizable(false);
+//		quantityColumn.setMinWidth(100);
 		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
 		TableColumn<Part, Double> priceColumn = new TableColumn<>("Price");
 		priceColumn.setReorderable(false);
-		priceColumn.setResizable(false);
-		priceColumn.setMinWidth(100);
+//		priceColumn.setResizable(false);
+//		priceColumn.setMinWidth(100);
 		priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 		priceColumn.setCellFactory(partFloatTableColumn -> new TableCell<>() {
 			@Override
@@ -227,57 +235,69 @@ public class InvoicePrintPreview {
 		tableViewParts.getColumns().add(descriptionColumn);
 		tableViewParts.getColumns().add(quantityColumn);
 		tableViewParts.getColumns().add(priceColumn);
-		tableViewParts.setPadding(padding);
-		tableViewParts.setMaxHeight(400);
+		tableViewParts.setMaxHeight(385);
+		tableViewParts.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		tableViewParts.setEditable(false);
 		tableViewParts.setItems(allParts);
 		
 
 		TextField textFieldPartsID = new TextField();
 		textFieldPartsID.setPromptText("Parts ID");
-		//textFieldPartsID.setMinWidth(100);
 		TextField textFieldDescription = new TextField();
 		textFieldDescription.setPromptText("Description");
-		//textFieldDescription.setMinWidth(300);
 		TextField textFieldQuantity = new TextField();
 		textFieldQuantity.setPromptText("Quantity");
-		//textFieldQuantity.setMinWidth(100);
 		TextField textFieldPrice = new TextField();
 		textFieldPrice.setPromptText("Price");
-		//textFieldPrice.setMinWidth(100);
 		Label labelAddPart = new Label("Add new Part:");
-		//labelAddPart.setMinWidth(50);
 		Button buttonAddPart = new Button("Add");
-		//buttonAddPart.setMinWidth(50);
+		buttonAddPart.getStyleClass().add("buttonMain");
 		HBox hBoxAddPart = new HBox(labelAddPart, textFieldPartsID, textFieldDescription, textFieldQuantity, textFieldPrice, buttonAddPart);
 		vBoxParts = new VBox(tableViewParts, hBoxAddPart);
-		vBoxParts.setPadding(padding);
 
 		//4th part
 		Label labelComments = new Label("Comments:");
-		labelComments.setId("label2");
+		labelComments.getStyleClass().add("printLabelBold");
 		textAreaComments = new TextArea();
-		textAreaComments.setPrefHeight(70);
-		//textAreaComments.setPrefWidth(220);
+		textAreaComments.setPrefHeight(75);
 		Label labelSignature = new Label("\tIssued By");
-		Label labelDots1 = new Label("..........................................");
-		VBox boxComments = new VBox(labelComments, textAreaComments, labelSignature, labelDots1);
-		boxComments.setId("label2");
-		boxComments.setSpacing(5);
+		labelSignature.getStyleClass().add("printLabelBold");
+		Label labelDots1 = new Label("...............................................");
+		labelDots1.getStyleClass().add("printLabelBold");
+		VBox boxComments = new VBox(labelComments, textAreaComments);
+
+		VBox boxSignature=new VBox(labelSignature,labelDots1);
+		boxSignature.setSpacing(8);
 
 		Label labelTotal1 = new Label("Amount:");
+		labelTotal1.getStyleClass().add("printLabelBold");
 		labelAmount = new Label("");
+		labelAmount.getStyleClass().add("printLabel2");
 		Label labelTotal2 = new Label("Discount:");
+		labelTotal2.getStyleClass().add("printLabelBold");
 		labelDiscount = new Label("");
+		labelDiscount.getStyleClass().add("printLabel2");
 		textFieldDiscount=new TextField("0");
 		Label labelTotal3 = new Label("Net:");
+		labelTotal3.getStyleClass().add("printLabelBold");
 		labelNet = new Label("");
+		labelNet.getStyleClass().add("printLabel2");
 		Label labelTotal4 = new Label("Vat:");
+		labelTotal4.getStyleClass().add("printLabelBold");
 		labelVat = new Label("");
+		labelVat.getStyleClass().add("printLabel2");
 		Label labelTotal5 = new Label("GTotal:");
+		labelTotal5.getStyleClass().add("printLabelBold");
 		labelTotal = new Label("");
-		Label labelTotal6 = new Label("Received By");
-		Label labelDots2 = new Label("..........................................");
+		labelTotal.getStyleClass().add("printLabel2");
+		Label labelTotal6 = new Label("\tReceived By");
+		labelTotal6.getStyleClass().add("printLabelBold");
+		Label labelDots2 = new Label("...............................................");
+		labelDots2.getStyleClass().add("printLabelBold");
+
+
+		VBox boxSignature2=new VBox(labelTotal6,labelDots2);
+		boxSignature2.setSpacing(8);
 
 		gridTotal = new GridPane();
 		gridTotal.add(labelTotal1, 0, 0);
@@ -290,8 +310,7 @@ public class InvoicePrintPreview {
 		gridTotal.add(labelVat, 1, 3);
 		gridTotal.add(labelTotal5, 0, 4);
 		gridTotal.add(labelTotal, 1, 4);
-		gridTotal.add(labelTotal6, 0, 5, 2, 1);
-		gridTotal.add(labelDots2, 0, 6, 2, 1);
+		gridTotal.getStyleClass().add("printGrid");
 
 
 		//Scene Control
@@ -305,22 +324,17 @@ public class InvoicePrintPreview {
 		grid.add(vBoxParts, 0, 2, 3, 1);
 		grid.add(boxComments, 0, 3, 2, 1);
 		grid.add(gridTotal, 2, 3);
-		grid.setGridLinesVisible(false);
-		grid.setPadding(padding);
-		grid.setHgap(20);
-		grid.setVgap(20);
-		grid.setAlignment(Pos.TOP_CENTER);
+		grid.add(boxSignature,0,4,2,1);
+		grid.add(boxSignature2,2,4,1,1);
+		grid.getStyleClass().add("formGrid");
 
 		buttonPrint = new Button("Save and Show Print Preview");
-		Tooltip tooltipPrint = new Tooltip("Save Invoice and Print");
-		buttonPrint.setTooltip(tooltipPrint);
+		buttonPrint.getStyleClass().add("buttonMain");
 		buttonSave = new Button("Save and Close");
-		Tooltip tooltipSave = new Tooltip("Save Invoice without Printing");
-		buttonSave.setTooltip(tooltipSave);
+		buttonSave.getStyleClass().add("buttonCancel");
 
-		boxButtons = new HBox(buttonPrint, buttonSave);
-		boxButtons.setPadding(padding);
-		boxButtons.setSpacing(10);
+		boxButtons = new HBox(buttonSave,buttonPrint);
+		boxButtons.getStyleClass().add("buttonForm");
 		VBox boxMain = new VBox(grid, boxButtons);
 		boxMain.getStylesheets().add("stylesheets.css");
 		Scene scene = new Scene(boxMain);
@@ -584,11 +598,7 @@ public class InvoicePrintPreview {
 		grid.add(tableViewParts, 0, 2, 3, 1);
 	}
 
-	public GridPane getNodeForPrint(boolean isOpen){
-		if(!isOpen){
-			readyForPrint();
-		}
-		textAreaComments.setDisable(false);
+	public GridPane getNodeForPrint(){
 		return (grid);
 	}
 
@@ -609,16 +619,15 @@ public class InvoicePrintPreview {
 		tableViewParts.refresh();
 	}
 
-	public void initializePreview(){
+	private void initializePreview(){
 		calculateAmount();
 		readyForPrint();
-		textAreaComments.setDisable(true);
 		boxButtons.getChildren().remove(buttonSave);
+		buttonPrint.setText("Print");
 	}
 
 	public void showPreview(){
 		initializePreview();
-		buttonPrint.setText("Print");
 		stagePrint.showAndWait();
 	}
 
