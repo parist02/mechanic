@@ -192,33 +192,23 @@ public class InvoicePrintPreview {
 		//3rd part
 		TableColumn<Part, Integer> counterColumn = new TableColumn<>("No.");
 		counterColumn.setReorderable(false);
-		counterColumn.setMinWidth(width/8);
-		counterColumn.setMaxWidth(width/8+25);
-		counterColumn.setResizable(true);
 		counterColumn.setCellValueFactory(new PropertyValueFactory<>("counter"));
 
 		TableColumn<Part, String> partsIDColumn = new TableColumn<>("Parts ID");
 		partsIDColumn.setReorderable(false);
-		partsIDColumn.setResizable(false);
-		partsIDColumn.setPrefWidth(2*width/8-10);
 		partsIDColumn.setCellValueFactory(new PropertyValueFactory<>("partsID"));
 
 		TableColumn<Part, String> descriptionColumn = new TableColumn<>("Description");
 		descriptionColumn.setReorderable(false);
-		descriptionColumn.setResizable(false);
-		descriptionColumn.setPrefWidth(3*width/8);
+
 		descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
 		TableColumn<Part, Integer> quantityColumn = new TableColumn<>("Quantity");
 		quantityColumn.setReorderable(false);
-		quantityColumn.setResizable(false);
-		quantityColumn.setPrefWidth(width/8-9);
 		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
 		TableColumn<Part, Double> priceColumn = new TableColumn<>("Price");
 		priceColumn.setReorderable(false);
-		priceColumn.setResizable(false);
-		priceColumn.setPrefWidth(width/8-9);
 		priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 		priceColumn.setCellFactory(partFloatTableColumn -> new TableCell<>() {
 			@Override
@@ -631,7 +621,7 @@ public class InvoicePrintPreview {
 		readyForPrint();
 		buttonPrint.setText("Print");
 		boxButtons.getChildren().remove(buttonSave);
-		boxMain.getChildren().remove(boxButtons);
+		boxMain.getChildren().remove(boxButtons); //needs to be removed and added again because it was causing problems at the table(vertical scrolling bar)
 		boxMain.getChildren().add(boxButtons);
 		grid.setPrefWidth(width);
 		grid.setPrefHeight(height);

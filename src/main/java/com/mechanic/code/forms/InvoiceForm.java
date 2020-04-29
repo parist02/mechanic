@@ -59,6 +59,7 @@ public class InvoiceForm {
 		stageForm.initModality(Modality.WINDOW_MODAL);
 		stageForm.initOwner(primaryStage);
 		buttonCancel.setOnAction(actionEvent -> stageForm.close());
+		buttonCancel2.setOnAction(actionEvent -> stageForm.close());
 		buttonNext.setOnAction(actionEvent -> {
 			licensePlates = textFieldLicensePlates.getText().replaceAll("[^a-zA-Z0-9]", "");
 			if (licensePlates.equals("") || choiceBoxMechanic.getSelectionModel().isEmpty() || choiceBoxRepair.getSelectionModel().isEmpty() || choiceBoxCredit.getSelectionModel().isEmpty()) {
