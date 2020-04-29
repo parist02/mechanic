@@ -4,6 +4,7 @@ import com.mechanic.code.database.Part;
 import com.mechanic.code.main.MainScreen;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.print.Paper;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -42,13 +43,14 @@ public class InvoicePrintPreview {
 	private TextArea textAreaComments;
 	private Button buttonSave,buttonPrint;
 	private HBox boxButtons;
+	private VBox boxMain;
 
 	public InvoicePrintPreview(Stage primaryStage, Integer customerID, String fullName, String licensePlates, String brandModel, String vin) {
 		vat=MainScreen.getVat();
 		//1st Part, import from database except date
 		Label labelCompany1 = new Label("M.B.A LTD");
 		labelCompany1.getStyleClass().add("printLabelBold");
-		Label labelCompany2 = new Label("37 PRODROMOU STR.2062 STROVOLOS");
+		Label labelCompany2 = new Label("37 PRODROMOU\nSTR.2062 STROVOLOS");
 		labelCompany2.getStyleClass().add("printLabelBold");
 		Label labelCompany3 = new Label("Phone: 22424062");
 		labelCompany3.getStyleClass().add("printLabelBold");
@@ -190,32 +192,33 @@ public class InvoicePrintPreview {
 		//3rd part
 		TableColumn<Part, Integer> counterColumn = new TableColumn<>("No.");
 		counterColumn.setReorderable(false);
-		//counterColumn.setResizable(false);
-//		counterColumn.setMinWidth(100);
+		counterColumn.setMinWidth(width/8);
+		counterColumn.setMaxWidth(width/8+25);
+		counterColumn.setResizable(true);
 		counterColumn.setCellValueFactory(new PropertyValueFactory<>("counter"));
 
 		TableColumn<Part, String> partsIDColumn = new TableColumn<>("Parts ID");
 		partsIDColumn.setReorderable(false);
-//		partsIDColumn.setResizable(false);
-//		partsIDColumn.setMinWidth(100);
+		partsIDColumn.setResizable(false);
+		partsIDColumn.setPrefWidth(2*width/8-10);
 		partsIDColumn.setCellValueFactory(new PropertyValueFactory<>("partsID"));
 
 		TableColumn<Part, String> descriptionColumn = new TableColumn<>("Description");
 		descriptionColumn.setReorderable(false);
-//		descriptionColumn.setResizable(false);
-//		descriptionColumn.setMinWidth(300);
+		descriptionColumn.setResizable(false);
+		descriptionColumn.setPrefWidth(3*width/8);
 		descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
 		TableColumn<Part, Integer> quantityColumn = new TableColumn<>("Quantity");
 		quantityColumn.setReorderable(false);
-//		quantityColumn.setResizable(false);
-//		quantityColumn.setMinWidth(100);
+		quantityColumn.setResizable(false);
+		quantityColumn.setPrefWidth(width/8-9);
 		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
 		TableColumn<Part, Double> priceColumn = new TableColumn<>("Price");
 		priceColumn.setReorderable(false);
-//		priceColumn.setResizable(false);
-//		priceColumn.setMinWidth(100);
+		priceColumn.setResizable(false);
+		priceColumn.setPrefWidth(width/8-9);
 		priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 		priceColumn.setCellFactory(partFloatTableColumn -> new TableCell<>() {
 			@Override
@@ -239,6 +242,7 @@ public class InvoicePrintPreview {
 		tableViewParts.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		tableViewParts.setEditable(false);
 		tableViewParts.setItems(allParts);
+		tableViewParts.setPadding(new Insets(1,2,1,2));
 		
 
 		TextField textFieldPartsID = new TextField();
@@ -260,6 +264,7 @@ public class InvoicePrintPreview {
 		labelComments.getStyleClass().add("printLabelBold");
 		textAreaComments = new TextArea();
 		textAreaComments.setPrefHeight(75);
+		textAreaComments.setPrefWidth(2*width/3-10);
 		Label labelSignature = new Label("\tIssued By");
 		labelSignature.getStyleClass().add("printLabelBold");
 		Label labelDots1 = new Label("...............................................");
@@ -297,7 +302,7 @@ public class InvoicePrintPreview {
 
 
 		VBox boxSignature2=new VBox(labelTotal6,labelDots2);
-		boxSignature2.setSpacing(8);
+		boxSignature2.setSpacing(4);
 
 		gridTotal = new GridPane();
 		gridTotal.add(labelTotal1, 0, 0);
@@ -335,7 +340,9 @@ public class InvoicePrintPreview {
 
 		boxButtons = new HBox(buttonSave,buttonPrint);
 		boxButtons.getStyleClass().add("buttonForm");
-		VBox boxMain = new VBox(grid, boxButtons);
+		grid.setMinWidth(width);
+		grid.setMinHeight(height);
+		boxMain = new VBox(grid, boxButtons);
 		boxMain.getStylesheets().add("stylesheets.css");
 		Scene scene = new Scene(boxMain);
 		stagePrint.initStyle(StageStyle.UTILITY);
@@ -622,8 +629,13 @@ public class InvoicePrintPreview {
 	private void initializePreview(){
 		calculateAmount();
 		readyForPrint();
-		boxButtons.getChildren().remove(buttonSave);
 		buttonPrint.setText("Print");
+		boxButtons.getChildren().remove(buttonSave);
+		boxMain.getChildren().remove(boxButtons);
+		boxMain.getChildren().add(boxButtons);
+		grid.setPrefWidth(width);
+		grid.setPrefHeight(height);
+
 	}
 
 	public void showPreview(){

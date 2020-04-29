@@ -61,18 +61,18 @@
 }
 
 .printGrid{
-    -fx-hgap: 5;
-    -fx-vgap: 1;
+    -fx-hgap: 2.5;
+    -fx-vgap: 0.5;
 }
 
 .printVBox{
-    -fx-spacing: 2;
+    -fx-spacing: 1;
 }
 
 .printTitle{
     -fx-font-weight: bold;
     -fx-text-alignment: center;
-    -fx-font-size: 25;
+    -fx-font-size: 24;
 }
 
 .errorLabel{
