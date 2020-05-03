@@ -52,19 +52,18 @@ public class MainScreen extends Application {
     private static Float vat;
     DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
-    @Override
-    public void init() throws Exception {
-        super.init();
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mechanic", "root", "");
-        } catch (Exception e) {
-            System.exit(0);
 
-        }
-    }
 
     @Override
     public void start(Stage stage) {
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mechanic", "root", "");
+        } catch (Exception e) {
+            errorPopUp0 = new ErrorPopUp(0, null);
+            errorPopUp0.setErrorMessage("Connection Error. Open XAMPP and Start both Apache and MySQL");
+            errorPopUp0.showError();
+            System.exit(0);
+        }
         allMechanics=importFromMechanics();
         allRepairs=importFromRepairs();
         vat = importVat();
@@ -671,15 +670,28 @@ public class MainScreen extends Application {
                 int arithmosPelati = rs.getInt(3);
                 invoice.setCustomerID(arithmosPelati);
                 filteredListCustomers = new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter() == arithmosPelati));
-                invoice.setFullName(filteredListCustomers.get(0).getName() + " " + filteredListCustomers.get(0).getSurname());
-                invoice.setPhone(filteredListCustomers.get(0).getPhone1());
+                if(filteredListCustomers.isEmpty()){
+                    invoice.setFullName("-");
+                    invoice.setPhone(0);
+                }else {
+                    invoice.setFullName(filteredListCustomers.get(0).getName() + " " + filteredListCustomers.get(0).getSurname());
+                    invoice.setPhone(filteredListCustomers.get(0).getPhone1());
+                }
                 invoice.setLicensePlates(rs.getString(4));
                 int arithmosRepair = rs.getInt(5);
                 filteredRepairs = new FilteredList<>(allRepairs.filtered(repair -> repair.getRepairID() == arithmosRepair));
-                invoice.setRepairType(filteredRepairs.get(0).getName());
+                if (filteredRepairs.isEmpty()){
+                    invoice.setRepairType("-");
+                }else{
+                    invoice.setRepairType(filteredRepairs.get(0).getName());
+                }
                 int arithmosMixanikou = rs.getInt(6);
                 filteredMechanics = new FilteredList<>(allMechanics.filtered(mechanic -> mechanic.getMechanicID() == arithmosMixanikou));
-                invoice.setMechanicName(filteredMechanics.get(0).getName() + " " + filteredMechanics.get(0).getSurname());
+                if(filteredMechanics.isEmpty()){
+                    invoice.setMechanicName("-");
+                }else{
+                    invoice.setMechanicName(filteredMechanics.get(0).getName() + " " + filteredMechanics.get(0).getSurname());
+                }
                 invoice.setBalance(rs.getFloat(8));
                 importingInvoices.add(invoice);
             }
@@ -888,9 +900,10 @@ public class MainScreen extends Application {
             carsForm.showForm();
             if (carsForm.isChanged()) {
                 final String query = carsForm.getQueryAdd();
+                System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
-                Car carNew = new Car(carsForm.getLicensePlates(), carsForm.getBrand(), carsForm.getModel(), carsForm.getVin(), carsForm.getDate(), carsForm.getCustomerID());
+                Car carNew = new Car(carsForm.getLicensePlates(), carsForm.getBrand(), carsForm.getModel(), carsForm.getVin(), carsForm.getDate(), (carsForm.getCustomerID()==null)?0:carsForm.getCustomerID());
                 allCars.add(carNew);
                 tableViewCars.refresh();
             }
@@ -911,12 +924,12 @@ public class MainScreen extends Application {
             query = query + "'" + invoiceForm.getLicensePlates() + "', ";
             query = query + (invoiceForm.getRepairIndex() + 1) + ", ";
             query = query + (invoiceForm.getMechanicIndex() + 1) + ", ";
-            query = query + (invoiceForm.getCreditCash().equals("Credit") ? 0 : 1) + ", ";
-            query = query + (invoiceForm.getCreditCash().equals("Credit") ? 0 : invoicePrintPreview.getAmount()) + ");";
+            query = query + (invoiceForm.getCreditCash().equals("Cash") ? 0 : 1) + ", ";
+            query = query + (invoiceForm.getCreditCash().equals("Cash") ? 0 : invoicePrintPreview.getAmount()) + ");";
             final String queryInvoice = query;
             //invoice
             invoice = new Invoice();
-            invoice.setBalance(invoiceForm.getCreditCash().equals("Credit") ? 0 : invoicePrintPreview.getAmount());
+            invoice.setBalance(invoiceForm.getCreditCash().equals("Cash") ? 0 : invoicePrintPreview.getAmount());
             invoice.setDate(invoicePrintPreview.getDateInvoice());
             invoice.setFullName(invoiceForm.getFullName());
             invoice.setLicensePlates(invoiceForm.getLicensePlates());
@@ -924,7 +937,7 @@ public class MainScreen extends Application {
             invoice.setCustomerID(invoiceForm.getCustomerID());
             invoice.setMechanicName(allMechanics.get(invoiceForm.getMechanicIndex()).getName() + allMechanics.get(invoiceForm.getMechanicIndex()).getSurname());
             invoice.setPhone(invoiceForm.getPhone());
-            if (invoiceForm.getCreditCash().equals("Cash")) {
+            if (invoiceForm.getCreditCash().equals("Credit")) {
                 Invoice finalInvoice = invoice;
                 filteredListCustomers = new FilteredList<>(allCustomers.filtered(customer -> customer.getCounter() == finalInvoice.getCustomerID()));
                 float newAmount = filteredListCustomers.get(0).getBalance() + invoicePrintPreview.getAmount();

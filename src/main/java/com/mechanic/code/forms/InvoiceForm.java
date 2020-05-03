@@ -123,8 +123,8 @@ public class InvoiceForm {
 			choiceBoxRepair.getItems().add(r.getName());
 		}
 		choiceBoxCredit=new ChoiceBox<>();
-		choiceBoxCredit.getItems().add("Credit");
 		choiceBoxCredit.getItems().add("Cash");
+		choiceBoxCredit.getItems().add("Credit");
 		//Buttons
 		buttonNext = new Button("Next");
 		buttonNext.getStyleClass().add("buttonMain");

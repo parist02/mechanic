@@ -609,7 +609,7 @@ public class InvoicePrintPreview {
 		}
 		labelAmount.setText(String.valueOf(amount));
 		labelNet.setText(String.valueOf(net));
-		labelVat.setText(String.valueOf(vat));
+		labelVat.setText(String.valueOf(vatTotal));
 		labelTotal.setText(String.valueOf(total));
 		labelDiscount.setText(String.valueOf(discount));
 		tableViewParts.setItems(allParts);

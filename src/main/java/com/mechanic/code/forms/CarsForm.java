@@ -53,6 +53,7 @@ public class CarsForm {
 			try {
 				customerID = Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
 			}catch (Exception ex){
+				customerID=0;
 				textFieldCustomerID.setText("");
 			}
 			try {
@@ -60,7 +61,7 @@ public class CarsForm {
 					labelEmpty.setText("Please fill all the details");
 				} else {
 					changed = true;
-					queryAdd = queryAdd + "'" + licensePlates + "' , '" + brand + "', '" + model + "', '" + vin + "', '" + date + "', " + customerID + ");";
+					queryAdd = queryAdd + "'" + licensePlates + "' , '" + brand + "', '" + model + "', '" + vin + "', '" + date + "', " +((customerID==0)?"null":customerID) + ");";
 					stageForm.close();
 				}
 			}catch (Exception exception){
@@ -104,6 +105,7 @@ public class CarsForm {
 			try {
 				customerID = Integer.parseInt(textFieldCustomerID.getText().replaceAll("[^0-9]", ""));
 			}catch (Exception ex){
+				customerID=0;
 				textFieldCustomerID.setText("");
 			}
 			if (licensePlates.equals("") || brand.equals("") || model.equals("") || vin.equals("") || date.equals("")) {
@@ -151,10 +153,10 @@ public class CarsForm {
 				}
 				if(!customerID.equals(customerIDBefore)){
 					if(changed){
-						query=query+", CustomerID = "+customerID.toString();
+						query=query+", CustomerID = "+((customerID==0)?"null":customerID);
 					}else{
 						changed=true;
-						query=query+" CustomerID = "+customerID.toString();
+						query=query+" CustomerID = "+((customerID==0)?"null":customerID);
 					}
 				}
 				stageForm.close();
