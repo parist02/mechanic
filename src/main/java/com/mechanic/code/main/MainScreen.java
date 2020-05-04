@@ -900,7 +900,6 @@ public class MainScreen extends Application {
             carsForm.showForm();
             if (carsForm.isChanged()) {
                 final String query = carsForm.getQueryAdd();
-                System.out.println(query);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.execute();
                 Car carNew = new Car(carsForm.getLicensePlates(), carsForm.getBrand(), carsForm.getModel(), carsForm.getVin(), carsForm.getDate(), (carsForm.getCustomerID()==null)?0:carsForm.getCustomerID());

@@ -563,7 +563,7 @@ public class InvoicePrintPreview {
 	}
 
 	public float getAmount() {
-		return amount;
+		return total;
 	}
 
 
