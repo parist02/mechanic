@@ -677,7 +677,7 @@ public class MainScreen extends Application {
                     invoice.setFullName(filteredListCustomers.get(0).getName() + " " + filteredListCustomers.get(0).getSurname());
                     invoice.setPhone(filteredListCustomers.get(0).getPhone1());
                 }
-                invoice.setLicensePlates(rs.getString(4));
+                invoice.setLicensePlates((rs.getString(4)==null)?"-":rs.getString(4));
                 int arithmosRepair = rs.getInt(5);
                 filteredRepairs = new FilteredList<>(allRepairs.filtered(repair -> repair.getRepairID() == arithmosRepair));
                 if (filteredRepairs.isEmpty()){
@@ -883,7 +883,7 @@ public class MainScreen extends Application {
                 Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(querySearch);
                 rs.next();
-                Customer customerNew = new Customer(rs.getInt(1), customersForm.getName(), customersForm.getSurname(), customersForm.getPhone1(), ((customersForm.getPhone2() == null) ? 0 : customersForm.getPhone2()), customersForm.getAddress(), customersForm.getBalance());
+                Customer customerNew = new Customer(rs.getInt(1), customersForm.getName(), customersForm.getSurname(), customersForm.getPhone1(), ((customersForm.getPhone2() == null) ? 0 : customersForm.getPhone2()), (customersForm.getAddress()==null?"-":customersForm.getAddress()), customersForm.getBalance());
                 allCustomers.add(customerNew);
                 tableViewCustomers.refresh();
             }
@@ -1069,7 +1069,6 @@ public class MainScreen extends Application {
             3: tha ginei anazitisi analogos ton episkevon apo tin dipla filtrarismeni lista ton timologion
             4: tha ginei anazitisi analogos tou arithmou tou pelati kai an to balance einai aniso tou miden
             5: tha ginei anazitisi analogos tou arithmou tou pelati
-
         */
         switch (type) {
             case 0: {
@@ -1116,7 +1115,7 @@ public class MainScreen extends Application {
         ObservableList<Part> selectedParts;
         selectedParts = filteredParts;
         Car selectedCar = new FilteredList<>(allCars.filtered(car -> car.getLicencePlates().equals(invoice.getLicencePlates()))).get(0);
-        InvoicePrintPreview invoicePrintPreview = new InvoicePrintPreview(primaryStage, invoice.getCustomerID(), invoice.getFullName(), invoice.getLicencePlates(), selectedCar.getBrand() + selectedCar.getModel(), selectedCar.getVin());
+        InvoicePrintPreview invoicePrintPreview = new InvoicePrintPreview(primaryStage, invoice.getCustomerID(), invoice.getFullName(), invoice.getLicencePlates(), selectedCar.getBrand() +" "+selectedCar.getModel(), selectedCar.getVin());
         invoicePrintPreview.setMileage(selectedInvoiceMetaData.getMileage());
         invoicePrintPreview.setDateInvoice(invoice.getDate());
         invoicePrintPreview.setInvoiceID(invoice.getInvoiceID());

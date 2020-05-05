@@ -48,6 +48,7 @@ public class CustomersForm {
 			try {
 				phone2 = Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
 			}catch (Exception ex){
+				phone2=0;
 				textFieldPhone2.setText("");
 			}
 			address=textFieldAddress.getText();
@@ -94,6 +95,7 @@ public class CustomersForm {
 			try {
 				phone2 = Integer.parseInt(textFieldPhone2.getText().replaceAll("[^0-9]", ""));
 			}catch (Exception ex){
+				phone2=0;
 				textFieldPhone2.setText("");
 			}
 			address=textFieldAddress.getText().replaceAll("[^a-zA-Z0-9]\\s", "");
