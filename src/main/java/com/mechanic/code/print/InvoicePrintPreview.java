@@ -232,7 +232,7 @@ public class InvoicePrintPreview {
 		tableViewParts.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		tableViewParts.setEditable(false);
 		tableViewParts.setItems(allParts);
-		tableViewParts.setPadding(new Insets(1,2,1,2));
+		tableViewParts.setPadding(new Insets(0));
 		
 
 		TextField textFieldPartsID = new TextField();
@@ -343,11 +343,11 @@ public class InvoicePrintPreview {
 			boolean error = false;
 			int quantity = 0;
 			float price = 0;
-			String partID = textFieldPartsID.getText().replaceAll("[^a-zA-Z0-9]", "");
+			String partID = textFieldPartsID.getText().replace(";", "");
 			if (partID.equals("")) {
 				error = true;
 			}
-			String description = textFieldDescription.getText().replaceAll("[^a-zA-Z0-9/.-]\\s", "");
+			String description = textFieldDescription.getText().replace(";", "");
 			if (description.equals("")) {
 				textFieldDescription.setText(description);
 				error = true;
@@ -355,7 +355,7 @@ public class InvoicePrintPreview {
 			try {
 				quantity = Integer.parseInt(textFieldQuantity.getText().replaceAll("[^0-9]", ""));
 				price = Float.parseFloat(textFieldPrice.getText().replaceAll("[^0-9.]", ""));
-				discount=Float.parseFloat(textFieldDiscount.getText().replaceAll("[^0-9.]", ""));
+				discount=Float.parseFloat(textFieldDiscount.getText().replaceAll("[^0-9 .]", ""));
 			} catch (Exception ex) {
 				error = true;
 			}
@@ -406,6 +406,7 @@ public class InvoicePrintPreview {
 				errorPopUp.showError();
 			} else {
 				comments = textAreaComments.getText();
+				comments=comments.replace(";","");
 				beingSaved = true;
 				beingPrinted = true;
 				stagePrint.close();
@@ -435,7 +436,8 @@ public class InvoicePrintPreview {
 				errorPopUp.setErrorMessage("Please fill all the details.");
 				errorPopUp.showError();
 			} else {
-				comments = textAreaComments.getText();
+				comments = textAreaComments.getText().replace(";", "");
+				comments=comments.replace("'","");
 				beingSaved = true;
 				beingPrinted = false;
 				stagePrint.close();
