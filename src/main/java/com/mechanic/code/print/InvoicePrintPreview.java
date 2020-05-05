@@ -343,11 +343,17 @@ public class InvoicePrintPreview {
 			boolean error = false;
 			int quantity = 0;
 			float price = 0;
-			String partID = textFieldPartsID.getText().replace(";", "");
+			String partID = textFieldPartsID.getText();
+			partID=partID.replace(";","");
+			partID=partID.replace("`","");
+			partID=partID.replace("'","");
 			if (partID.equals("")) {
 				error = true;
 			}
-			String description = textFieldDescription.getText().replace(";", "");
+			String description = textFieldDescription.getText();
+			description=description.replace(";","");
+			description=description.replace("`","");
+			description=description.replace("'","");
 			if (description.equals("")) {
 				textFieldDescription.setText(description);
 				error = true;
@@ -407,6 +413,8 @@ public class InvoicePrintPreview {
 			} else {
 				comments = textAreaComments.getText();
 				comments=comments.replace(";","");
+				comments=comments.replace("`","");
+				comments=comments.replace("'","");
 				beingSaved = true;
 				beingPrinted = true;
 				stagePrint.close();
@@ -436,7 +444,9 @@ public class InvoicePrintPreview {
 				errorPopUp.setErrorMessage("Please fill all the details.");
 				errorPopUp.showError();
 			} else {
-				comments = textAreaComments.getText().replace(";", "");
+				comments = textAreaComments.getText();
+				comments=comments.replace(";","");
+				comments=comments.replace("`","");
 				comments=comments.replace("'","");
 				beingSaved = true;
 				beingPrinted = false;
